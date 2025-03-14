@@ -1,0 +1,83 @@
+.Header{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap:120px;
+    color: white;
+    background-color: rgb(10, 10, 10);
+}
+.Menu a{
+    cursor: pointer;
+    color: white;
+}
+.Name{
+    font-size: 20px;
+    font-weight: bold;
+    padding: 0px 40px;
+}
+.Menu{
+    display: flex;
+    gap: 60px;
+    align-items: center;
+    font-size: 18px;
+    padding: 0px 40px;
+}
+a:hover{
+    color: blueviolet;
+}
+.GroupSearch{
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+.GroupSearch input{
+    padding: 10px;
+    width: 200px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+.Search button{
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    color: black;
+    background-color: white;
+    cursor: pointer;
+}
+.Logo{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.User {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.Dropdown {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.Dropdown a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.Dropdown a:hover {
+    background-color: #f1f1f1;
+}
+
+.User:hover .Dropdown {
+    display: block;
+}

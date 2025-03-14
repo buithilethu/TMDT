@@ -1,0 +1,57 @@
+.FormLogin{
+    display: flex;
+    align-items: center;
+    gap: 129px;
+    padding: 50px 0;
+}
+.Loginform{
+    display: flex;
+    align-items: center;
+    gap:40px;
+}
+.GroupLogIn{
+    display: flex;
+    gap: 48px;
+    flex-direction: column;
+}
+.GroupTextLogin{
+    display: flex;
+    gap: 24px;
+    flex-direction: column;
+}
+.Text1{
+    font-size: 36px;
+}
+.Text2{
+    font-size: 16px;
+}
+.GroupInputLogin{
+    display: flex;
+    gap: 40px;
+    flex-direction: column;
+}
+.GroupInputLogin input{
+    border: none;
+    padding: 16px 0;
+    border-bottom: 1px solid #d7d3d3;
+    font-size: 16px;
+    outline: none;
+    width: 250px;
+}
+.BtnLogIn{
+    display: flex;
+    gap: 87px;
+    align-items: center;
+}
+.BtnLogIn button{
+    background-color: #DB4444;
+    border: none;
+    padding: 16px ;
+    font-size: 16px;
+    color: white;
+    border-radius: 10px;
+}
+.BtnLogIn a{
+    color: #DB4444;
+    text-decoration: none;
+}

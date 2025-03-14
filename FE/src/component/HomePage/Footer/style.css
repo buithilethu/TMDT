@@ -1,0 +1,99 @@
+
+.Footer {
+    background-color: black; 
+    width: 100%;
+    color: white;
+    margin-top: 50px;
+  }
+  
+  .FooterTop {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 20px 0;
+  }
+  
+  .Exclusive, .Support, .Account, .QuickLink, .DownloadApp {
+    flex: 1;
+    min-width: 200px; 
+    margin-left: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .GroupText1 h2, .GroupText1 h3, .Support h3, .Account h3, .QuickLink h3, .DownloadApp h3 {
+    margin: 10px 0;
+    
+  }
+  
+  .Send {
+    display: flex;
+    align-items: center;
+  }
+  
+  .Send input {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .BtnAccount,.BtnQuickLinks,.GroupText1{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .BtnAccount a, .BtnQuickLinks a {
+    display: block;
+    margin: 5px 0;
+    text-decoration: none;
+    color: white;
+    
+  }
+  
+  .BtnAccount a:hover, .BtnQuickLinks a:hover {
+    color: #007bff;
+  }
+  
+  .GroupImage {
+    display: flex;
+    align-items: center;
+  }
+  .ImageApp{
+    display: flex;
+    flex-direction: column;
+   justify-content: center;
+  }
+  .Qrcode img {
+    width: 80px;
+    margin-right: 10px;
+  }
+  
+  .ImageApp img {
+    width: 100px;
+    margin: 5px 0;
+  }
+  
+  .GroupIcon {
+    display: flex;
+    justify-content:first baseline;
+    gap: 10px;
+  }
+  
+  .GroupIcon img {
+    width: 24px;
+  }
+  
+  .FooterBottom {
+    text-align: center;
+    padding: 10px 0;
+  }
+  
+  .FooterBottom hr {
+    margin: 20px 0;
+  }
+  
+  .copy p {
+    display: inline;
+    margin-left: 5px;
+  }

@@ -1,0 +1,31 @@
+.Dvu{
+    display: flex;
+    justify-content: center;
+    gap: 88px;
+    margin: 20px;
+}
+.Down{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-direction: column;
+}
+.image{
+    border: 10px solid #989b9e;
+    border-radius: 50px;
+    padding: 5px;
+    background-color: black;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.TextDown{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.texttop{
+    font-size: 20px;
+    font-weight: bold;
+}
+.textbottom{
+    font-size: 16px;
+}

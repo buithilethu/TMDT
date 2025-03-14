@@ -1,0 +1,115 @@
+.about-container {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+  }
+  
+  .about-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 40px 10%;
+    width: 100%;
+    gap: 40px;
+    box-sizing: border-box;
+  }
+  
+  .left {
+    background-color: #f0f0f0;
+    flex-direction: row;
+  }
+  
+  .right {
+    background-color: #656565;
+    flex-direction: row-reverse;
+  }
+  
+  .about-text-content {
+    flex: 1;
+    max-width: 50%;
+    
+  }
+  .about-text-content1 h1 h2 p {
+    color: white;
+  }
+  .about-title {
+    font-size: 36px;
+    font-weight: bold;
+    color: #222;
+  }
+  
+  .about-text {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333;
+  }
+  
+  /* Nút bấm */
+  .about-button {
+    background-color: #d4a017;
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+    border-radius: 5px;
+  }
+  
+  .about-button:hover {
+    background-color: #b58900;
+  }
+  
+  /* Ảnh */
+  .about-image-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .about-image {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Google Map */
+  .map-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 40px;
+  }
+  
+  .map-container iframe {
+    width: 80%;
+    height: 450px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .about-section {
+      flex-direction: column !important;
+      text-align: center;
+      padding: 40px 5%;
+    }
+  
+    .about-text-content {
+      max-width: 100%;
+    }
+  
+    .about-image {
+      width: 100%;
+      max-width: 350px;
+    }
+  
+    .map-container iframe {
+      width: 90%;
+      height: 300px;
+    }
+  }
+  

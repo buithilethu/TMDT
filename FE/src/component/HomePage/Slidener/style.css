@@ -1,0 +1,73 @@
+.Up{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+    margin: 40px 0;
+}
+.RouterProducts{
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    font-size: 20px;
+    font-weight: bold;
+}
+.RouterProducts a{
+    color: black;
+    text-decoration: none;
+}
+a:hover{
+    color: cornflowerblue;
+}
+.banner{
+    color:black;
+    padding-top: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    width:1000px ;
+    height: 344px;
+
+}
+.Banner{
+    padding-left:100px ;
+}
+.banner_text{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.iphone_icon{
+    display: flex;
+    align-items:flex-start;
+    gap: 24px;
+}
+h1{
+    font-size: 48px;
+}
+.anh img{
+    display: flex;
+    align-items: center;
+    width:396px;
+    height: 300px;
+ 
+}
+.shop_now{
+    display: flex;
+    align-items: center;
+    padding-left: 100px;
+    font-size: 20px;
+}
+ .shop_now a{
+    color: plum;
+    text-decoration: none;
+    font-weight: bold;
+ }
+ img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;  
+    
+    
+}
