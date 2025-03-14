@@ -60,6 +60,11 @@ const findAll = async (search, page, limit, categorySlug, isDestroy) => {
     const products = await productModel.findAll(search, categorySlug, isDestroy)
 
     delete products['variants']
+    
+    for (let i = 0; i < products.length; i++) {
+      const images = products[i].images[0]
+      products[i].images = images
+    }
 
     return products.slice((page - 1) * limit, page * limit)
   } catch (error) {

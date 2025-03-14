@@ -129,7 +129,20 @@ const findAll = async (search, categorySlug, isDestroy) => {
       result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({ category_id: category._id, _destroy: isDestroy }).toArray()
     }
     else {
-      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({ _destroy:isDestroy }).toArray()
+      // result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({ _destroy:isDestroy }).toArray()
+      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+        {
+          $match: { _destroy: isDestroy }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: '_id',
+            foreignField: 'product_id',
+            as: 'images'
+          }
+        }
+      ]).toArray()
     }
 
     return result

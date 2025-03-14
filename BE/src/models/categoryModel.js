@@ -42,25 +42,13 @@ const remove = async (id) => {
 }
 
 const findOneById = async (id) => {
-  return await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
-    {
-      $match: {
-        _id: new ObjectId(id)
-      }
-    },
-    {
-      $lookup: {
-        from: 'images',
-        localField: '_id',
-        foreignField: 'product_id',
-        as: 'image'
-      }
-    }
-  ]).toArray()[0]
+
+  const category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+  return category
 }
 
 const findOneBySlug = async (slug) => {
-  return await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
+  const category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
     {
       $match: {
         slug: slug
@@ -75,6 +63,8 @@ const findOneBySlug = async (slug) => {
       }
     }
   ]).toArray()[0]
+
+  return category
 }
 
 const findAll = async () => {
