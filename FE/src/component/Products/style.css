@@ -1,0 +1,139 @@
+/* AddProduct.css */
+.add-product-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+  }
+  
+  .add-product-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #000;
+    font-size: 24px;
+  }
+  
+  .add-product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .form-group input[type="file"] {
+    padding: 5px;
+  }
+  
+  .form-group span {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+  }
+  
+
+  
+  .variant-section {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .variant-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .variant-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .variant-item span {
+    min-width: 50px;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .variant-item input {
+    flex: 1;
+  }
+  
+  .button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .add-variant-btn, .submit-btn, .login-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .add-variant-btn {
+    background-color: #ccc;
+    color: #000;
+  }
+  
+  .add-variant-btn:hover {
+    background-color: #999;
+  }
+  
+  .submit-btn {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .submit-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .login-btn {
+    background-color: #28a745;
+    color: #fff;
+    margin-top: 10px;
+  }
+  
+  .login-btn:hover {
+    background-color: #218838;
+  }
+  
+  .login-prompt {
+    text-align: center;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+  }
+  
+  .login-prompt p {
+    margin-bottom: 10px;
+    color: #333;
+  }
+ 
