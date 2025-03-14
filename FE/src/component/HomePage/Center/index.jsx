@@ -1,49 +1,90 @@
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../Center/style.css';
-import { xuhuong, yeuthich } from '../../../data.js'; // Import dữ liệu từ data.js (điều chỉnh đường dẫn nếu cần)
 
 const Center = () => {
-    return (
-        <div className='Main'>
-            <div className="Xuhuong">
-                <h2>Xu hướng tìm kiếm</h2>
-                <div className='GroupSP'>
-                   {xuhuong.map((item) => (
-                    <div className='SP' key={item.id}> {/* Sử dụng id làm key */}
-                       <a href=""><div className='images'>
-                            <img src={item.image} alt={item.title} /> {/* Hiển thị hình ảnh */}
-                        </div>
-                        <div className='text'>
-                            <a>{item.title}</a> {/* Sử dụng Link */}
-                        </div></a> 
-                    </div>
-                    ))} 
-                </div>
-                
-            </div>
-            <div className='yeuthich'>
-    <h2>Sản phẩm yêu thích</h2>
-    <div className='GroupYT'>
-        {yeuthich.slice(0, 10).map((item) => (
-            <div className='SPYT' key={item.id}> {/* Card sản phẩm */}
-                <a> {/* Liên kết đến trang chi tiết */}
-                    <div className='imagesyt'>
-                        <img src={item.image} alt={item.title} />
-                    </div>
-                    <div className='textyt'>
-                        <p className='title'>{item.title}</p> {/* Tiêu đề */}
-                        <p className='price'>{item.price.toLocaleString()} VNĐ</p> {/* Giá tiền */}
-                    </div>
-                </a>
-                <button>                                         
-                    Thêm vào giỏ hàng
-                </button>
-            </div>
-        ))}
-    </div>
-</div>
+  const [xuhuong, setXuhuong] = useState([]); // Xu hướng từ categories
+  const [yeuthich, setYeuthich] = useState([]); // Yêu thích từ products
+
+  // Lấy dữ liệu Xu hướng từ API
+  useEffect(() => {
+    const fetchXuhuong = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/v1/categories/');
+        const data = await response.json();
+        setXuhuong(data);
+      } catch (error) {
+        console.error('Error fetching xu huong:', error);
+      }
+    };
+
+    fetchXuhuong();
+  }, []);
+
+  // Lấy dữ liệu Sản phẩm yêu thích từ API
+  useEffect(() => {
+    const fetchYeuthich = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/v1/products/');
+        const data = await response.json();
+        setYeuthich(data);
+      } catch (error) {
+        console.error('Error fetching yeu thich:', error);
+      }
+    };
+
+    fetchYeuthich();
+  }, []);
+
+  return (
+    <div className="Main">
+      <div className="Xuhuong">
+        <h2>Xu hướng tìm kiếm</h2>
+        <div className="GroupSP">
+          {xuhuong.length > 0 ? (
+            xuhuong.map((item) => (
+              <div className="SP" key={item._id}>
+                <Link to={item.shopLink}>
+                  <div className="images">
+                    {/* Giả sử image là mảng, lấy phần tử đầu tiên */}
+                    <img src={item.image && item.image[0]?.url ? item.image[0].url : item.image} alt={item.name} />
+                  </div>
+                  <div className="text">
+                    <span>{item.name}</span>
+                  </div>
+                </Link>
+              </div>
+            ))
+          ) : (
+            <p>Loading xu huong...</p>
+          )}
         </div>
-    );
+      </div>
+      <div className="yeuthich">
+        <h2>Sản phẩm yêu thích</h2>
+        <div className="GroupYT">
+          {yeuthich.length > 0 ? (
+            yeuthich.slice(0, 10).map((item) => (
+              <div className="SPYT" key={item._id}>
+                <Link to={item.shopLink || '#'}>
+                  <div className="imagesyt">
+                    <img src={item.image} alt={item.title} />
+                  </div>
+                  <div className="textyt">
+                    <p className="title">{item.title}</p>
+                    <p className="price">{item.price.toLocaleString()} VNĐ</p>
+                  </div>
+                </Link>
+                <button>Thêm vào giỏ hàng</button>
+              </div>
+            ))
+          ) : (
+            <p>Loading yeu thich...</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Center;
