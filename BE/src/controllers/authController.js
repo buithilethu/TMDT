@@ -29,7 +29,8 @@ const loginUser = async (req, res, next) => {
 
     const userData = {
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      isAdmin : user.isAdmin
     }
 
 
