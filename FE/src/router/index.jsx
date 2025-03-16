@@ -5,6 +5,8 @@ import Contact from "../component/Contact/index.jsx";
 import Singup from "../component/Singup/index.jsx";
 import Login from "../component/Login/index.jsx";
 import Cart from "../component/Cart/index.jsx";
+import Checkout from "../component/CheckOut/index.jsx";
+import ProductDetail from "../component/HomePage/ProductDetails/index.jsx";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -27,9 +29,15 @@ const router = createBrowserRouter([
         element:<Login/>
     },
     {
-        path:"Giohang",
+        path:"/Giohang",
         element:<Cart/>
-    }
+    },
+    {
+        path: "/Thanhtoan",
+        element:<Checkout/>
+    },
+    { path:"/product/:id",
+         element:<ProductDetail /> }
 
 ]);
 export default router;

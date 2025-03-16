@@ -144,7 +144,7 @@ const Cart = () => {
                 </tbody>
               </table>
               <button className="Checkout">
-                <Link to="/Checkout">Tiến hành thanh toán</Link>
+                <Link to="/Thanhtoan">Tiến hành thanh toán</Link>
               </button>
             </div>
           </div>

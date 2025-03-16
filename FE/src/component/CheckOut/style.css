@@ -1,0 +1,233 @@
+.checkout{
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    flex-direction: column;
+    margin: 40px 0;
+
+}
+.RoadMapCheckOut{
+    display: flex;
+    margin-left: -800px;
+}
+.RaodMap{
+    display: flex;
+    gap: 12px;
+}
+
+.RaodMap p{
+    text-decoration: none;
+    color: #333333;
+    font-size: 18px;
+}
+p.home{
+    color: rgb(154, 151, 151)
+}
+.GroupCheckOut{
+    display: flex;
+    gap: 150px;
+  
+}
+.BillingDetauls{
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+}
+.BillingDetauls p{
+    font-size: 36px;
+    color: #333333;
+}
+.GroupInputCheck{
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+}
+.Input{
+    display: flex;
+    flex-direction: column;
+}
+.Input input{
+    padding: 10px;
+}
+.Input b{
+    color: #DB4444;
+}
+.containerCheckout{
+   display: flex;
+   flex-direction: row-reverse;
+}
+.Payment{
+    display: flex;
+    gap: 32px;
+}
+.tr{
+    display: flex;
+    gap: 230px;
+    align-items: center;
+}
+.NameImg{
+    display: flex;
+    gap: 24px;
+}
+.hr{
+    display: flex;
+    gap: 320px;
+    padding: 15px;
+    border-bottom: 1px solid #000;
+}
+.hr1{
+    display: flex;
+    gap: 340px;
+    padding: 15px;
+    border-bottom: 1px solid #000;
+    font-size: 18px;
+    font-weight: bold;
+}
+tbody{
+    display: flex;
+    flex-direction: column;
+    margin-top: 120px;
+    gap: 24px;
+}
+.banks{
+    display: flex;
+    gap: 190px;
+    align-items: center;
+    
+}
+.bank{
+    display: flex;
+    gap: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+.imgageCheck{
+    display: flex;
+    gap: 20px;
+}
+.cash{
+    font-size: 18px;
+    font-weight: bold;
+}
+.radio{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.coupons{
+    display: flex;
+    gap: 16px;
+}
+.coupon input{
+    padding: 15px 50px;
+    
+}
+.apply input{
+    background-color: #DB4444;
+    color: #fff;
+    padding: 17px 30px;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+}
+.place input{
+    background-color: #DB4444;
+    color: #fff;
+    padding: 17px 35px;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+
+  .tr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+
+  .NameImg {
+    display: flex;
+    align-items: center;
+    gap: 20px; 
+    flex: 2; 
+  }
+  
+  .NameImg img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  
+  .NameImg p {
+    margin: 0;
+    font-weight: 600;
+    color: #555;
+  }
+  
+  /* Price Section */
+  .Price {
+    flex: 1; /* Ensure equal spacing */
+    text-align: right;
+    color: #444;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  /* Subtotal Row */
+  .hr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+   
+  }
+  
+  .hr .Name {
+    flex: 1;
+    text-align: left;
+  }
+  
+  .hr .Price {
+    flex: 1;
+    text-align: right;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .NameImg {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .Price {
+      text-align: left;
+    }
+  
+    .hr {
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+  }
+  
+  
+
+ 
+  
+ 
+  

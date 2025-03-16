@@ -6,7 +6,6 @@ const Center = () => {
   const [xuhuong, setXuhuong] = useState([]); // Xu hướng từ categories
   const [yeuthich, setYeuthich] = useState([]); // Yêu thích từ products
 
-  // Lấy dữ liệu Xu hướng từ API
   useEffect(() => {
     const fetchXuhuong = async () => {
       try {
@@ -21,7 +20,6 @@ const Center = () => {
     fetchXuhuong();
   }, []);
 
-  // Lấy dữ liệu Sản phẩm yêu thích từ API
   useEffect(() => {
     const fetchYeuthich = async () => {
       try {
@@ -44,19 +42,18 @@ const Center = () => {
           {xuhuong.length > 0 ? (
             xuhuong.slice(0, 5).map((item) => (
               <div className="SP" key={item._id}>
-                <Link to={item.shopLink}>
+               
                   <div className="images">
-                    {/* Giả sử image là mảng, lấy phần tử đầu tiên */}
                     <img src={item.image[0].url} alt={item.name} />
                   </div>
                   <div className="text">
                     <span>{item.name}</span>
                   </div>
-                </Link>
+              
               </div>
             ))
           ) : (
-            <p>Loading xu huong...</p>
+            <p>Đang tải xu hướng...</p>
           )}
         </div>
       </div>
@@ -66,7 +63,7 @@ const Center = () => {
           {yeuthich.length > 0 ? (
             yeuthich.slice(0, 10).map((item) => (
               <div className="SPYT" key={item._id}>
-                <Link to={item.shopLink || '#'}>
+                <Link to={`/product/${item._id}`}>
                   <div className="imagesyt">
                     <img src={item.images.url} alt={item.name} />
                   </div>
@@ -79,7 +76,7 @@ const Center = () => {
               </div>
             ))
           ) : (
-            <p>Loading yeu thich...</p>
+            <p>Đang tải sản phẩm yêu thích...</p>
           )}
         </div>
       </div>
