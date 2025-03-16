@@ -34,26 +34,20 @@ const update = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
   try {
-    //(id)
-    const categoryId = req.params.id
-    const category = await categoryService.remove(categoryId)
+    //(id || slug)
+    const idOrSlug = req.params.id
+    await categoryService.remove(idOrSlug)
 
-    res.status(StatusCodes.NO_CONTENT).json(category)
+    res.status(StatusCodes.NO_CONTENT)
   } catch (error) {
-
     next(error)
-
   }
 }
 
 const findOneById = async (req, res, next) => {
   try {
-    //(id)
     const categoryId = req.params.id
-
     let validate = OBJECT_ID_RULE.test(categoryId)
-
-    console.log(validate)
     let category
     if (!validate) {
       category = await categoryService.findOneBySlug(categoryId)

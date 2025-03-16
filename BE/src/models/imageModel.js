@@ -3,6 +3,7 @@ import { GET_DB } from '~/config/mongodb'
 import { ObjectId } from 'mongodb'
 import fs from 'fs/promises'
 import path from 'path'
+import { remove } from 'lodash'
 
 
 const IMAGE_COLLECTION_NAME = 'images'
@@ -40,23 +41,30 @@ const update = async (id, data) => {
   }
 }
 
-const removeUrl = async (url) => {
+const removeByUrl = async (url) => {
   try {
     const fileName = url.split('/').pop()
     const filePath = path.join(__dirname, `../../uploads/${fileName}`)
     fs.unlink(filePath)
-    const result = await GET_DB().collection(IMAGE_COLLECTION_NAME).deleteOne({ url: url })
-
-    // return result
+    await GET_DB().collection(IMAGE_COLLECTION_NAME).deleteOne({ url: url })
   } catch (error) {
     throw new Error(error)
   }
 }
 
-const remove = async (id) => {
+const removeById = async (id) => {
   try {
-    const result = await GET_DB().collection(IMAGE_COLLECTION_NAME).deleteOne({ _id: new ObjectId(id) })
-    return result
+    const image = await GET_DB().collection(IMAGE_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+    removeByUrl(image.url)
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const findOneByProductId = async (productId) => {
+  try {
+    const image = await GET_DB().collection(IMAGE_COLLECTION_NAME).findOne({ product_id: new ObjectId(productId) })
+    return image
   } catch (error) {
     throw new Error(error)
   }
@@ -67,6 +75,7 @@ export const imageModel = {
   IMAGE_COLLECTION_SCHEMA,
   createNew,
   update,
-  removeUrl,
-  remove
+  removeByUrl,
+  removeById,
+  findOneByProductId
 }

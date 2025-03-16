@@ -1,4 +1,5 @@
-import Joi from 'joi'
+import e from 'express'
+import Joi, { object } from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
@@ -23,31 +24,69 @@ const validateBeforeCreate = async (data) => {
 }
 
 const create = async (data) => {
-  const value = await validateBeforeCreate(data)
-  const result = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).insertOne(value)
+  try {
+    const value = await validateBeforeCreate(data)
+    const result = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).insertOne(value)
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
 
-  return result
 }
 
 const update = async (id, data) => {
-  const result = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $set: data })
+  try {
+    let category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
 
-  return result
+    if (!category) {
+      throw new Error('Category not found')
+    }
+
+    const result = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $set: data })
+    return result
+
+  } catch (error) {
+    throw new Error(error)
+  }
 }
 
-const remove = async (id) => {
-  const result = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).deleteOne({ _id: new ObjectId(id) })
+const remove = async (idOrSlug) => {
+  let category
 
-  return result
+  if (!OBJECT_ID_RULE.test(idOrSlug)) {
+    category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).findOne({ slug: idOrSlug })
+  } else {
+    category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).findOne({ _id: new ObjectId(idOrSlug) })
+  }
+
+  if (!category) {
+    throw new Error('Category not found')
+  }
+
+  await GET_DB().collection(CATEGORIES_COLLECTION_NAME).deleteOne({ _id: category._id })
+
+  return category._id.toString()
 }
 
 const findOneById = async (id) => {
 
-  const category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+  const category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
+    {
+      $match: {
+        _id: new ObjectId(id)
+      }
+    },
+    {
+      $lookup: {
+        from: 'images',
+        localField: '_id',
+        foreignField: 'product_id',
+        as: 'image'
+      }
+    }
+  ]).toArray()
 
-  console.log(category)
-
-  return category
+  return category[0] || {}
 }
 
 const findOneBySlug = async (slug) => {
@@ -60,18 +99,18 @@ const findOneBySlug = async (slug) => {
     {
       $lookup: {
         from: 'images',
-        localField: 'product_id',
-        foreignField: '_id',
+        localField: '_id',
+        foreignField: 'product_id',
         as: 'image'
       }
     }
-  ]).toArray()[0]
+  ]).toArray()
 
-  return category
+  return category[0] || {}
 }
 
 const findAll = async () => {
-  return await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
+  const products = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
     {
       $lookup: {
         from: 'images',
@@ -81,6 +120,8 @@ const findAll = async () => {
       }
     }
   ]).toArray()
+
+  return products
 }
 
 export const categoryModel = {

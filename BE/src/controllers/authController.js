@@ -21,6 +21,17 @@ const loginUser = async (req, res, next) => {
   try {
     //(req.body) => {email: 'abc', password: 'abc'}
     const { accessToken, isSuccess } = await authService.loginUser(req.body, res)
+    const user = await userModel.findOne({ email: req.body.email })
+
+    if (!user) {
+      throw new Error('Email not found')
+    }
+
+    const userData = {
+      firstName: user.firstName,
+      lastName: user.lastName
+    }
+
 
     res.cookie('token', accessToken, {
       httpOnly: true,
@@ -29,7 +40,7 @@ const loginUser = async (req, res, next) => {
       maxAge: 3600000,
       path:'/'
     })
-    res.status(StatusCodes.OK).json({ isSuccess: isSuccess, accessToken: accessToken })
+    res.status(StatusCodes.OK).json({ isSuccess: isSuccess, accessToken: accessToken, userData: userData })
   } catch (error) {
     res.status(StatusCodes.NOT_FOUND).json({ message: error.message, isSuccess: false })
   }
