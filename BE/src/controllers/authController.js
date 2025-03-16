@@ -26,6 +26,7 @@ const loginUser = async (req, res, next) => {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
+      maxAge: 3600000,
       path:'/'
     })
     res.status(StatusCodes.OK).json({ isSuccess: isSuccess, accessToken: accessToken })
