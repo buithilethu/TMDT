@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie'; // Import js-cookie
 import '../Singup/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
@@ -12,12 +13,11 @@ const Singup = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const navigate = useNavigate(); // Hook để điều hướng
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Kiểm tra các trường bắt buộc
     if (!firstName || !lastName || !email || !password) {
       setErrorMessage('Vui lòng điền đầy đủ tất cả các trường');
       return;
@@ -41,7 +41,10 @@ const Singup = () => {
       const data = await response.json();
       console.log('Đăng ký thành công:', data);
 
-      // Chuyển hướng sang trang chủ sau khi đăng ký thành công
+      // Lưu thông tin người dùng vào cookie (giả sử API trả về user info)
+      Cookies.set('user', JSON.stringify({ firstName, lastName, email, isAdmin: false }), { expires: 7 });
+
+      // Chuyển hướng sang trang chủ
       navigate('/');
     } catch (error) {
       setErrorMessage('Đã xảy ra lỗi, vui lòng thử lại sau. ' + error.message);

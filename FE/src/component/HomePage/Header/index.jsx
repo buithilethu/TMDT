@@ -1,22 +1,46 @@
 import { Link } from 'react-router-dom';
 import '../Header/style.css';
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 const Header = () => {
   const [user, setUser] = useState(null);
 
-  // Lấy thông tin người dùng từ localStorage khi component mount
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = Cookies.get('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+
+      // Nếu cần kiểm tra thêm từ server (không bắt buộc vì đã lấy từ /me)
+      // fetchUserData(userData.accessToken);
     }
   }, []);
 
-  // Hàm xử lý đăng xuất
+  const fetchUserData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:3000/v1/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUser({ ...data, accessToken: token });
+        Cookies.set('user', JSON.stringify({ ...data, accessToken: token }), {
+          expires: 7,
+          secure: true,
+          sameSite: 'Strict',
+        });
+      }
+    } catch (error) {
+      console.error('Lỗi khi lấy thông tin user:', error);
+    }
+  };
+
   const handleLogout = () => {
-    localStorage.removeItem('user'); // Xóa thông tin người dùng khỏi localStorage
-    setUser(null); // Cập nhật state để giao diện thay đổi
+    Cookies.remove('user');
+    setUser(null);
   };
 
   return (
@@ -29,6 +53,9 @@ const Header = () => {
         <Link to="/Gioithieu">Giới thiệu</Link>
         <Link to="/Tuongtac">Tương tác</Link>
         <Link to="/Dangky">Đăng ký</Link>
+        {user?.isAdmin === true && (
+          <Link to="/Products">Products</Link> // Hiển thị khi isAdmin là true từ MongoDB
+        )}
       </div>
       <div className="GroupSearch">
         <input type="text" placeholder="Tìm kiếm..." />
@@ -47,7 +74,6 @@ const Header = () => {
         </div>
         <div className="User">
           {user ? (
-            // Nếu đã đăng nhập, hiển thị tên người dùng
             <div className="UserLoggedIn">
               <span>Xin chào, {user.firstName || user.email}</span>
               <div className="Dropdown">
@@ -56,7 +82,6 @@ const Header = () => {
               </div>
             </div>
           ) : (
-            // Nếu chưa đăng nhập, hiển thị icon user
             <>
               <img src="/image/Header/user.png" alt="User" />
               <div className="Dropdown">

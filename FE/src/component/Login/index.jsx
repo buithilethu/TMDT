@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import '../Login/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
@@ -9,7 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const navigate = useNavigate(); // Hook điều hướng
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +21,8 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/v1/auth/login', {
+      // Đăng nhập
+      const loginResponse = await fetch('http://localhost:3000/v1/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,17 +30,31 @@ const Login = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!loginResponse.ok) {
+        const errorData = await loginResponse.json();
         setErrorMessage(errorData.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
         return;
       }
 
-      const data = await response.json();
-      console.log('Đăng nhập thành công:', data);
+      const loginData = await loginResponse.json();
+      const token = loginData.accessToken;
 
-      // Lưu thông tin người dùng vào localStorage (giả sử API trả về user info)
-      localStorage.setItem('user', JSON.stringify(data.user || { email }));
+      // Lấy thông tin user từ /v1/auth/me
+      const userResponse = await fetch('http://localhost:3000/v1/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!userResponse.ok) {
+        throw new Error('Không thể lấy thông tin người dùng');
+      }
+
+      const userData = await userResponse.json();
+      userData.accessToken = token; // Thêm token vào userData
+
+      // Lưu thông tin user vào cookie
+      Cookies.set('user', JSON.stringify(userData), { expires: 7, secure: true, sameSite: 'Strict' });
 
       // Chuyển hướng sang trang chủ
       navigate('/');

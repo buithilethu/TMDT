@@ -7,6 +7,7 @@ import Login from "../component/Login/index.jsx";
 import Cart from "../component/Cart/index.jsx";
 import Checkout from "../component/CheckOut/index.jsx";
 import ProductDetail from "../component/HomePage/ProductDetails/index.jsx";
+import Products from "../component/Products/index.jsx";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -37,7 +38,12 @@ const router = createBrowserRouter([
         element:<Checkout/>
     },
     { path:"/product/:id",
-         element:<ProductDetail /> }
+         element:<ProductDetail/> 
+        },
+        //  {
+        //     path: "/Themsanpham",
+        //     element:<Products/>
+        //  }
 
 ]);
 export default router;
