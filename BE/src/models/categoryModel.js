@@ -44,6 +44,9 @@ const remove = async (id) => {
 const findOneById = async (id) => {
 
   const category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+
+  console.log(category)
+
   return category
 }
 
@@ -57,8 +60,8 @@ const findOneBySlug = async (slug) => {
     {
       $lookup: {
         from: 'images',
-        localField: '_id',
-        foreignField: 'product_id',
+        localField: 'product_id',
+        foreignField: '_id',
         as: 'image'
       }
     }
