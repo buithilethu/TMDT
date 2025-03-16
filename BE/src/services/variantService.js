@@ -1,6 +1,5 @@
 // service: thao tác với model, su li logic
 import { variantModel } from '~/models/variantModel'
-import { ObjectId } from 'mongodb'
 //(id, variant) => create new variant
 const create = async (productId, variant) =>
 {

@@ -73,10 +73,29 @@ const findAll = async () => {
   }
 }
 
-const deleteMany = async (urls) => {
+const removeMany = async (idOrUrls) => {
   try {
-    for (let id of urls) {
-      await imageModel.removeUrl(id)
+    for (let idOrUrl of idOrUrls) {
+      if (idOrUrl.includes('http')) {
+        await imageModel.removeByUrl(idOrUrl)
+      } else {
+        //xóa nhiều thông qua id sản phẩm
+        const image = await imageModel.findOneByProductId(idOrUrl)
+        await imageModel.removeId(image._id)
+      }
+    }
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const remove = async (idOrUrl) => {
+  try {
+    if (idOrUrl.includes('http')) {
+      await imageModel.removeByUrl(idOrUrl)
+    } else {
+      const image = await imageModel.findOneByProductId(idOrUrl)
+      await imageModel.removeById(image._id)
     }
   } catch (error) {
     throw new Error(error)
@@ -89,5 +108,6 @@ export const imageService = {
   findOneById,
   findAll,
   update,
-  deleteMany
+  removeMany,
+  remove
 }

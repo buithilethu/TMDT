@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { productService } from '~/services/productService'
 import { variantService } from '~/services/variantService'
 import { imageService } from '~/services/imageService'
+import { OBJECT_ID_RULE } from '~/utils/validators'
 const createNew = async (req, res, next) => {
   try {
     //create new product
@@ -74,8 +75,13 @@ const update = async (req, res, next) =>{
 const getProduct = async (req, res, next) => {
   try {
     //req.params => {id: 'abc'} -? productId
-    const productId = req.params.id
-    const product = await productService.findOneById(productId)
+    const idOrSlug = req.params.id
+    let product = {}
+    if (OBJECT_ID_RULE.test(idOrSlug)) {
+      product = await productService.findOneById(idOrSlug)
+    } else {
+      product = await productService.findOneBySlug(idOrSlug)
+    }
 
     res.status(StatusCodes.OK).json(product)
   } catch (error) {

@@ -1,6 +1,6 @@
 // service: thao tác với model, su li logic
 import { categoryModel } from '~/models/categoryModel'
-import { imageModel } from '~/models/imageModel'
+import { imageService } from './imageService'
 import { slugify } from '~/utils/fommaters'
 
 
@@ -38,15 +38,6 @@ const findOneById = async (id) =>
   }
 }
 
-const findAll = async () => {
-  try {
-    const categories = await categoryModel.findAll()
-    return categories
-  } catch (error) {
-    throw new Error(error)
-  }
-}
-
 const findOneBySlug = async (slug) => {
   try {
     const category = await categoryModel.findOneBySlug(slug)
@@ -57,16 +48,25 @@ const findOneBySlug = async (slug) => {
   }
 }
 
-const remove = async (id) => {
+const findAll = async () => {
   try {
-
-    const category = await categoryModel.remove(id)
-    await imageModel.remove(id)
-    return category
+    const categories = await categoryModel.findAll()
+    return categories
   } catch (error) {
     throw new Error(error)
   }
 }
+
+
+const remove = async (idOrSlug) => {
+  try {
+    const categoryId = await categoryModel.remove(idOrSlug)
+    await imageService.remove(categoryId)
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 
 export const categoryService = {
   create,

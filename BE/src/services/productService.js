@@ -55,12 +55,22 @@ const findOneById = async (id) =>
   }
 }
 
+const findOneBySlug = async (slug) =>{
+  try {
+    const product = await productModel.findOneBySlug(slug)
+
+    return product
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const findAll = async (search, page, limit, categorySlug, isDestroy) => {
   try {
     const products = await productModel.findAll(search, categorySlug, isDestroy)
 
     delete products['variants']
-    
+
     for (let i = 0; i < products.length; i++) {
       const images = products[i].images[0]
       products[i].images = images
@@ -83,6 +93,7 @@ const deleteProduct = async (id) => {
 export const productService = {
   createNew,
   findOneById,
+  findOneBySlug,
   findAll,
   update,
   deleteProduct

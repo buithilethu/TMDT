@@ -65,7 +65,7 @@ const increase = async (userId, variantId) => {
     const result = await update(userId, variantId, { quantity: newQuantity })
 
     return result
-  } catch (error) { 
+  } catch (error) {
     throw new Error(error)
   }
 }
@@ -98,9 +98,9 @@ const remove = async (variantId, userId) => {
 }
 
 const findUserCartItem = async (userId, variantId) => {
-    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).findOne({ userId: new ObjectId(userId), variantId: new ObjectId(variantId) })
+  const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).findOne({ userId: new ObjectId(userId), variantId: new ObjectId(variantId) })
 
-    return result
+  return result
 }
 
 const getCart = async (userId) => {

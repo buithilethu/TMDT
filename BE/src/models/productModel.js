@@ -105,6 +105,41 @@ const findOneById = async (id) => {
   }
 }
 
+const findOneBySlug = async (slug) => {
+  try {
+    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+      { $match: { slug: slug } },
+      {
+        $lookup: {
+          from: 'images',
+          localField: '_id',
+          foreignField: 'product_id',
+          as: 'images'
+        }
+      },
+      {
+        $lookup: {
+          from: 'variants',
+          localField: '_id',
+          foreignField: 'product_id',
+          as: 'variants'
+        }
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category_id',
+          foreignField: '_id',
+          as: 'category'
+        }
+      }
+    ]).toArray()
+    return result[0] || {}
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const findAll = async (search, categorySlug, isDestroy) => {
   try {
     let result
@@ -166,5 +201,6 @@ export const productModel = {
   findOneById,
   findAll,
   update,
-  deleteProduct
+  deleteProduct,
+  findOneBySlug
 }
