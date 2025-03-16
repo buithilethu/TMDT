@@ -2,7 +2,8 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap:110px;
+    gap:100px;
+    padding: 10px;
     color: white;
     background-color: rgb(10, 10, 10);
 }

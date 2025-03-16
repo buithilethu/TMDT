@@ -47,9 +47,7 @@ const Slidener = () => {
                             <img src={banners[currentIndex].image} alt={banners[currentIndex].title} />
                         </div>
                     </div>
-                    <div className="shop_now">
-                        <a href={banners[currentIndex].shopLink}>Mua ngay</a>
-                    </div>
+                 
                 </div> 
 
                

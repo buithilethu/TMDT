@@ -77,7 +77,7 @@ const Header = () => {
             <div className="UserLoggedIn">
               <span>Xin chào, {user.firstName || user.email}</span>
               <div className="Dropdown">
-                <Link to="/Taikhoan">Tài khoản của tôi</Link>
+                {/* <Link to="/Taikhoan">Tài khoản của tôi</Link> */}
                 <a href="#" onClick={handleLogout}>Đăng xuất</a>
               </div>
             </div>
