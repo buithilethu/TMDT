@@ -6,45 +6,42 @@ import Footer from '../HomePage/Footer';
 import { Link } from 'react-router-dom';
 
 const Singup = () => {
-  const [name, setName] = useState('');
-  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  
+
   const navigate = useNavigate(); // Hook để điều hướng
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !emailOrPhone || !password || !confirmPassword) {
+    // Kiểm tra các trường bắt buộc
+    if (!firstName || !lastName || !email || !password) {
       setErrorMessage('Vui lòng điền đầy đủ tất cả các trường');
       return;
     }
 
-    if (password !== confirmPassword) {
-      setErrorMessage('Mật khẩu không khớp');
-      return;
-    }
-
     try {
-      const response = await fetch('https://677e3faf94bde1c1252b16ee.mockapi.io/api/users', {
+      const response = await fetch('http://localhost:3000/v1/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, emailOrPhone, password }),
+        body: JSON.stringify({ firstName, lastName, email, password }),
       });
 
       if (!response.ok) {
-        setErrorMessage('Không thể tạo tài khoản. Vui lòng thử lại sau.');
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || 'Không thể tạo tài khoản. Vui lòng thử lại sau.');
         return;
       }
 
       const data = await response.json();
-      console.log('Dữ liệu:', data);
+      console.log('Đăng ký thành công:', data);
 
-      // Chuyển hướng sang trang chủ nếu đăng ký thành công
+      // Chuyển hướng sang trang chủ sau khi đăng ký thành công
       navigate('/');
     } catch (error) {
       setErrorMessage('Đã xảy ra lỗi, vui lòng thử lại sau. ' + error.message);
@@ -56,7 +53,6 @@ const Singup = () => {
       <div className="header">
         <Header />
       </div>
-   
       <div className="FormSignUp">
         <div className="ImageSignUp">
           <img src="/image/Singup/phone.png" alt="Biểu tượng điện thoại" />
@@ -70,34 +66,34 @@ const Singup = () => {
             <div className="GroupInput">
               <input
                 type="text"
-                id="Signname"
-                placeholder="Tên"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                id="SignFirstName"
+                placeholder="Họ"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 required
               />
               <input
                 type="text"
-                id="Signemailorphone"
-                placeholder="Email hoặc Số điện thoại"
-                value={emailOrPhone}
-                onChange={(e) => setEmailOrPhone(e.target.value)}
+                id="SignLastName"
+                placeholder="Tên"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
+              <input
+                type="email"
+                id="SignEmail"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <input
                 type="password"
-                id="Signpassword"
+                id="SignPassword"
                 placeholder="Mật khẩu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                id="SignConfirmpassword"
-                placeholder="Xác nhận mật khẩu"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
             </div>
@@ -111,8 +107,7 @@ const Singup = () => {
                   <a href="https://www.google.com/">Đăng ký bằng Google</a>
                 </div>
                 <div className="Singin">
-                  Đã có tài khoản?{' '}
-                  <Link to="/Dangnhap">Đăng nhập</Link>
+                  Đã có tài khoản? <Link to="/Dangnhap">Đăng nhập</Link>
                 </div>
               </div>
             </div>

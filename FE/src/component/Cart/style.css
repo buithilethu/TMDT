@@ -1,0 +1,242 @@
+.cart {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.RoadMapCart {
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 20px;
+}
+
+.Roadmap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.Roadmap span {
+    font-size: 14px;
+    color: #555;
+}
+
+.Roadmap a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.Roadmap a:hover {
+    text-decoration: underline;
+}
+
+.ContentCart {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1200px;
+    gap: 30px;
+}
+
+.GroupTable {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.Table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #f5f5f5;
+}
+
+thead th {
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    text-align: left;
+}
+
+.td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+
+.tbodycart {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #555;
+}
+
+.tbodycart img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.tbodycart p {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.tbodycart input {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 15px;
+}
+
+.tbodycart input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.td:hover {
+    background-color: #f9f9f9;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #e60000;
+}
+
+button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(230, 0, 0, 0.5);
+}
+
+.Update {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.Update .Return {
+    background-color: #ccc;
+}
+
+.Update .Return:hover {
+    background-color: #b3b3b3;
+}
+
+.GroupCart {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.Coupon {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.Coupon input {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.Coupon .Apply {
+    padding: 10px 20px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.Coupon .Apply:hover {
+    background-color: #f52c2c;
+}
+
+.CartTotal {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    flex: 1;
+    max-width: 400px;
+}
+
+.CartTotal table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.CartTotal .tableCart tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.CartTotal .tableCart h2 {
+    font-size: 20px;
+    color: #333;
+    margin: 0 0 15px 0;
+}
+
+.CartTotal .hr td {
+    padding: 10px 0;
+}
+
+.CartTotal .hr .Name {
+    font-size: 16px;
+    color: #555;
+    font-weight: 500;
+}
+
+.CartTotal .hr .Price {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    text-align: right;
+}
+
+.CartTotal .Checkout {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.CartTotal .Checkout a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.CartTotal .Checkout:hover {
+    background-color: #f63838;
+}
