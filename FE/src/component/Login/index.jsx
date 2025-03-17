@@ -51,7 +51,7 @@ const Login = () => {
 
       // Lưu thông tin user vào cookie
       Cookies.set('user', JSON.stringify(userData), { expires: 7, secure: true, sameSite: 'Strict' });
-      Cookies.set('token', userData.accessToken, { expires: 7, secure: true, sameSite: 'Strict' });
+      Cookies.set('token', loginData.accessToken, { expires: 7, secure: true, sameSite: 'Strict' });
 
 
       // Chuyển hướng sang trang chủ
