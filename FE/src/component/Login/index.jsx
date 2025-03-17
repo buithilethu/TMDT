@@ -9,65 +9,62 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      setErrorMessage('Vui lòng điền đầy đủ cả hai trường');
+      setErrorMessage('Vui lòng điền đầy đủ email và mật khẩu');
+      return;
+    }
+
+    // Kiểm tra định dạng email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage('Email không hợp lệ');
       return;
     }
 
     try {
-      // Đăng nhập
       const loginResponse = await fetch('http://localhost:3000/v1/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
       if (!loginResponse.ok) {
         const errorData = await loginResponse.json();
-        setErrorMessage(errorData.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
-        return;
+        throw new Error(errorData.message || 'Đăng nhập thất bại');
       }
 
       const loginData = await loginResponse.json();
       const token = loginData.accessToken;
+      if (!token) throw new Error('Không nhận được token từ server');
 
-      // Lấy thông tin user từ /v1/auth/me
-      const userResponse = await fetch('http://localhost:3000/v1/auth/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!userResponse.ok) {
-        throw new Error('Không thể lấy thông tin người dùng');
-      }
-
-      const userData = await userResponse.json();
-      userData.accessToken = token; // Thêm token vào userData
+      // Giả sử loginData chứa thông tin người dùng cần thiết (email, tên, v.v.)
+      const userData = {
+        email: email, // Lấy email từ input
+        // Nếu API trả về thêm thông tin như firstName, lastName, bạn có thể thêm vào đây
+        ...(loginData.userData || {}), // Nếu server trả về thông tin user trong loginData
+      };
 
       // Lưu thông tin user vào cookie
       Cookies.set('user', JSON.stringify(userData), { expires: 7, secure: true, sameSite: 'Strict' });
+      Cookies.set('token', userData.accessToken, { expires: 7, secure: true, sameSite: 'Strict' });
+
 
       // Chuyển hướng sang trang chủ
       navigate('/');
     } catch (error) {
-      setErrorMessage('Đã xảy ra lỗi, vui lòng thử lại. ' + error.message);
+      console.error('Lỗi đăng nhập:', error);
+      setErrorMessage(error.message || 'Đã xảy ra lỗi, vui lòng thử lại');
     }
   };
 
   return (
     <div className="Login">
-      <div className="header">
-        <Header />
-      </div>
+      <div className="header"><Header /></div>
       <div className="FormLogin">
         <div className="ImagePhone">
           <img src="/image/Singup/phone.png" alt="Biểu tượng điện thoại" />

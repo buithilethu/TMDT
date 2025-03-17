@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie'; // Import js-cookie
+import { useNavigate, Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import '../Singup/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
-import { Link } from 'react-router-dom';
 
-const Singup = () => {
+const Signup = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -23,39 +21,59 @@ const Singup = () => {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage('Email không hợp lệ');
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage('Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:3000/v1/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstName, lastName, email, password }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        setErrorMessage(errorData.message || 'Không thể tạo tài khoản. Vui lòng thử lại sau.');
-        return;
+        throw new Error(errorData.message || 'Đăng ký thất bại');
       }
 
       const data = await response.json();
       console.log('Đăng ký thành công:', data);
 
-      // Lưu thông tin người dùng vào cookie (giả sử API trả về user info)
-      Cookies.set('user', JSON.stringify({ firstName, lastName, email, isAdmin: false }), { expires: 7 });
+      // Tạo userData từ dữ liệu đầu vào và phản hồi API (nếu có)
+      const userData = {
+        firstName,
+        lastName,
+        email,
+        ...(data.user || {}), // Nếu API trả về thông tin user
+        accessToken: data.accessToken || null, // Lưu token nếu API trả về
+      };
+
+      // Lưu thông tin vào cookie
+      Cookies.set('user', JSON.stringify(userData), {
+        expires: 7,
+        secure: true,
+        sameSite: 'Strict',
+      });
 
       // Chuyển hướng sang trang chủ
       navigate('/');
     } catch (error) {
-      setErrorMessage('Đã xảy ra lỗi, vui lòng thử lại sau. ' + error.message);
+      console.error('Lỗi đăng ký:', error);
+      setErrorMessage(error.message || 'Đã xảy ra lỗi, vui lòng thử lại');
     }
   };
 
   return (
     <div className="Singup">
-      <div className="header">
-        <Header />
-      </div>
+      <div className="header"><Header /></div>
       <div className="FormSignUp">
         <div className="ImageSignUp">
           <img src="/image/Singup/phone.png" alt="Biểu tượng điện thoại" />
@@ -123,4 +141,4 @@ const Singup = () => {
   );
 };
 
-export default Singup;
+export default Signup;

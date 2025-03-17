@@ -40,10 +40,10 @@ const router = createBrowserRouter([
     { path:"/product/:id",
          element:<ProductDetail/> 
         },
-        //  {
-        //     path: "/Themsanpham",
-        //     element:<Products/>
-        //  }
+         {
+            path: "/Themsanpham",
+            element:<Products/>
+         }
 
 ]);
 export default router;

@@ -19,7 +19,7 @@ const Header = () => {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch('http://localhost:3000/v1/auth/me', {
+      const response = await fetch('http://localhost:3000/v1/auth/login', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -54,7 +54,7 @@ const Header = () => {
         <Link to="/Tuongtac">Tương tác</Link>
         <Link to="/Dangky">Đăng ký</Link>
         {user?.isAdmin === true && (
-          <Link to="/Products">Products</Link> // Hiển thị khi isAdmin là true từ MongoDB
+          <Link to="/Themsanpham">Thêm sản phẩm</Link> // Hiển thị khi isAdmin là true từ MongoDB
         )}
       </div>
       <div className="GroupSearch">
