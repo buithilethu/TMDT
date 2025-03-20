@@ -7,7 +7,9 @@ import Login from "../component/Login/index.jsx";
 import Cart from "../component/Cart/index.jsx";
 import Checkout from "../component/CheckOut/index.jsx";
 import ProductDetail from "../component/HomePage/ProductDetails/index.jsx";
-import Products from "../component/Products/index.jsx";
+
+import AddProduct from "../component/Products/index.jsx";
+import ProductList from "../component/ProductList/index.jsx";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -42,8 +44,12 @@ const router = createBrowserRouter([
         },
          {
             path: "/Themsanpham",
-            element:<Products/>
-         }
+            element:<AddProduct/>
+         },
+        {
+            path:"/products/:categorySlug",
+            element:<ProductList/>
+        }
 
 ]);
 export default router;

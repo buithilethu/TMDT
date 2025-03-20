@@ -76,6 +76,7 @@ const Center = ({ cartItems, addToCart }) => {
             </div>
           ))}
         </div>
+        
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 .Header{
     display: flex;
     align-items: center;
@@ -6,9 +7,11 @@
     padding: 10px;
     color: white;
     background-color: rgb(10, 10, 10);
+  
 }
 .Menu a{
     cursor: pointer;
+    text-decoration: none;
     color: white;
 }
 .Name{

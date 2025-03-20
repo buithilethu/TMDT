@@ -53,13 +53,16 @@ a:hover{
     grid-template-columns: repeat(5, 1fr); /* Chia thành 5 cột đều nhau */
     gap: 20px; /* Khoảng cách giữa các sản phẩm */
 }
-
+p{
+    text-decoration: none;
+}
 .SPYT {
     border: 1px solid #ddd;
     padding: 10px;
     text-align: center;
     background-color: #fff;
     border-radius: 5px;
+    text-decoration: none;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
