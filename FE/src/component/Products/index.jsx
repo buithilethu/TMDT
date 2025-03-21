@@ -240,27 +240,15 @@ const AddProduct = () => {
     try {
       const response = await fetch(`http://localhost:3000/v1/products/${productId}`);
       const product = await response.json();
-
+      console.log(product)
       setEditProductId(product._id);
-      setEditName(product.name || '');
-      setEditDescription(product.description || '');
-      setEditPrice(product.price || '');
-      setEditCategory(product.category_id || (product.category && product.category[0]?._id) || '');
-      setEditImages(product.images?.map(img => ({
-        url: img.url || `http://localhost:3000/${img}`,
-        _id: img._id
-      })) || []);
-      setEditAttributes(product.variants?.length > 0 
-        ? [...new Set(product.variants.flatMap(v => Object.keys(v.attributes)))]
-            .map(name => ({ name })) 
-        : [{ name: '' }]
-      );
-      setEditVariants(product.variants?.map(v => ({
-        _id: v._id,
-        price: v.price || '',
-        stock: v.stock || '',
-        attributes: { ...v.attributes }
-      })) || []);
+      setEditName(product.name);
+      setEditDescription(product.description);
+      setEditPrice(product.price);
+      setEditCategory(product.category[0]?._id || product.category || '');
+      setEditImages(product.images?.map(img => ({ url: img.url || `http://localhost:3000/${img}` })) || []);
+      setEditAttributes([...new Set(product.variants.flatMap(v => Object.keys(v.attributes))).map(name => ({ name }))] || [{ name: '' }]);
+      setEditVariants(product.variants.map(v => ({ _id: v._id, price: v.price, stock: v.stock, attributes: { ...v.attributes } })) || []);
       setDeletedImages([]);
       setDeletedVariants([]);
       
