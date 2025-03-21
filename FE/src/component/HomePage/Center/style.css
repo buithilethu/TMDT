@@ -82,7 +82,14 @@ p{
     color: #e91e63;
     margin: 5px 0;
 }
-
+span{
+    color: black;
+    font-size: 16px;
+    
+}
+a{
+    text-decoration: none !important;;
+}
 .yeuthich button {
     background-color: #4CAF50;
     color: white;

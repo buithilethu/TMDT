@@ -5,13 +5,12 @@ import '../Center/style.css';
 const Center = ({ cartItems, addToCart }) => {
   const [xuhuong, setXuhuong] = useState([]);
   const [yeuthich, setYeuthich] = useState([]);
-  const location = useLocation(); // Dùng useLocation để lấy query từ URL
+  const location = useLocation();
 
   useEffect(() => {
-    // Lấy query parameters từ URL
     const queryParams = new URLSearchParams(location.search);
-    const page = queryParams.get('page') || 1; // Mặc định page = 1
-    const limit = queryParams.get('limit') || 10; // Mặc định limit = 10
+    const page = queryParams.get('page') || 1;
+    const limit = queryParams.get('limit') || 10;
 
     const fetchXuhuong = async () => {
       try {
@@ -39,7 +38,7 @@ const Center = ({ cartItems, addToCart }) => {
 
     fetchXuhuong();
     fetchYeuthich();
-  }, [location.search]); // Chạy lại effect khi query trong URL thay đổi
+  }, [location.search]);
 
   return (
     <div className="Main">
@@ -48,12 +47,14 @@ const Center = ({ cartItems, addToCart }) => {
         <div className="GroupSP">
           {xuhuong.slice(0, 5).map((item) => (
             <div className="SP" key={item._id}>
-              <div className="images">
-                <img src={item.image[0].url} alt={item.name} />
-              </div>
-              <div className="text">
-                <span>{item.name}</span>
-              </div>
+              <Link to={`/products/?categories=${item.slug}`}>
+                <div className="images">
+                  <img src={item.image?.[0]?.url || '/images/placeholder-image.jpg'} alt={item.name} />
+                </div>
+                <div className="text">
+                  <span>{item.name}</span>
+                </div>
+              </Link>
             </div>
           ))}
         </div>
@@ -65,7 +66,7 @@ const Center = ({ cartItems, addToCart }) => {
             <div className="SPYT" key={item._id}>
               <Link to={`/product/${item.slug}`}>
                 <div className="imagesyt">
-                  <img src={item.images.url} alt={item.name} />
+                  <img src={item.images?.url || '/images/placeholder-image.jpg'} alt={item.name} />
                 </div>
                 <div className="textyt">
                   <p className="title">{item.name}</p>
@@ -76,7 +77,6 @@ const Center = ({ cartItems, addToCart }) => {
             </div>
           ))}
         </div>
-        
       </div>
     </div>
   );

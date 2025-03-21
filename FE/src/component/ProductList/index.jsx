@@ -1,48 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import '../ProductList/style.css'; // CSS cho ProductList
+import { useLocation } from 'react-router-dom';
+import '../ProductList/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 
 const ProductList = () => {
+  const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const categorySlug = queryParams.get('categories') // Lấy categorySlug từ URL
+  const categorySlug = queryParams.get('categories');
+
   const [products, setProducts] = useState([]);
   const [categoryName, setCategoryName] = useState('');
-  const [loading, setLoading] = useState(true); // Thêm trạng thái loading
-  const [error, setError] = useState(null); // Thêm trạng thái lỗi
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const productsPerPage = 12; // Số sản phẩm mỗi trang
 
-  // Lấy danh sách sản phẩm và tên danh mục từ API
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Bắt đầu loading
-      setError(null); // Reset lỗi
+      setLoading(true);
+      setError(null);
 
       try {
-        // Lấy sản phẩm theo categorySlug
         const productResponse = await fetch(`http://localhost:3000/v1/products?category=${categorySlug}`);
-        console.log(categorySlug)
         if (!productResponse.ok) throw new Error('Không thể lấy dữ liệu sản phẩm');
         const productData = await productResponse.json();
         setProducts(productData);
 
-        // Lấy danh sách danh mục để tìm tên danh mục
         const categoryResponse = await fetch('http://localhost:3000/v1/categories/');
         if (!categoryResponse.ok) throw new Error('Không thể lấy dữ liệu danh mục');
         const categoryData = await categoryResponse.json();
         const category = categoryData.find(cat => cat.slug === categorySlug);
-        setCategoryName(category ? category.name : categorySlug); // Nếu không tìm thấy, dùng slug làm tên
+        setCategoryName(category ? category.name : categorySlug);
       } catch (error) {
         console.error('Lỗi khi lấy dữ liệu:', error);
         setError(error.message);
         setProducts([]);
       } finally {
-        setLoading(false); // Kết thúc loading
+        setLoading(false);
       }
     };
 
-    fetchData();
-  }, [categorySlug]); // Gọi lại khi categorySlug thay đổi
+    if (categorySlug) fetchData();
+  }, [categorySlug]);
+
+  // Tính toán chỉ số sản phẩm cho trang hiện tại
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  // Tính tổng số trang
+  const totalPages = Math.ceil(products.length / productsPerPage);
+
+  // Hàm chuyển trang
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="ProductList">
@@ -56,19 +67,57 @@ const ProductList = () => {
         ) : error ? (
           <p className="error-message">{error}</p>
         ) : products.length > 0 ? (
-          <div className="products-grid">
-            {products.map((product) => (
-              <div key={product._id} className="product-card">
-                <img
-                  src={product.images[0] || '/image/default-product.jpg'}
-                  alt={product.name}
-                  className="product-image"
-                />
-                <h4 className="product-name">{product.name}</h4>
-                <p className="product-price">{product.price.toLocaleString('vi-VN')} VND</p>
+          <>
+            <div className="product-grid">
+              {currentProducts.map(product => (
+                <div className="SPYT" key={product._id}>
+                  <a href={`/product/${product.slug}`}>
+                    <div className="imagesyt">
+                      <img
+                        src={product.images?.url || '/images/placeholder-image.jpg'}
+                        alt={product.name}
+                        onError={(e) => (e.target.src = '/images/placeholder-image.jpg')}
+                      />
+                    </div>
+                    <div className="textyt">
+                      <p className="title">{product.name}</p>
+                      <p className="price">{product.price.toLocaleString()} VNĐ</p>
+                    </div>
+                  </a>
+                  <button>Thêm vào giỏ hàng</button>
+                </div>
+              ))}
+            </div>
+
+            {/* Phân trang */}
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="page-btn"
+                >
+                  Trước
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => paginate(i + 1)}
+                    className={`page-btn ${currentPage === i + 1 ? 'active' : ''}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="page-btn"
+                >
+                  Sau
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         ) : (
           <p>Không có sản phẩm nào trong danh mục này.</p>
         )}
