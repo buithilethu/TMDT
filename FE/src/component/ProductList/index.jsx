@@ -5,7 +5,8 @@ import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 
 const ProductList = () => {
-  const { categorySlug } = useParams(); // Lấy categorySlug từ URL
+  const queryParams = new URLSearchParams(location.search);
+  const categorySlug = queryParams.get('categories') // Lấy categorySlug từ URL
   const [products, setProducts] = useState([]);
   const [categoryName, setCategoryName] = useState('');
   const [loading, setLoading] = useState(true); // Thêm trạng thái loading
@@ -19,7 +20,8 @@ const ProductList = () => {
 
       try {
         // Lấy sản phẩm theo categorySlug
-        const productResponse = await fetch(`http://localhost:3000/v1/products?category=${categorySlug}`);
+        const productResponse = await fetch(`http://localhost:3000/v1/products?categories=${categorySlug}`);
+        console.log(categorySlug)
         if (!productResponse.ok) throw new Error('Không thể lấy dữ liệu sản phẩm');
         const productData = await productResponse.json();
         setProducts(productData);

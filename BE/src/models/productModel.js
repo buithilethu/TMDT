@@ -194,6 +194,15 @@ const deleteProduct = async (id) => {
   }
 }
 
+const getProductCount = async () => {
+  try{
+    return await GET_DB().collection(PRODUCT_COLLECTION_NAME).countDocuments({ _destroy: false })
+  }catch (error)
+  {
+    throw new Error(error)
+  }
+}
+
 export const productModel = {
   PRODUCT_COLLECTION_NAME,
   PRODUCT_COLLECTION_SCHEMA,
@@ -202,5 +211,6 @@ export const productModel = {
   findAll,
   update,
   deleteProduct,
-  findOneBySlug
+  findOneBySlug,
+  getProductCount
 }

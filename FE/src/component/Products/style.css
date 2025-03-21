@@ -18,8 +18,7 @@
 
 /* Form chung */
 form {
-  width: 100%;
-  max-width: 1000px; /* Giới hạn chiều rộng tối đa của form để không quá dài */
+ /* Giới hạn chiều rộng tối đa của form để không quá dài */
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;

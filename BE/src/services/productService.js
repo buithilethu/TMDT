@@ -75,7 +75,10 @@ const findAll = async (search, page, limit, categorySlug, isDestroy) => {
       const images = products[i].images[0]
       products[i].images = images
     }
-
+    if (!limit)
+    {
+      return products
+    }
     return products.slice((page - 1) * limit, page * limit)
   } catch (error) {
     throw new Error(error)

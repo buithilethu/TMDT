@@ -96,7 +96,7 @@ const getAllProducts = async (req, res, next) => {
     //req.query => {search: 'abc', page: 1, limit: 10, category: 'abc-cde'}
     const search = req.query.search
     const page = req.query.page || 1
-    const limit = req.query.limit || 10
+    const limit = req.query.limit
     const categorySlug = req.query.category
     const isDestroy = req.query.isdestroy === 'true' ? true : false
     const products = await productService.findAll(search, page, limit, categorySlug, isDestroy)

@@ -58,7 +58,7 @@ const Signup = () => {
 
       // Lưu thông tin vào cookie
       Cookies.set('user', JSON.stringify(userData), {
-        expires: 7,
+        expires: 2,
         secure: true,
         sameSite: 'Strict',
       });

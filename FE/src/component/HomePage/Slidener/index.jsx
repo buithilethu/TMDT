@@ -41,7 +41,7 @@ const Slidener = () => {
         {categories.map((category) => (
           <Link
             key={category._id}
-            to={`/products/${category.slug}`} // Điều hướng đến trang sản phẩm với slug
+            to={`/products/?categories=${category.slug}`} // Điều hướng đến trang sản phẩm với slug
             className="category-link"
           >
             {category.name}

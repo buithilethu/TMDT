@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
-import '../Products/style.css'; // Import CSS mới
+import '../Products/style.css';
 
 const AddProduct = () => {
   // State cho form thêm sản phẩm
@@ -39,7 +39,7 @@ const AddProduct = () => {
   useEffect(() => {
     fetchCategories();
     fetchProducts();
-    if (productVariants.length === 0) addProductVariant(); // Thêm biến thể mặc định
+    if (productVariants.length === 0) addProductVariant();
   }, []);
 
   // Fetch dữ liệu từ API
@@ -68,7 +68,7 @@ const AddProduct = () => {
     const errors = [];
     if (!data.name) errors.push('Tên sản phẩm không được để trống');
     if (!data.description) errors.push('Mô tả sản phẩm không được để trống');
-    if (!data.category) errors.push('Vui lòng chọn danh mục');
+    if (!data.category_id && !data.category) errors.push('Vui lòng chọn danh mục');
     if (!data.price || isNaN(data.price) || data.price <= 0) errors.push('Giá sản phẩm phải là số dương');
     if (!data.variants || data.variants.length === 0) errors.push('Phải có ít nhất một biến thể');
     else {
@@ -141,11 +141,10 @@ const AddProduct = () => {
   const handleProductSubmit = async (e) => {
     e.preventDefault();
 
-    // Chuẩn bị dữ liệu
     const data = {
       name: productName.trim(),
       description: productDescription.trim(),
-      category: productCategory,
+      category_id: productCategory,
       price: productPrice ? parseInt(productPrice) : null,
       variants: productVariants.map(variant => ({
         price: parseInt(variant.price) || 0,
@@ -154,21 +153,18 @@ const AddProduct = () => {
       })),
     };
 
-    // Kiểm tra hình ảnh
     const validImages = productImages.filter(image => image !== null);
     if (validImages.length === 0) {
       setProductError(['Vui lòng thêm ít nhất một hình ảnh sản phẩm']);
       return;
     }
 
-    // Validation
     const errors = validateJson(data);
     if (errors.length > 0) {
       setProductError(errors);
       return;
     }
 
-    // Chuẩn bị FormData
     const formData = new FormData();
     formData.append('data', JSON.stringify(data));
     validImages.forEach((image, index) => {
@@ -190,7 +186,6 @@ const AddProduct = () => {
       await response.json();
       alert('Sản phẩm đã được thêm thành công!');
 
-      // Reset form
       setProductName('');
       setProductDescription('');
       setProductCategory('');
@@ -247,17 +242,34 @@ const AddProduct = () => {
       const product = await response.json();
 
       setEditProductId(product._id);
-      setEditName(product.name);
-      setEditDescription(product.description);
-      setEditPrice(product.price);
-      setEditCategory(product.category[0]?._id || product.category || '');
-      setEditImages(product.images?.map(img => ({ url: img.url || `http://localhost:3000/${img}` })) || []);
-      setEditAttributes([...new Set(product.variants.flatMap(v => Object.keys(v.attributes))).map(name => ({ name }))] || [{ name: '' }]);
-      setEditVariants(product.variants.map(v => ({ _id: v._id, price: v.price, stock: v.stock, attributes: { ...v.attributes } })) || []);
+      setEditName(product.name || '');
+      setEditDescription(product.description || '');
+      setEditPrice(product.price || '');
+      setEditCategory(product.category_id || (product.category && product.category[0]?._id) || '');
+      setEditImages(product.images?.map(img => ({
+        url: img.url || `http://localhost:3000/${img}`,
+        _id: img._id
+      })) || []);
+      setEditAttributes(product.variants?.length > 0 
+        ? [...new Set(product.variants.flatMap(v => Object.keys(v.attributes)))]
+            .map(name => ({ name })) 
+        : [{ name: '' }]
+      );
+      setEditVariants(product.variants?.map(v => ({
+        _id: v._id,
+        price: v.price || '',
+        stock: v.stock || '',
+        attributes: { ...v.attributes }
+      })) || []);
       setDeletedImages([]);
       setDeletedVariants([]);
-      if (editVariants.length === 0) addEditVariant();
-      if (editImages.length === 0) addEditImage();
+      
+      if (!product.variants || product.variants.length === 0) {
+        addEditVariant();
+      }
+      if (!product.images || product.images.length === 0) {
+        addEditImage();
+      }
     } catch (err) {
       console.error('Lỗi tải dữ liệu sản phẩm:', err);
       alert('Có lỗi khi tải dữ liệu sản phẩm!');
@@ -346,9 +358,14 @@ const AddProduct = () => {
     const data = {
       name: editName.trim(),
       description: editDescription.trim(),
-      category: editCategory,
+      category_id: editCategory,
       price: editPrice ? parseInt(editPrice) : null,
-      variants: editVariants,
+      variants: editVariants.map(v => ({
+        _id: v._id,
+        price: parseInt(v.price) || 0,
+        stock: parseInt(v.stock) || 0,
+        attributes: v.attributes
+      })),
       delete: { images: deletedImages, variants: deletedVariants },
     };
 
@@ -360,7 +377,9 @@ const AddProduct = () => {
 
     const formData = new FormData();
     formData.append('data', JSON.stringify(data));
-    editImages.forEach(image => { if (image && !image.url) formData.append('images', image); });
+    editImages.forEach(image => {
+      if (image && !image.url) formData.append('images', image);
+    });
 
     try {
       const response = await fetch(`http://localhost:3000/v1/products/${editProductId}`, {
