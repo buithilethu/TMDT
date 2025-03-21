@@ -143,43 +143,43 @@ const findOneBySlug = async (slug) => {
 const findAll = async (search, categorySlug, isDestroy) => {
   try {
     let result
-    if (search) {
-      if (categorySlug) {
-        const category = await GET_DB().collection('categories').findOne({ slug: categorySlug })
 
-        result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({
-          $and: [
-            { name: { $regex: search, $options: 'i' } },
-            { category_id: category._id },
-            { _destroy: isDestroy }
-          ]
-        }).toArray()
-      }
-      else {
-        result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({ name: { $regex: search, $options: 'i' }, _destroy:isDestroy }).toArray()
-      }
-    }
-    else if (categorySlug) {
+    if (categorySlug)
+    {
       const category = await GET_DB().collection('categories').findOne({ slug: categorySlug })
-      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({ category_id: category._id, _destroy: isDestroy }).toArray()
-    }
-    else {
-      // result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({ _destroy:isDestroy }).toArray()
-      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
-        {
-          $match: { _destroy: isDestroy }
-        },
-        {
-          $lookup: {
-            from: 'images',
-            localField: '_id',
-            foreignField: 'product_id',
-            as: 'images'
+      if (!category)
+      {
+        return []
+      }
+      if (search)
+      {
+        result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+          {
+            $match: { category_id: category._id, _destroy: isDestroy },
+            $lookup: {
+              from: 'images',
+              localField: '_id',
+              foreignField: 'product_id',
+              as: 'images'
+            }
           }
-        }
-      ]).toArray()
+        ]).toArray()
+      } else {
+        result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+          {
+            $match: { category_id: category._id, _destroy: isDestroy }
+          },
+          {
+            $lookup: {
+              from: 'images',
+              localField: '_id',
+              foreignField: 'product_id',
+              as: 'images'
+            }
+          }
+        ]).toArray()
+      }
     }
-
     return result
   } catch (error) {
     throw new Error(error)
@@ -194,15 +194,6 @@ const deleteProduct = async (id) => {
   }
 }
 
-const getProductCount = async () => {
-  try{
-    return await GET_DB().collection(PRODUCT_COLLECTION_NAME).countDocuments({ _destroy: false })
-  }catch (error)
-  {
-    throw new Error(error)
-  }
-}
-
 export const productModel = {
   PRODUCT_COLLECTION_NAME,
   PRODUCT_COLLECTION_SCHEMA,
@@ -211,6 +202,5 @@ export const productModel = {
   findAll,
   update,
   deleteProduct,
-  findOneBySlug,
-  getProductCount
+  findOneBySlug
 }
