@@ -240,7 +240,7 @@ const AddProduct = () => {
     try {
       const response = await fetch(`http://localhost:3000/v1/products/${productId}`);
       const product = await response.json();
-      console.log(product)
+
       setEditProductId(product._id);
       setEditName(product.name);
       setEditDescription(product.description);
