@@ -143,43 +143,78 @@ const findOneBySlug = async (slug) => {
 const findAll = async (search, categorySlug, isDestroy) => {
   try {
     let result
-
-    if (categorySlug)
+    
+    if (!categorySlug && !search)
     {
+      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+        {
+          $match: { _destroy: isDestroy }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: '_id',
+            foreignField: 'product_id',
+            as: 'images'
+          }
+        }
+      ]).toArray()
+    }
+
+    if (categorySlug && !search) {
       const category = await GET_DB().collection('categories').findOne({ slug: categorySlug })
-      if (!category)
+      if(!category)
       {
         return []
       }
-      if (search)
-      {
-        result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
-          {
-            $match: { category_id: category._id, _destroy: isDestroy },
-            $lookup: {
-              from: 'images',
-              localField: '_id',
-              foreignField: 'product_id',
-              as: 'images'
-            }
+      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+        {
+          $match: { category_id: category._id, _destroy: isDestroy }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: '_id',
+            foreignField: 'product_id',
+            as: 'images'
           }
-        ]).toArray()
-      } else {
-        result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
-          {
-            $match: { category_id: category._id, _destroy: isDestroy }
-          },
-          {
-            $lookup: {
-              from: 'images',
-              localField: '_id',
-              foreignField: 'product_id',
-              as: 'images'
-            }
-          }
-        ]).toArray()
-      }
+        }
+      ]).toArray()
     }
+
+    if (!categorySlug && search) {
+      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+        {
+          $match: { name: { $regex: search, $options: 'i' }, _destroy: isDestroy }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: '_id',
+            foreignField: 'product_id',
+            as: 'images'
+          }
+        }
+      ]).toArray()
+    }
+
+    if (categorySlug && search) {
+      const category = await GET_DB().collection('categories').findOne({ slug: categorySlug })
+      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+        {
+          $match: { name: { $regex: search, $options: 'i' }, category_id: category._id, _destroy: isDestroy }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: '_id',
+            foreignField: 'product_id',
+            as: 'images'
+          }
+        }
+      ]).toArray()
+    }
+
     return result
   } catch (error) {
     throw new Error(error)
