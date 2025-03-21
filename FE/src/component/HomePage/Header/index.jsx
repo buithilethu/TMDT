@@ -11,9 +11,6 @@ const Header = () => {
     if (storedUser) {
       const userData = JSON.parse(storedUser);
       setUser(userData);
-
-      // Nếu cần kiểm tra thêm từ server (không bắt buộc vì đã lấy từ /me)
-      // fetchUserData(userData.accessToken);
     }
   }, []);
 
@@ -52,9 +49,10 @@ const Header = () => {
         <Link to="/">Trang chủ</Link>
         <Link to="/Gioithieu">Giới thiệu</Link>
         <Link to="/Tuongtac">Tương tác</Link>
-        <Link to="/Dangky">Đăng ký</Link>
+        {/* Chỉ hiển thị Đăng ký khi chưa đăng nhập */}
+        {!user && <Link to="/Dangky">Đăng ký</Link>}
         {user?.isAdmin === true && (
-          <Link to="/Themsanpham">Thêm sản phẩm</Link> // Hiển thị khi isAdmin là true từ MongoDB
+          <Link to="/Themsanpham">Thêm sản phẩm</Link>
         )}
       </div>
       <div className="GroupSearch">
@@ -75,9 +73,8 @@ const Header = () => {
         <div className="User">
           {user ? (
             <div className="UserLoggedIn">
-              <span>Xin chào, {user.firstName || user.email}</span>
+              <span>Xin chào, {user.lastName || user.email}</span>
               <div className="Dropdown">
-                {/* <Link to="/Taikhoan">Tài khoản của tôi</Link> */}
                 <a href="#" onClick={handleLogout}>Đăng xuất</a>
               </div>
             </div>
