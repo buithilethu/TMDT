@@ -20,7 +20,7 @@ const ProductList = () => {
 
       try {
         // Lấy sản phẩm theo categorySlug
-        const productResponse = await fetch(`http://localhost:3000/v1/products?categories=${categorySlug}`);
+        const productResponse = await fetch(`http://localhost:3000/v1/products?category=${categorySlug}`);
         console.log(categorySlug)
         if (!productResponse.ok) throw new Error('Không thể lấy dữ liệu sản phẩm');
         const productData = await productResponse.json();
