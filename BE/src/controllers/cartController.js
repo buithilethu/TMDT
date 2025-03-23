@@ -6,8 +6,24 @@ const add = async (req, res, next) => {
   try {
     //req.body => {variantId: 'abc', quantity: 1}
     const { variantId, quantity } = req.body
-    const userId = req.user.id
-    const cart = await cartService.add({ userId, variantId, quantity })
+
+    if (!variantId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        errors: 'variantId are required'
+      })
+    }
+
+    if (!quantity) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        errors: 'quantity are required'
+      })
+    }
+
+    const cart = await cartService.add({
+      variantId,
+      quantity,
+      userId: req.user.id
+    })
 
     return res.status(StatusCodes.OK).json(cart)
   } catch (error) {
@@ -19,8 +35,22 @@ const update = async (req, res, next) => {
   try {
     //req.body => {variantId: 'abc', quantity: 1}
     const { variantId, quantity } = req.body
-    const userId = req.user.id
-    const cart = await cartService.update(userId, variantId, { quantity : quantity})
+    if (!variantId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        errors: 'variantId are required'
+      })
+    }
+
+    if (!quantity) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        errors: 'quantity are required'
+      })
+    }
+    const cart = await cartService.update({
+      variantId,
+      quantity,
+      userId: req.user.id
+    })
 
     return res.status(StatusCodes.OK).json(cart)
   } catch (error) {
