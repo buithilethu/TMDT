@@ -1,5 +1,5 @@
 // service: thao tác với model, su li logic
-import { slugify } from '~/utils/fommaters'
+import { generateUniqueSlug } from '~/utils/fommaters'
 import { productModel } from '~/models/productModel'
 import { createProductWithSKU, updateProductWithSKU } from '~/utils/generateSKU'
 import { uploadImage } from '~/utils/ImageUploader'
@@ -11,12 +11,13 @@ const createNew = async (reqBody) =>
 {
 
   try {
+  const slug = await generateUniqueSlug(reqBody.name)
     const newProduct = {
       ...reqBody,
-      slug:slugify(reqBody.name)
+      slug: slug
     }
 
-
+    console.log(newProduct)
     //create product
     const createdProduct = await productModel.createNew(newProduct)
 
@@ -34,7 +35,7 @@ const update = async (id, reqBody) =>{
   try {
     const product = {
       ...reqBody,
-      slug:slugify(reqBody.name)
+      slug:generateUniqueSlug(reqBody.name)
     }
     const updatedProduct = await productModel.update(id, product)
 
