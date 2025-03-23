@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import '../ProductDetails/style.css';
+import '../ProductDetails/style.css'; // File CSS cho trang chi tiết
 import Header from '../Header';
 import Footer from '../Footer';
-//selectedVariantId lấy mã biến thể ở đây
+
 const ProductDetail = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Lấy ID sản phẩm từ URL
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedAttributes, setSelectedAttributes] = useState({});
-  const [selectedVariantId, setSelectedVariantId] = useState(null);
-  const [availableAttributes, setAvailableAttributes] = useState({});
+  const [selectedImage, setSelectedImage] = useState(0); // Hình ảnh được chọn
+  const [selectedVariant, setSelectedVariant] = useState(null); // Biến thể được chọn
+  const [quantity, setQuantity] = useState(1); // Số lượng sản phẩm
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -24,18 +21,12 @@ const ProductDetail = () => {
           throw new Error('Không thể tải sản phẩm');
         }
         const data = await response.json();
+        console.log('Dữ liệu sản phẩm:', data);
         setProduct(data);
-        if (data.variants && data.variants.length > 0) {
-          const firstVariant = data.variants[0];
-          const attributeKeys = Object.keys(firstVariant.attributes);
-          const initialAttributes = {};
-          attributeKeys.forEach(key => {
-            initialAttributes[key] = '';
-          });
-          setSelectedAttributes(initialAttributes);
-          setAvailableAttributes(getInitialAvailableAttributes(data.variants));
-        }
         setLoading(false);
+        if (data.variants && data.variants.length > 0) {
+          setSelectedVariant(data.variants[0]);
+        }
       } catch (err) {
         setError(err.message);
         setLoading(false);
@@ -45,110 +36,39 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
-  const getInitialAvailableAttributes = (variants) => {
-    const attributes = {};
-    if (variants && variants.length > 0) {
-      // Collect all possible attribute keys from all variants
-      const allKeys = new Set();
-      variants.forEach(variant => {
-        Object.keys(variant.attributes).forEach(key => allKeys.add(key));
-      });
-
-      // Get unique values for each attribute
-      allKeys.forEach(key => {
-        attributes[key] = [...new Set(variants
-          .filter(v => v.attributes[key] !== undefined)
-          .map(v => v.attributes[key]))];
-      });
-    }
-    return attributes;
-  };
-
-  const getAttributeKeys = () => {
-    if (!product?.variants?.length) return [];
-    // Collect all unique attribute keys from all variants
-    const allKeys = new Set();
-    product.variants.forEach(variant => {
-      Object.keys(variant.attributes).forEach(key => allKeys.add(key));
-    });
-    return Array.from(allKeys);
-  };
-
-  const handleAttributeSelect = (attributeKey, value) => {
-    const newAttributes = {
-      ...selectedAttributes,
-      [attributeKey]: value
-    };
-    setSelectedAttributes(newAttributes);
-
-    // Reset subsequent attributes
-    const attributeKeys = getAttributeKeys();
-    const currentIndex = attributeKeys.indexOf(attributeKey);
-    const subsequentKeys = attributeKeys.slice(currentIndex + 1);
-    subsequentKeys.forEach(key => {
-      newAttributes[key] = '';
-    });
-
-    // Find matching variants and update available options
-    const matchingVariants = product.variants.filter(variant => {
-      return Object.entries(newAttributes).every(([key, val]) => {
-        // Skip if the variant doesn't have this attribute or if no value is selected
-        if (!variant.attributes[key] || !val) return true;
-        return variant.attributes[key] === val;
-      });
-    });
-
-    // Update available options for subsequent attributes
-    const newAvailableAttributes = { ...availableAttributes };
-    subsequentKeys.forEach(key => {
-      newAvailableAttributes[key] = [...new Set(matchingVariants
-        .filter(v => v.attributes[key] !== undefined)
-        .map(v => v.attributes[key]))];
-    });
-    setAvailableAttributes(newAvailableAttributes);
-
-    // Check if we have a complete match
-    const completeMatch = matchingVariants.find(variant =>
-      Object.entries(newAttributes).every(([key, val]) => {
-        // Only check attributes that exist in this variant
-        if (!variant.attributes[key]) return true;
-        return variant.attributes[key] === val && val !== '';
-      })
-    );
-
-    if (completeMatch) {
-      setSelectedVariant(completeMatch);
-      setSelectedVariantId(completeMatch._id);
-      setQuantity(1);
-    } else {
-      setSelectedVariant(null);
-      setSelectedVariantId(null);
-    }
-  };
-
-  const handleQuantityChange = (change) => {
-    if (!selectedVariant) return;
-    const newQuantity = quantity + change;
-    if (newQuantity >= 1 && newQuantity <= selectedVariant.stock) {
-      setQuantity(newQuantity);
-    }
-  };
-
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>Lỗi: {error}</div>;
   if (!product) return <div>Không tìm thấy sản phẩm</div>;
 
+  // Lọc hình ảnh duy nhất dựa trên URL
   const images = product.images || [];
   const uniqueImages = Array.from(
     new Map(images.map((img) => [img.url, img])).values()
+  ); // Loại bỏ trùng lặp dựa trên URL
+
+  // Lọc variants duy nhất dựa trên attributes
+  const variants = product.variants || [];
+  const uniqueVariants = Array.from(
+    new Map(
+      variants.map((variant) => {
+        const attrString = Object.entries(variant.attributes)
+          .sort()
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(', ');
+        return [attrString, variant];
+      })
+    ).values()
   );
 
   const category = product.category && product.category.length > 0 ? product.category[0] : null;
-  const stockWarning = selectedVariant && selectedVariant.stock < 5
-    ? `Chỉ còn ${selectedVariant.stock} sản phẩm!`
-    : '';
-  const isVariantSelected = selectedVariant !== null;
-  const isOutOfStock = selectedVariant?.stock === 0;
+
+  const handleVariantClick = (variant) => {
+    setSelectedVariant(variant);
+  };
+
+  const handleQuantityChange = (change) => {
+    setQuantity((prev) => Math.max(1, Math.min(prev + change, selectedVariant?.stock || 999)));
+  };
 
   return (
     <div className="ProductDetail">
@@ -175,7 +95,6 @@ const ProductDetail = () => {
             </div>
           )}
         </div>
-
         <div className="product-info">
           <h1>{product.name}</h1>
           <p className="price">
@@ -189,58 +108,49 @@ const ProductDetail = () => {
             </div>
           )}
 
-          {product.variants.length > 0 && getAttributeKeys().map((attributeKey, index) => (
-            <div key={attributeKey} className="variant-section">
-              <label>{attributeKey}:</label>
-              <div className="variant-buttons">
-                {availableAttributes[attributeKey]?.map((value) => (
+          {/* Màu sắc (không hiển thị nhãn) */}
+          {uniqueVariants.length > 0 && (
+            <div className="colors">
+              <div className="color-buttons">
+                {uniqueVariants.map((variant) => (
                   <button
-                    key={value}
-                    className={`variant-button ${selectedAttributes[attributeKey] === value ? 'selected' : ''}`}
-                    onClick={() => handleAttributeSelect(attributeKey, value)}
-                    disabled={index > 0 && !selectedAttributes[getAttributeKeys()[index - 1]]}
+                    key={variant._id}
+                    className={`color-button ${selectedVariant?._id === variant._id ? 'selected' : ''}`}
+                    onClick={() => handleVariantClick(variant)}
                   >
-                    {value}
+                    {Object.entries(variant.attributes)
+                      .map(([key, value]) => value) // Chỉ lấy giá trị (ví dụ: "Bạc")
+                      .join(', ')}
                   </button>
                 ))}
               </div>
             </div>
-          ))}
+          )}
 
-          {selectedVariant && (
+          {/* Tồn kho (chỉ hiển thị số) */}
+          {uniqueVariants.length > 0 && selectedVariant && (
             <div className="stock">
-              <div>Tồn kho: <span className="stock-value">{selectedVariant.stock}</span></div>
-              {stockWarning && <div className="stock-warning">{stockWarning}</div>}
-              {selectedVariantId && <div className="variant-id">Mã biến thể: {selectedVariantId}</div>}
+              Tồn kho : <span className="stock-value">{selectedVariant.stock}</span>
             </div>
           )}
 
+          {/* Số lượng */}
           <div className="quantity">
             <label>Số lượng: </label>
             <div className="quantity-controls">
-              <button
-                onClick={() => handleQuantityChange(-1)}
-                disabled={!isVariantSelected || isOutOfStock}
-              >-</button>
+              <button onClick={() => handleQuantityChange(-1)}>-</button>
               <span>{quantity}</span>
-              <button
-                onClick={() => handleQuantityChange(1)}
-                disabled={!isVariantSelected || isOutOfStock}
-              >+</button>
+              <button onClick={() => handleQuantityChange(1)}>+</button>
             </div>
           </div>
 
+          {/* Mô tả */}
           <p className="description">
             <label>Mô tả: </label>
             {product.description || 'Chưa có mô tả sản phẩm'}
           </p>
 
-          <button
-            className="add-to-cart"
-            disabled={!isVariantSelected || isOutOfStock}
-          >
-            {isOutOfStock ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
-          </button>
+          <button className="add-to-cart">Thêm vào giỏ hàng</button>
           <Link to="/" className="back-link">Quay lại trang chủ</Link>
         </div>
       </div>

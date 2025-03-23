@@ -1,4 +1,5 @@
-import Joi from 'joi'
+import e from 'express'
+import Joi, { object } from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
@@ -11,13 +12,11 @@ const CATEGORIES_COLLECTION_SCHEMA = Joi.object({
     .max(100)
     .required()
     .messages({
-      'string.empty': 'Tên danh mục không được để trống',
-      'string.min': 'Tên danh mục phải có ít nhất 3 ký tự',
-      'string.max': 'Tên danh mục không được vượt quá 100 ký tự',
-      'any.required': 'Tên danh mục là bắt buộc'
-    }),
-  createdAt: Joi.date().timestamp('javascript').default(Date.now),
-  updatedAt: Joi.date().timestamp('javascript').default(null)
+      'string.empty': 'Tên sản phẩm không được để trống',
+      'string.min': 'Tên sản phẩm phải có ít nhất 3 ký tự',
+      'string.max': 'Tên sản phẩm không được vượt quá 100 ký tự',
+      'any.required': 'Tên sản phẩm là bắt buộc'
+    })
 }).unknown(true)
 
 const validateBeforeCreate = async (data) => {
@@ -42,95 +41,87 @@ const update = async (id, data) => {
     if (!category) {
       throw new Error('Category not found')
     }
-    data.updatedAt = Date.now()
+
     const result = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $set: data })
     return result
 
   } catch (error) {
-    throw new Error(`Error updating category: ${error.message}`)
+    throw new Error(error)
   }
 }
 
 const remove = async (idOrSlug) => {
-  try {
-    let query = !OBJECT_ID_RULE.test(idOrSlug) ? { slug: idOrSlug } : { _id: new ObjectId(idOrSlug) }
-    let result = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).findOneAndDelete(query)
+  let category
 
-    if (!result.value) {
-      throw new Error('Category not found')
-    }
-
-    return result._id.toString()
-  } catch (error) {
-    throw new Error(`Error removing category: ${error.message}`)
+  if (!OBJECT_ID_RULE.test(idOrSlug)) {
+    category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).findOne({ slug: idOrSlug })
+  } else {
+    category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).findOne({ _id: new ObjectId(idOrSlug) })
   }
+
+  if (!category) {
+    throw new Error('Category not found')
+  }
+
+  await GET_DB().collection(CATEGORIES_COLLECTION_NAME).deleteOne({ _id: category._id })
+
+  return category._id.toString()
 }
 
 const findOneById = async (id) => {
-  try {
-    const category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
-      {
-        $match: {
-          _id: new ObjectId(id)
-        }
-      },
-      {
-        $lookup: {
-          from: 'images',
-          localField: '_id',
-          foreignField: 'product_id',
-          as: 'image'
-        }
+
+  const category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
+    {
+      $match: {
+        _id: new ObjectId(id)
       }
-    ]).toArray()
+    },
+    {
+      $lookup: {
+        from: 'images',
+        localField: '_id',
+        foreignField: 'product_id',
+        as: 'image'
+      }
+    }
+  ]).toArray()
 
-    return category[0] || {}
-  } catch (error) {
-    throw new Error(`Error finding category by Id: ${error.message}`)
-  }
-
+  return category[0] || {}
 }
 
 const findOneBySlug = async (slug) => {
-  try {
-    const category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
-      {
-        $match: {
-          slug: slug
-        }
-      },
-      {
-        $lookup: {
-          from: 'images',
-          localField: '_id',
-          foreignField: 'product_id',
-          as: 'image'
-        }
+  const category = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
+    {
+      $match: {
+        slug: slug
       }
-    ]).toArray()
-    return category[0] || {}
-  } catch (error) {
-    throw new Error(`Error finding category by slug: ${error.message}`)
-  }
+    },
+    {
+      $lookup: {
+        from: 'images',
+        localField: '_id',
+        foreignField: 'product_id',
+        as: 'image'
+      }
+    }
+  ]).toArray()
+
+  return category[0] || {}
 }
 
 const findAll = async () => {
-  try {
-    const products = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
-      {
-        $lookup: {
-          from: 'images',
-          localField: '_id',
-          foreignField: 'product_id',
-          as: 'image'
-        }
+  const products = await GET_DB().collection(CATEGORIES_COLLECTION_NAME).aggregate([
+    {
+      $lookup: {
+        from: 'images',
+        localField: '_id',
+        foreignField: 'product_id',
+        as: 'image'
       }
-    ]).toArray()
+    }
+  ]).toArray()
 
-    return products
-  } catch (error) {
-    throw new Error(`Error finding categories: ${error.message}`)
-  }
+  return products
 }
 
 export const categoryModel = {
