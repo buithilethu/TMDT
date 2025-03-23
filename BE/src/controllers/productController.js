@@ -11,11 +11,12 @@ const createNew = async (req, res, next) => {
     //use product's id to create new category (vì product chưa id của category) nên không cần
     //use product's id to create variants
     const json = JSON.parse(req.body.data)
+
     //req
     const product ={
       name: json.name,
       description: json.description,
-      category_id: json.category,
+      category_id: json.category_id,
       price: json.price
     }
 

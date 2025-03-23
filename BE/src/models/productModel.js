@@ -1,7 +1,6 @@
 import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const PRODUCT_COLLECTION_NAME = 'products'
 const PRODUCT_COLLECTION_SCHEMA = Joi.object({
@@ -54,7 +53,7 @@ const createNew = async (data) => {
     const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).insertOne(value)
     return result
   } catch (error) {
-    throw new Error(error)
+    throw new Error(`Error creating product: ${error.message}`)
   }
 }
 
@@ -66,7 +65,7 @@ const update = async (id, data) => {
     const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $set: value })
     return result
   } catch (error) {
-    throw new Error(error)
+    throw new Error(`Error updating product: ${error.message}`)
   }
 }
 
@@ -142,92 +141,125 @@ const findOneBySlug = async (slug) => {
 
 const findAll = async (search, categorySlug, isDestroy) => {
   try {
-    let result
+    const matchStage = { _destroy: isDestroy }
     
-    if (!categorySlug && !search)
-    {
-      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
-        {
-          $match: { _destroy: isDestroy }
-        },
-        {
-          $lookup: {
-            from: 'images',
-            localField: '_id',
-            foreignField: 'product_id',
-            as: 'images'
-          }
-        }
-      ]).toArray()
+    if (search) {
+      matchStage.name = { $regex: search, $options: 'i' }
     }
 
-    if (categorySlug && !search) {
+    if (categorySlug) {
       const category = await GET_DB().collection('categories').findOne({ slug: categorySlug })
-      if(!category)
+      if (!category) return []
+      matchStage.category_id = category._id
+    }
+
+    const pipeline = [
+      { $match: matchStage },
       {
-        return []
+        $lookup: {
+          from: 'images',
+          localField: '_id',
+          foreignField: 'product_id',
+          as: 'images'
+        }
       }
-      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
-        {
-          $match: { category_id: category._id, _destroy: isDestroy }
-        },
-        {
-          $lookup: {
-            from: 'images',
-            localField: '_id',
-            foreignField: 'product_id',
-            as: 'images'
-          }
-        }
-      ]).toArray()
-    }
+    ]
 
-    if (!categorySlug && search) {
-      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
-        {
-          $match: { name: { $regex: search, $options: 'i' }, _destroy: isDestroy }
-        },
-        {
-          $lookup: {
-            from: 'images',
-            localField: '_id',
-            foreignField: 'product_id',
-            as: 'images'
-          }
-        }
-      ]).toArray()
-    }
-
-    if (categorySlug && search) {
-      const category = await GET_DB().collection('categories').findOne({ slug: categorySlug })
-      result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
-        {
-          $match: { name: { $regex: search, $options: 'i' }, category_id: category._id, _destroy: isDestroy }
-        },
-        {
-          $lookup: {
-            from: 'images',
-            localField: '_id',
-            foreignField: 'product_id',
-            as: 'images'
-          }
-        }
-      ]).toArray()
-    }
-
-    return result
+    return await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate(pipeline).toArray()
   } catch (error) {
-    throw new Error(error)
+    throw new Error(`Error finding products: ${error.message}`)
   }
 }
+
+// const findAll = async (search, categorySlug, isDestroy) => {
+//   try {
+//     let result
+    
+//     if (!categorySlug && !search)
+//     {
+//       result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+//         {
+//           $match: { _destroy: isDestroy }
+//         },
+//         {
+//           $lookup: {
+//             from: 'images',
+//             localField: '_id',
+//             foreignField: 'product_id',
+//             as: 'images'
+//           }
+//         }
+//       ]).toArray()
+//     }
+
+//     if (categorySlug && !search) {
+//       const category = await GET_DB().collection('categories').findOne({ slug: categorySlug })
+//       if(!category)
+//       {
+//         return []
+//       }
+//       result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+//         {
+//           $match: { category_id: category._id, _destroy: isDestroy }
+//         },
+//         {
+//           $lookup: {
+//             from: 'images',
+//             localField: '_id',
+//             foreignField: 'product_id',
+//             as: 'images'
+//           }
+//         }
+//       ]).toArray()
+//     }
+
+//     if (!categorySlug && search) {
+//       result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+//         {
+//           $match: { name: { $regex: search, $options: 'i' }, _destroy: isDestroy }
+//         },
+//         {
+//           $lookup: {
+//             from: 'images',
+//             localField: '_id',
+//             foreignField: 'product_id',
+//             as: 'images'
+//           }
+//         }
+//       ]).toArray()
+//     }
+
+//     if (categorySlug && search) {
+//       const category = await GET_DB().collection('categories').findOne({ slug: categorySlug })
+//       result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
+//         {
+//           $match: { name: { $regex: search, $options: 'i' }, category_id: category._id, _destroy: isDestroy }
+//         },
+//         {
+//           $lookup: {
+//             from: 'images',
+//             localField: '_id',
+//             foreignField: 'product_id',
+//             as: 'images'
+//           }
+//         }
+//       ]).toArray()
+//     }
+
+//     return result
+//   } catch (error) {
+//     throw new Error(error)
+//   }
+// }
 
 const deleteProduct = async (id) => {
   try {
-    GET_DB().collection(PRODUCT_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $set: { _destroy: true } })
+    GET_DB().collection(PRODUCT_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $set: { _destroy: true, updatedAt: Date.now() } })
   } catch (error) {
-    throw new Error(error)
+    throw new Error(`Error deleting product: ${error.message}`)
   }
 }
+
 
 export const productModel = {
   PRODUCT_COLLECTION_NAME,

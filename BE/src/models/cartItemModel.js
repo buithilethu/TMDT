@@ -6,10 +6,25 @@ import ApiError from '~/utils/ApiError'
 
 const CART_ITEM_COLLECTION_NAME = 'cartItems'
 const CART_ITEM_COLLECTION_SCHEMA = Joi.object({
-  userId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).required(),
-  variantId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).required(),
-  quantity: Joi.number().min(1).required(),
-  addedAt: Joi.date().timestamp().default(Date.now())
+  userId: Joi.string()
+    .pattern(OBJECT_ID_RULE)
+    .message(OBJECT_ID_RULE_MESSAGE)
+    .required(),
+  variantId: Joi.string()
+    .pattern(OBJECT_ID_RULE)
+    .message(OBJECT_ID_RULE_MESSAGE)
+    .required(),
+  quantity: Joi.number()
+    .integer()
+    .min(1)
+    .required()
+    .messages({
+      'number.base': 'Quantity must be a number',
+      'number.integer': 'Quantity must be an integer',
+      'number.min': 'Quantity must be at least 1'
+    }),
+  addedAt: Joi.date().timestamp().default(Date.now),
+  updatedAt: Joi.date().timestamp().default(null)
 }).unknown(true)
 
 const validateBeforeCreate = async (data) => {
@@ -18,69 +33,105 @@ const validateBeforeCreate = async (data) => {
 //add to cart
 const add = async (data) => {
   try {
-    const cartItem = {
-      userId: data.userId,
-      variantId: data.variantId,
-      quantity: data.quantity
-    }
-    const value = await validateBeforeCreate(cartItem)
 
-    const cartItemExist = await findUserCartItem(value.userId, value.variantId)
-    let result
-    if (cartItemExist) {
-      const newQuantity = cartItemExist.quantity + value.quantity
-      result = await update(cartItemExist.userId, cartItemExist.variantId, { quantity: newQuantity })
-      return
-    } else {
-      value.userId = new ObjectId(value.userId)
-      value.variantId = new ObjectId(value.variantId)
-      result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).insertOne(value)
+    const value = await validateBeforeCreate(data)
+    value.userId = new ObjectId(value.userId)
+    value.variantId = new ObjectId(value.variantId)
+
+    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).findOneAndUpdate(
+      {
+        userId: value.userId,
+        variantId: value.variantId
+      },
+      {
+        $inc: { quantity: value.quantity },
+        $setOnInsert: { addedAt: Date.now() },
+        $set: { updatedAt: Date.now() }
+      },
+      { 
+        upsert: true,
+        returnDocument: 'after'
+      }
+    )
+
+    if (!result) {
+      throw new Error('Failed to add item to cart')
     }
 
     return result
   } catch (error) {
-    throw new Error(error)
+    throw new Error(`Error adding to cart: ${error.message}`)
   }
 }
 //id == variant_id, userId == userId
 
-const update = async (userId, variantId, data) => {
+const update = async (data) => {
   try {
+    const { userId, variantId, quantity } = data
+    const parsedQuantity = parseInt(quantity)
+
+    if (parsedQuantity <= 0) {
+      throw new Error('Quantity must be greater than 0')
+    }
     data.quantity = parseInt(data.quantity)
     if (data.quantity <= 0) {
       throw new Error('Quantity must be greater than 0')
     }
-    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).updateOne({ userId: new ObjectId(userId), variantId: new ObjectId(variantId) }, { $set: data })
+    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).findOneAndUpdate(
+      {
+        userId: new ObjectId(userId),
+        variantId: new ObjectId(variantId)
+      },
+      {
+        $set: {
+          quantity: parsedQuantity,
+          updatedAt: Date.now()
+        }
+      },
+      { returnDocument: 'after' }
+    )
+
+    if (!result.value) {
+      throw new Error('Cart item not found')
+    }
+
     return result
   } catch (error) {
-    throw new Error(error)
+    throw new Error(`Error updating cart: ${error.message}`)
   }
 
 }
 
 const increase = async (userId, variantId) => {
   try {
-    const cartItem = await findUserCartItem(userId, variantId)
-    const newQuantity = cartItem.quantity + 1
-    const result = await update(userId, variantId, { quantity: newQuantity })
+    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).findOneAndUpdate(
+      { userId: new ObjectId(userId), variantId: new ObjectId(variantId) },
+      { $inc: { quantity: 1 } },
+      { returnDocument: 'after' }
+    )
 
+    if (!result) {
+      throw new Error('Cart item not found')
+    }
     return result
   } catch (error) {
-    throw new Error(error)
+    throw new Error(`Error increasing cart item quantity: ${error.message}`)
   }
 }
 
 const decrease = async (userId, variantId) => {
   try {
-    const cartItem = await findUserCartItem(userId, variantId)
-    const newQuantity = cartItem.quantity - 1
+    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).findOneAndUpdate(
+      { userId: new ObjectId(userId), variantId: new ObjectId(variantId) },
+      { $inc: { quantity: -1 } },
+      { returnDocument: 'after' }
+    )
 
-    if (newQuantity <= 0) {
-      return remove(cartItem._id)
-    } else {
-      const result = await update(userId, variantId, { quantity: newQuantity })
-      return result
+    if (!result)
+    {
+      throw new Error('Cart item not found')
     }
+    return result
   } catch (error) {
     throw new Error(error)
   }
@@ -88,17 +139,24 @@ const decrease = async (userId, variantId) => {
 
 const remove = async (variantId, userId) => {
   try {
-    const cartItem = await findUserCartItem(userId, variantId)
-    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).deleteOne({ _id: cartItem._id })
+    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).findOneAndDelete({ userId: new ObjectId(userId), variantId: new ObjectId(variantId) })
+
+    if (!result) {
+      throw new Error('Cart item not found')
+    }
 
     return result
   } catch (error) {
-    throw new ApiError(400, 'Cart item not found')
+    throw new Error(`Error removing cart item: ${error.message}`)
   }
 }
 
 const findUserCartItem = async (userId, variantId) => {
   const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).findOne({ userId: new ObjectId(userId), variantId: new ObjectId(variantId) })
+
+  if (!result) {
+    throw new Error( 'Cart item not found')
+  }
 
   return result
 }
@@ -120,7 +178,10 @@ const getCart = async (userId) => {
         }
       },
       {
-        $unwind: '$variant'
+        $unwind: {
+          path: '$variant',
+          preserveNullAndEmptyArrays: false
+        }
       },
       {
         $lookup: {
@@ -131,7 +192,10 @@ const getCart = async (userId) => {
         }
       },
       {
-        $unwind: '$product'
+        $unwind: {
+          path: '$product',
+          preserveNullAndEmptyArrays: false
+        }
       },
       {
         $lookup: {
@@ -146,27 +210,27 @@ const getCart = async (userId) => {
           _id: 1,
           quantity: 1,
           addedAt: 1,
-          variant: {
-            _id: 1,
-            price: 1,
-            attributes: 1,
-            size: 1,
-            stock: 1
+          productName: '$product.name',
+          variantPrice: '$variant.price',
+          stock: '$variant.stock',
+          attributes: {
+            $map: {
+              input: { $objectToArray: '$variant.attributes' },
+              as: 'attr',
+              in: {
+                name: { $trim: { input: '$$attr.k' } },
+                value: { $trim: { input: '$$attr.v' } }
+              }
+            }
           },
-          product: {
-            name: 1,
-            price: 1
-          },
-          images: {
-            url: 1
-          }
+          imageUrl: { $arrayElemAt: ['$images.url', 0] }
         }
       }
     ]).toArray()
 
-    return result
+    return result || []
   } catch (error) {
-    throw new Error(error)
+    throw new ApiError(500, `Error fetching cart: ${error.message}`)
   }
 }
 
