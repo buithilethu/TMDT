@@ -8,13 +8,13 @@ import { saveFilesToDisk, deleteFiles } from '~/config/multer'
 const createNew = async (req, res, next) => {
   let uploadedImages = []
   let savedImages = []
-
   try {
     //create new product
     //use product's id to create new image
     //use product's id to create new category (vì product chưa id của category) nên không cần
     //use product's id to create variants
     const json = JSON.parse(req.body.data)
+    const host = req.protocol + '://' + req.get('host')
     //req
     const product ={
       name: json.name,
@@ -31,7 +31,7 @@ const createNew = async (req, res, next) => {
     //Create new variants
     await variantService.createMany(product_id, variants)
     //Create new images
-    uploadedImages = await imageService.createMany(product_id, req.files, json.name)
+    uploadedImages = await imageService.createMany(product_id, req.files, json.name, host)
 
     savedImages = saveFilesToDisk(req.files)
 
@@ -54,10 +54,9 @@ const update = async (req, res, next) => {
   let uploadedImages = []
   let savedImages = []
   try {
-
     const productId = req.params.id
     const json = JSON.parse(req.body.data)
-
+    const host = req.protocol + '://' + req.get('host')
     const product ={
       name: json.name,
       description: json.description,
@@ -74,7 +73,7 @@ const update = async (req, res, next) => {
     await productService.update(productId, product)
     await variantService.updateMany(productId, variants)// có id thì update, không có id thì tạo mới
     await variantService.deleteMany(deleteVariants)// xóa theo danh sach id
-    uploadedImages = await imageService.createMany(productId, req.files, json.name)
+    uploadedImages = await imageService.createMany(productId, req.files, json.name, host)
     savedImages = saveFilesToDisk(req.files)
     await imageService.deleteMany(deleteImagesUrl)// xóa theo danh sach id
 
