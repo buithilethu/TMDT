@@ -6,10 +6,13 @@ import { imageService } from '~/services/imageService'
 import { OBJECT_ID_RULE } from '~/utils/validators'
 const createNew = async (req, res, next) => {
 <<<<<<< HEAD
+<<<<<<< HEAD
   let uploadedImages = []
   let savedImages = []
 =======
 >>>>>>> parent of b3e24d4 (Merge branch 'main' of https://github.com/buithilethu/TMDT)
+=======
+>>>>>>> parent of c057edc (a)
   try {
     //create new product
     //use product's id to create new image
@@ -17,10 +20,14 @@ const createNew = async (req, res, next) => {
     //use product's id to create variants
     const json = JSON.parse(req.body.data)
 <<<<<<< HEAD
+<<<<<<< HEAD
     const host = req.protocol + '://' + req.get('host')
 =======
 
 >>>>>>> parent of b3e24d4 (Merge branch 'main' of https://github.com/buithilethu/TMDT)
+=======
+
+>>>>>>> parent of c057edc (a)
     //req
     const product ={
       name: json.name,
@@ -38,10 +45,14 @@ const createNew = async (req, res, next) => {
     await variantService.createMany(product_id, variants)
     //Create new images
 <<<<<<< HEAD
+<<<<<<< HEAD
     uploadedImages = await imageService.createMany(product_id, req.files, json.name, host)
 =======
     await imageService.createMany(product_id, req.files, json.name)
 >>>>>>> parent of b3e24d4 (Merge branch 'main' of https://github.com/buithilethu/TMDT)
+=======
+    await imageService.createMany(product_id, req.files, json.name)
+>>>>>>> parent of c057edc (a)
 
 
     const result = await productService.findOneById(product_id)
@@ -74,11 +85,15 @@ const update = async (req, res, next) =>{
     await variantService.updateMany(productId, variants)// có id thì update, không có id thì tạo mới
     await variantService.deleteMany(deleteVariants)// xóa theo danh sach id
 <<<<<<< HEAD
+<<<<<<< HEAD
     uploadedImages = await imageService.createMany(productId, req.files, json.name, host)
     savedImages = saveFilesToDisk(req.files)
 =======
     await imageService.createMany(productId, req.files, json.name)
 >>>>>>> parent of b3e24d4 (Merge branch 'main' of https://github.com/buithilethu/TMDT)
+=======
+    await imageService.createMany(productId, req.files, json.name)
+>>>>>>> parent of c057edc (a)
     await imageService.deleteMany(deleteImagesUrl)// xóa theo danh sach id
 
     const result = await productService.findOneById(productId)
