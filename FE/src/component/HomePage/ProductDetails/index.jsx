@@ -12,12 +12,9 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [selectedAttributes, setSelectedAttributes] = useState({
-    color: '',
-    size: ''
-  });
+  const [selectedAttributes, setSelectedAttributes] = useState({});
   const [selectedVariantId, setSelectedVariantId] = useState(null);
-  const [availableSizes, setAvailableSizes] = useState([]);
+  const [availableAttributes, setAvailableAttributes] = useState({});
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -30,17 +27,13 @@ const ProductDetail = () => {
         setProduct(data);
         if (data.variants && data.variants.length > 0) {
           const firstVariant = data.variants[0];
-          setSelectedVariant(firstVariant);
-          setSelectedVariantId(firstVariant._id);
-          setSelectedAttributes({
-            color: firstVariant.attributes.color,
-            size: firstVariant.attributes.size
+          const attributeKeys = Object.keys(firstVariant.attributes);
+          const initialAttributes = {};
+          attributeKeys.forEach(key => {
+            initialAttributes[key] = '';
           });
-          // Set available sizes for the first color
-          const sizesForColor = data.variants
-            .filter(v => v.attributes.color === firstVariant.attributes.color)
-            .map(v => v.attributes.size);
-          setAvailableSizes([...new Set(sizesForColor)]);
+          setSelectedAttributes(initialAttributes);
+          setAvailableAttributes(getInitialAvailableAttributes(data.variants));
         }
         setLoading(false);
       } catch (err) {
@@ -52,43 +45,89 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
-  const handleColorSelect = (color) => {
-    setSelectedAttributes(prev => ({
-      ...prev,
-      color: color,
-      size: ''
-    }));
-    setSelectedVariant(null);
-    setSelectedVariantId(null);
-
-    const sizesForColor = product.variants
-      .filter(variant => variant.attributes.color === color)
-      .map(variant => variant.attributes.size);
-    setAvailableSizes([...new Set(sizesForColor)]);
-    setQuantity(1);
+  const getInitialAvailableAttributes = (variants) => {
+    const attributes = {};
+    if (variants && variants.length > 0) {
+      // Collect all possible attribute keys from all variants
+      const allKeys = new Set();
+      variants.forEach(variant => {
+        Object.keys(variant.attributes).forEach(key => allKeys.add(key));
+      });
+      
+      // Get unique values for each attribute
+      allKeys.forEach(key => {
+        attributes[key] = [...new Set(variants
+          .filter(v => v.attributes[key] !== undefined)
+          .map(v => v.attributes[key]))];
+      });
+    }
+    return attributes;
   };
 
-  const handleSizeSelect = (size) => {
-    setSelectedAttributes(prev => ({
-      ...prev,
-      size: size
-    }));
+  const getAttributeKeys = () => {
+    if (!product?.variants?.length) return [];
+    // Collect all unique attribute keys from all variants
+    const allKeys = new Set();
+    product.variants.forEach(variant => {
+      Object.keys(variant.attributes).forEach(key => allKeys.add(key));
+    });
+    return Array.from(allKeys);
+  };
 
-    const matchingVariant = product.variants.find(variant =>
-      variant.attributes.color === selectedAttributes.color &&
-      variant.attributes.size === size
+  const handleAttributeSelect = (attributeKey, value) => {
+    const newAttributes = {
+      ...selectedAttributes,
+      [attributeKey]: value
+    };
+    setSelectedAttributes(newAttributes);
+
+    // Reset subsequent attributes
+    const attributeKeys = getAttributeKeys();
+    const currentIndex = attributeKeys.indexOf(attributeKey);
+    const subsequentKeys = attributeKeys.slice(currentIndex + 1);
+    subsequentKeys.forEach(key => {
+      newAttributes[key] = '';
+    });
+
+    // Find matching variants and update available options
+    const matchingVariants = product.variants.filter(variant => {
+      return Object.entries(newAttributes).every(([key, val]) => {
+        // Skip if the variant doesn't have this attribute or if no value is selected
+        if (!variant.attributes[key] || !val) return true;
+        return variant.attributes[key] === val;
+      });
+    });
+
+    // Update available options for subsequent attributes
+    const newAvailableAttributes = { ...availableAttributes };
+    subsequentKeys.forEach(key => {
+      newAvailableAttributes[key] = [...new Set(matchingVariants
+        .filter(v => v.attributes[key] !== undefined)
+        .map(v => v.attributes[key]))];
+    });
+    setAvailableAttributes(newAvailableAttributes);
+
+    // Check if we have a complete match
+    const completeMatch = matchingVariants.find(variant =>
+      Object.entries(newAttributes).every(([key, val]) => {
+        // Only check attributes that exist in this variant
+        if (!variant.attributes[key]) return true;
+        return variant.attributes[key] === val && val !== '';
+      })
     );
 
-    if (matchingVariant) {
-      setSelectedVariant(matchingVariant);
-      setSelectedVariantId(matchingVariant._id);
+    if (completeMatch) {
+      setSelectedVariant(completeMatch);
+      setSelectedVariantId(completeMatch._id);
       setQuantity(1);
+    } else {
+      setSelectedVariant(null);
+      setSelectedVariantId(null);
     }
   };
 
   const handleQuantityChange = (change) => {
     if (!selectedVariant) return;
-
     const newQuantity = quantity + change;
     if (newQuantity >= 1 && newQuantity <= selectedVariant.stock) {
       setQuantity(newQuantity);
@@ -103,10 +142,6 @@ const ProductDetail = () => {
   const uniqueImages = Array.from(
     new Map(images.map((img) => [img.url, img])).values()
   );
-
-  const getUniqueColors = () => {
-    return [...new Set(product.variants.map(variant => variant.attributes.color))];
-  };
 
   const category = product.category && product.category.length > 0 ? product.category[0] : null;
   const stockWarning = selectedVariant && selectedVariant.stock < 5
@@ -154,41 +189,23 @@ const ProductDetail = () => {
             </div>
           )}
 
-          {product.variants.length > 0 && (
-            <>
-              <div className="variant-section">
-                <label>Màu sắc:</label>
-                <div className="variant-buttons">
-                  {getUniqueColors().map((color) => (
-                    <button
-                      key={color}
-                      className={`variant-button ${selectedAttributes.color === color ? 'selected' : ''}`}
-                      onClick={() => handleColorSelect(color)}
-                    >
-                      {color}
-                    </button>
-                  ))}
-                </div>
+          {product.variants.length > 0 && getAttributeKeys().map((attributeKey, index) => (
+            <div key={attributeKey} className="variant-section">
+              <label>{attributeKey}:</label>
+              <div className="variant-buttons">
+                {availableAttributes[attributeKey]?.map((value) => (
+                  <button
+                    key={value}
+                    className={`variant-button ${selectedAttributes[attributeKey] === value ? 'selected' : ''}`}
+                    onClick={() => handleAttributeSelect(attributeKey, value)}
+                    disabled={index > 0 && !selectedAttributes[getAttributeKeys()[index - 1]]}
+                  >
+                    {value}
+                  </button>
+                ))}
               </div>
-
-              {selectedAttributes.color && (
-                <div className="variant-section">
-                  <label>Kích thước:</label>
-                  <div className="variant-buttons">
-                    {availableSizes.map((size) => (
-                      <button
-                        key={size}
-                        className={`variant-button ${selectedAttributes.size === size ? 'selected' : ''}`}
-                        onClick={() => handleSizeSelect(size)}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+            </div>
+          ))}
 
           {selectedVariant && (
             <div className="stock">
