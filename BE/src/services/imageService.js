@@ -25,6 +25,7 @@ const createMany = async (productId, files, name) =>
 {
   try {
     const images = files.map(file => file.path)
+    const uploadedImages = []
     for ( let image of images) {
       image = image.replace('uploads\\', 'uploads/')
       const imageObj =
@@ -33,10 +34,10 @@ const createMany = async (productId, files, name) =>
           title : name,
           product_id: productId
         }
-
-      await imageModel.createNew(imageObj)
+      uploadedImages.push(imageObj)
     }
 
+    return await imageModel.createNew(uploadedImages)
   } catch (error) {
     throw new Error(error)
   }
