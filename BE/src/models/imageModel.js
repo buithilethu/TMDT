@@ -28,12 +28,11 @@ const createNew = async (data) => {
     const result = await GET_DB().collection(IMAGE_COLLECTION_NAME)
       .insertOne(value)
 
-    const image = await GET_DB().collection(IMAGE_COLLECTION_NAME).findOne({ _id: result.insertedId })
     if (!result.insertedId) {
       throw new Error('Failed to create image')
     }
 
-    return image
+    return result
   } catch (error) {
     throw new Error(`Error creating image: ${error.message}`)
   }
