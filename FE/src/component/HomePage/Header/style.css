@@ -88,3 +88,7 @@ a:hover{
 .User:hover .Dropdown {
     display: block;
 }
+p{
+    font-size: 20px;
+    padding-top: 10px;
+}

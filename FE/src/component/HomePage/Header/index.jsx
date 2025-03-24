@@ -43,7 +43,7 @@ const Header = () => {
   return (
     <div className="Header">
       <div className="Name">
-        <h3>TDB JEWELRY</h3>
+        <p>TBD JEWELRY</p>
       </div>
       <div className="Menu">
         <Link to="/">Trang chủ</Link>
