@@ -11,11 +11,13 @@ const createNew = async (req, res, next) => {
     //use product's id to create new category (vì product chưa id của category) nên không cần
     //use product's id to create variants
     const json = JSON.parse(req.body.data)
+    const host = req.protocol + '://' + req.get('host')
+
     //req
     const product ={
       name: json.name,
       description: json.description,
-      category_id: json.category,
+      category_id: json.category_id,
       price: json.price
     }
 
@@ -27,7 +29,7 @@ const createNew = async (req, res, next) => {
     //Create new variants
     await variantService.createMany(product_id, variants)
     //Create new images
-    await imageService.createMany(product_id, req.files, json.name)
+    await imageService.createMany(product_id, req.files, json.name, host)
 
 
     const result = await productService.findOneById(product_id)
@@ -40,10 +42,9 @@ const createNew = async (req, res, next) => {
 }
 const update = async (req, res, next) =>{
   try {
-
     const productId = req.params.id
     const json = JSON.parse(req.body.data)
-
+    const host = req.protocol + '://' + req.get('host')
     const product ={
       name: json.name,
       description: json.description,
@@ -60,7 +61,7 @@ const update = async (req, res, next) =>{
     await productService.update(productId, product)
     await variantService.updateMany(productId, variants)// có id thì update, không có id thì tạo mới
     await variantService.deleteMany(deleteVariants)// xóa theo danh sach id
-    await imageService.createMany(productId, req.files, json.name)
+    await imageService.createMany(productId, req.files, json.name, host)
     await imageService.deleteMany(deleteImagesUrl)// xóa theo danh sach id
 
     const result = await productService.findOneById(productId)

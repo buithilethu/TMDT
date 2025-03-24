@@ -8,8 +8,9 @@ const create = async (req, res, next) => {
   try {
     //(req.body) => {name: 'abc'}
     //req.file => {filename: imageFile}
+    const host = req.protocol + '://' + req.get('host')
     const createCategory = await categoryService.create(req.body)
-    await imageService.create(createCategory.insertedId.toString(), req.file)
+    await imageService.create(createCategory.insertedId.toString(), req.file, host)
 
     const result = await categoryService.findOneById(createCategory.insertedId)
     res.status(StatusCodes.CREATED).json(result)

@@ -1,13 +1,13 @@
 import { imageModel } from '~/models/imageModel'
 import { env } from '~/config/environment'
 //(id, image) => create new image
-const create = async (productId, image) =>
+const create = async (productId, image, host) =>
 {
   try {
     image = image.path.replace('uploads\\', 'uploads/')
     const imageObj =
       {
-        url: `${env.BASE_URL}/${image}`,
+        url: `${host}/${image}`,
         title : image.filename,
         product_id: productId
       }
@@ -21,7 +21,7 @@ const create = async (productId, image) =>
   }
 }
 //(id, images) => create new images
-const createMany = async (productId, files, name) =>
+const createMany = async (productId, files, name, host) =>
 {
   try {
     const images = files.map(file => file.path)
@@ -29,7 +29,7 @@ const createMany = async (productId, files, name) =>
       image = image.replace('uploads\\', 'uploads/')
       const imageObj =
         {
-          url: `${env.BASE_URL}/${image}`,
+          url: `${host}/${image}`,
           title : name,
           product_id: productId
         }

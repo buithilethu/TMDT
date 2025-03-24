@@ -1,13 +1,13 @@
 // service: thao tác với model, su li logic
 import { categoryModel } from '~/models/categoryModel'
 import { imageService } from './imageService'
-import { slugify } from '~/utils/fommaters'
+import { generateUniqueSlug } from '~/utils/fommaters'
 
 
 const create = async (reqBody) =>
 {
   try {
-    reqBody.slug = slugify(reqBody.name)
+    reqBody.slug = generateUniqueSlug(reqBody.name)
     const newCategory = categoryModel.create(reqBody)
 
     return newCategory
