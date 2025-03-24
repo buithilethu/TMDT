@@ -9,6 +9,10 @@
     background-color: rgb(10, 10, 10);
   
 }
+.Header{
+    position: fixed;
+    top: 0;
+}
 .Menu a{
     cursor: pointer;
     text-decoration: none;
