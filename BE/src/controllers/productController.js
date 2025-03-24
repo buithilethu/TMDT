@@ -4,10 +4,7 @@ import { productService } from '~/services/productService'
 import { variantService } from '~/services/variantService'
 import { imageService } from '~/services/imageService'
 import { OBJECT_ID_RULE } from '~/utils/validators'
-import { saveFilesToDisk, deleteFiles } from '~/config/multer'
 const createNew = async (req, res, next) => {
-  let uploadedImages = []
-  let savedImages = []
   try {
     //create new product
     //use product's id to create new image
@@ -15,6 +12,7 @@ const createNew = async (req, res, next) => {
     //use product's id to create variants
     const json = JSON.parse(req.body.data)
     const host = req.protocol + '://' + req.get('host')
+
     //req
     const product ={
       name: json.name,
@@ -31,28 +29,18 @@ const createNew = async (req, res, next) => {
     //Create new variants
     await variantService.createMany(product_id, variants)
     //Create new images
-    uploadedImages = await imageService.createMany(product_id, req.files, json.name, host)
+    await imageService.createMany(product_id, req.files, json.name, host)
 
-    savedImages = saveFilesToDisk(req.files)
 
     const result = await productService.findOneById(product_id)
 
     res.status(StatusCodes.CREATED).json(result)
   } catch (error) {
-
-    if (uploadedImages.length > 0) {
-      await imageService.removeMany(uploadedImages.map(img => img.url))
-    }
-    if (savedImages.length > 0) {
-      deleteFiles(savedImages.map(img => img.filepath))
-    }
     next(error)
   }
 
 }
-const update = async (req, res, next) => {
-  let uploadedImages = []
-  let savedImages = []
+const update = async (req, res, next) =>{
   try {
     const productId = req.params.id
     const json = JSON.parse(req.body.data)
@@ -73,20 +61,13 @@ const update = async (req, res, next) => {
     await productService.update(productId, product)
     await variantService.updateMany(productId, variants)// có id thì update, không có id thì tạo mới
     await variantService.deleteMany(deleteVariants)// xóa theo danh sach id
-    uploadedImages = await imageService.createMany(productId, req.files, json.name, host)
-    savedImages = saveFilesToDisk(req.files)
+    await imageService.createMany(productId, req.files, json.name, host)
     await imageService.deleteMany(deleteImagesUrl)// xóa theo danh sach id
 
     const result = await productService.findOneById(productId)
     res.status(StatusCodes.OK).json(result)
   } catch (error) {
 
-    if (uploadedImages.length > 0) {
-      await imageService.removeMany(uploadedImages.map(img => img.url))
-    }
-    if (savedImages.length > 0) {
-      deleteFiles(savedImages.map(img => img.filepath))
-    }
     next(error)
 
   }

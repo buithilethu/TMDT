@@ -19,7 +19,6 @@ const create = async (reqBody) =>
 
 const update = async (id, reqBody) => {
   try {
-    reqBody.slug = generateUniqueSlug(reqBody.name)
     const updatedCategory = categoryModel.update(id, reqBody)
 
     return updatedCategory

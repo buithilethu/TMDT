@@ -120,8 +120,7 @@ label {
 .color-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  /* Tăng khoảng cách giữa các nút */
+  gap: 15px; /* Tăng khoảng cách giữa các nút */
 }
 
 .color-button {
@@ -135,8 +134,7 @@ label {
   color: #333;
   transition: all 0.3s ease;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  min-width: 120px;
-  /* Đảm bảo nút có chiều rộng tối thiểu */
+  min-width: 120px; /* Đảm bảo nút có chiều rộng tối thiểu */
   text-align: center;
 }
 
@@ -284,17 +282,6 @@ label {
     margin-top: 10px;
   }
 }
-
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.add-to-cart:disabled {
-  background-color: #cccccc;
-}
-
 
 .variant-section {
   opacity: 1;

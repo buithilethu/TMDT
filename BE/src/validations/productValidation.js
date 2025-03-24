@@ -46,7 +46,7 @@ const createNew = async (req, res, next) => {
       _destroy: Joi.boolean().default(false)
     })
     const json = JSON.parse(req.body.data)
-    console.log(json)
+
     const product ={
       name: json.name,
       description: json.description,

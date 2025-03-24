@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import '../ProductDetails/style.css';
 import Header from '../Header';
 import Footer from '../Footer';
-//selectedVariantId lấy mã biến thể ở đây
+
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);

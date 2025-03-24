@@ -142,7 +142,6 @@ const findOneBySlug = async (slug) => {
 const findAll = async (search, categorySlug, isDestroy) => {
   try {
     const matchStage = { _destroy: isDestroy }
-    
     if (search) {
       matchStage.name = { $regex: search, $options: 'i' }
     }

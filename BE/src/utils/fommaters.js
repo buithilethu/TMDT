@@ -18,12 +18,12 @@ export const generateUniqueSlug = async (name, existingId = null) => {
   const maxIterations = 99999 // Set a maximum number of iterations to avoid infinite loop
   while (maxIterations > 0 && counter <= maxIterations) {
     const existingProduct = await productModel.findOneBySlug(uniqueSlug)
-    if (!existingProduct || (existingProduct && existingProduct._id.toString() === existingId)) {
+    if (Object.keys(existingProduct).length === 0) {
       break
     }
     uniqueSlug = `${slug}-${counter}`
     counter++
   }
 
-  return uniqueSlug
+  return uniqueSlug.toString()
 }

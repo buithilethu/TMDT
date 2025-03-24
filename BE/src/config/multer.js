@@ -1,10 +1,15 @@
 import multer from 'multer'
-import fs from 'fs'
-import path from 'path'
 
-const storage = multer.memoryStorage()
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now()+'.jpg')
+  }
+})
 
-const fileFilter = (req, file, cb) => {
+var fileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     'image/jpeg',
     'image/png',
@@ -25,34 +30,5 @@ const fileFilter = (req, file, cb) => {
   }
 }
 
-export const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter
-})
-
-export const saveFilesToDisk = (files) => {
-  const uploadDir = 'uploads/'
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true })
-  }
-
-  return files.map(file => {
-    const filename = file.fieldname + '-' + Date.now() + '.jpg'
-    const filepath = path.join(uploadDir, filename)
-    fs.writeFileSync(filepath, file.buffer)
-    return {
-      filename,
-      filepath,
-      originalname: file.originalname
-    }
-  })
-}
-
-export const deleteFiles = (filepaths) => {
-  filepaths.forEach(filepath => {
-    if (fs.existsSync(filepath)) {
-      fs.unlinkSync(filepath)
-    }
-  })
-}
+export const upload = multer({ storage: storage, fileFilter: fileFilter })
 

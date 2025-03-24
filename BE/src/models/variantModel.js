@@ -8,6 +8,7 @@ const VARIANT_COLLECTION_SCHEMA = Joi.object({
   product_id: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
     .required()
     .trim()
+    .required()
     .messages({
       'string.empty': 'ID sản phẩm không được để trống',
       'any.required': 'ID sản phẩm là bắt buộc'
@@ -32,9 +33,8 @@ const VARIANT_COLLECTION_SCHEMA = Joi.object({
     .messages({
       'object.base': 'Thuộc tính phải là một object',
       'any.required': 'Thuộc tính biến thể là bắt buộc'
-    }).default([]),
-  createdAt: Joi.date().timestamp('javascript').default(Date.now),
-  updatedAt: Joi.date().timestamp('javascript').default(null)
+    }).default([])
+
 }).unknown(true)
 
 const validateBeforeCreate = async (data) => {
@@ -46,12 +46,11 @@ const create = async (productId, data) => {
     data.product_id = productId
     const value = await validateBeforeCreate(data)
     value.product_id = new ObjectId(value.product_id)
-    const result = await GET_DB().collection(VARIANT_COLLECTION_NAME)
-      .insertOne(value)
+    const result = await GET_DB().collection(VARIANT_COLLECTION_NAME).insertOne(value)
 
     return result
   } catch (error) {
-    throw new Error(`Error creating variant: ${error.message}`)
+    throw new Error(error)
   }
 }
 
@@ -60,37 +59,29 @@ const update = async (id, data) => {
     delete data['_id']
     const value = await validateBeforeCreate(data)
     value.product_id = new ObjectId(value.product_id)
-    value.updatedAt = Date.now()
     const result = await GET_DB().collection(VARIANT_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $set: value })
     return result
   } catch (error) {
-    throw new Error(`Error updating variant: ${error.message}`)
+    throw new Error(error)
   }
 }
 
 const remove = async (id) => {
   try {
-    const result = await GET_DB().collection(VARIANT_COLLECTION_NAME)
-      .deleteOne({ _id: new ObjectId(id) })
-
-    if (!result.deletedCount) {
-      throw new Error('Variant not found')
-    }
-
+    const result = await GET_DB().collection(VARIANT_COLLECTION_NAME).deleteOne({ _id: new ObjectId(id) })
     return result
   } catch (error) {
-    throw new Error(`Error removing variant: ${error.message}`)
+    throw new Error(error)
   }
 }
 
 const findOneById = async (id) => {
   try {
-    const variant = await GET_DB().collection(VARIANT_COLLECTION_NAME)
-      .findOne({ _id: new ObjectId(id) })
+    const variant = await GET_DB().collection(VARIANT_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
 
     return variant
   } catch (error) {
-    throw new Error(`Error finding variant: ${error.message}`)
+    throw new Error(error)
   }
 }
 
