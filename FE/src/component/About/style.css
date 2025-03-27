@@ -2,9 +2,11 @@
     display: flex;
     flex-direction: column;
     width: 100vw;
-    padding: 50px;
+
   }
-  
+  .about{
+    padding-top: 50px;
+  }
   .about-section {
     display: flex;
     align-items: center;
