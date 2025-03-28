@@ -1,5 +1,7 @@
 
-
+.Contact{
+    padding-top: 50px;
+}
 .Contactmain{
     display: flex;
     gap: 50px;
