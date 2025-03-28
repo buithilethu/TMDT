@@ -40,15 +40,19 @@ const createNew = async (req, res, next) => {
   }
 
 }
-const update = async (req, res, next) =>{
+const update = async (req, res, next) => {
   try {
+  console.log('update')
+    //req.params => {id: 'abc'} -? productId
+    //req.body => {name: 'abc', description: 'abc', category: 'abc', price: 123}
+    //req.file
     const productId = req.params.id
     const json = JSON.parse(req.body.data)
     const host = req.protocol + '://' + req.get('host')
     const product ={
       name: json.name,
       description: json.description,
-      category_id: json.category,
+      category_id: json.category_id,
       price: json.price
     }
 

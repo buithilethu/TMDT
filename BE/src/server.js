@@ -19,7 +19,7 @@ const START_SERVER = () => {
   app.use(errorHandlerMiddleware)
 
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
+  app.listen(env.APP_PORT || 3000, () => {
     console.log(`Hello, I am running at ${ env.APP_HOST }:${env.APP_PORT }`)
   })
 
