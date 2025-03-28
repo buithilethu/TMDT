@@ -54,6 +54,7 @@ const createNew = async (req, res, next) => {
       price: json.price
     }
 
+
     await correctBody.validateAsync(product, { abortEarly: false })
     //validate xong thì cho req chạy tiếp qua controller
     next()
@@ -101,12 +102,14 @@ const update = async (req, res, next) => {
       updatedAt: Joi.date().timestamp('javascript').default(null),
       _destroy: Joi.boolean().default(false)
     })
+
+    console.log(req.body.data)
     const json = JSON.parse(req.body.data)
 
     const product ={
       name: json.name,
       description: json.description,
-      category: json.category,
+      category: json.category_id,
       price: json.price
     }
 
