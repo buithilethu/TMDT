@@ -103,7 +103,6 @@ const update = async (req, res, next) => {
       _destroy: Joi.boolean().default(false)
     })
 
-    console.log(req.body.data)
     const json = JSON.parse(req.body.data)
 
     const product ={

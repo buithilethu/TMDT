@@ -2,19 +2,26 @@
 import { StatusCodes } from 'http-status-codes'
 import { categoryService } from '~/services/categoryService'
 import { imageService } from '~/services/imageService'
-import {OBJECT_ID_RULE} from '~/utils/validators'
+import { OBJECT_ID_RULE } from '~/utils/validators'
 
 const create = async (req, res, next) => {
   try {
     //(req.body) => {name: 'abc'}
     //req.file => {filename: imageFile}
-    const host = req.protocol + '://' + req.get('host')
     const createCategory = await categoryService.create(req.body)
-    await imageService.create(createCategory.insertedId.toString(), req.file, host)
+    if (!req.file) throw new Error('Danh mục không có hình ảnh')
+    await imageService.create(createCategory.insertedId.toString(), req.file, req.body.name)
+
 
     const result = await categoryService.findOneById(createCategory.insertedId)
     res.status(StatusCodes.CREATED).json(result)
   } catch (error) {
+
+    if (req.files && req.files.length > 0) {
+      const host = req.protocol + '://' + req.get('host')
+      await imageService.removeMany(req.files.map(file => `${host}/uploads/${file.filename}`))
+    }
+
     next(error)
   }
 
@@ -67,8 +74,8 @@ const findOneById = async (req, res, next) => {
 
 const getAllCategory = async (req, res, next) => {
   try {
-    //()
-    const categories = await categoryService.findAll()
+    const host = req.protocol + '://' + req.get('host')
+    const categories = await categoryService.findAll(host)
 
     res.status(StatusCodes.OK).json(categories)
   } catch (error) {

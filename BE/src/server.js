@@ -7,10 +7,13 @@ import { env } from '~/config/environment.js'
 import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware'
 import { corsOptions } from '~/config/cors'
 import { APIsV1 } from '~/routes/v1/index'
+import 'dotenv/config'
 
 const START_SERVER = () => {
   const app = express()
   app.use(cors(corsOptions))
+  // app.use(cors())
+
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
   app.use(cookieParser())
@@ -19,8 +22,8 @@ const START_SERVER = () => {
   app.use(errorHandlerMiddleware)
 
 
-  app.listen(env.APP_PORT || 3000, () => {
-    console.log(`Hello, I am running at ${ env.APP_HOST }:${env.APP_PORT }`)
+  app.listen(process.env.PORT || 3000, () => {
+    console.log(`Hello, I am running at ${ env.APP_HOST }:${process.env.PORT }`)
   })
 
 }

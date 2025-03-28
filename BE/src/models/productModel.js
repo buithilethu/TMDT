@@ -71,8 +71,17 @@ const update = async (id, data) => {
 
 const findOneById = async (id) => {
   try {
+    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+    return result
+  } catch (error) {
+    throw new Error(`Error finding product: ${error.message}`)
+  }
+}
+
+const findOne = async (query) => {
+  try {
     const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
-      { $match: { _id: new ObjectId(id) } },
+      { $match: query },
       {
         $lookup: {
           from: 'images',
@@ -98,46 +107,13 @@ const findOneById = async (id) => {
         }
       }
     ]).toArray()
+
     return result[0] || {}
   } catch (error) {
     throw new Error(error)
   }
 }
 
-const findOneBySlug = async (slug) => {
-  try {
-    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate([
-      { $match: { slug: slug } },
-      {
-        $lookup: {
-          from: 'images',
-          localField: '_id',
-          foreignField: 'product_id',
-          as: 'images'
-        }
-      },
-      {
-        $lookup: {
-          from: 'variants',
-          localField: '_id',
-          foreignField: 'product_id',
-          as: 'variants'
-        }
-      },
-      {
-        $lookup: {
-          from: 'categories',
-          localField: 'category_id',
-          foreignField: '_id',
-          as: 'category'
-        }
-      }
-    ]).toArray()
-    return result[0] || {}
-  } catch (error) {
-    throw new Error(error)
-  }
-}
 
 const findAll = async (search, categorySlug, isDestroy) => {
   try {
@@ -264,9 +240,9 @@ export const productModel = {
   PRODUCT_COLLECTION_NAME,
   PRODUCT_COLLECTION_SCHEMA,
   createNew,
-  findOneById,
+  findOne,
   findAll,
   update,
   deleteProduct,
-  findOneBySlug
+  findOneById
 }

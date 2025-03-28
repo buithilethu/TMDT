@@ -5,7 +5,10 @@ var storage = multer.diskStorage({
     cb(null, 'uploads/')
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now()+'.jpg')
+    // Lấy đuôi file gốc
+    const ext = file.originalname.split('.').pop()
+    // Giữ nguyên định dạng file gốc thay vì ép sang .jpg
+    cb(null, `${file.fieldname}-${Date.now()}.${ext}`)
   }
 })
 

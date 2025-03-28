@@ -1,4 +1,5 @@
 import { productModel } from '~/models/productModel'
+import { GET_DB } from '~/config/mongodb'
 export const slugify = (val) => {
   if (!val) return ''
   return String(val)
@@ -11,19 +12,21 @@ export const slugify = (val) => {
     .replace(/-+/g, '-') // remove consecutive hyphens
 }
 
-export const generateUniqueSlug = async (name, existingId = null) => {
+export const generateUniqueSlug = async (name, collectionName) => {
   let slug = slugify(name)
   let counter = 1
   let uniqueSlug = slug
   const maxIterations = 99999 // Set a maximum number of iterations to avoid infinite loop
   while (maxIterations > 0 && counter <= maxIterations) {
-    const existingProduct = await productModel.findOneBySlug(uniqueSlug)
-    if (Object.keys(existingProduct).length === 0) {
+    const existingProduct = await GET_DB().collection(collectionName).findOne({ slug: uniqueSlug })
+
+    if (existingProduct === null) {
       break
     }
     uniqueSlug = `${slug}-${counter}`
     counter++
   }
 
+    console.log(uniqueSlug)
   return uniqueSlug.toString()
 }

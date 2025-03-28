@@ -5,9 +5,11 @@ const create = async (productId, image, host) =>
 {
   try {
     image = image.path.replace('uploads\\', 'uploads/')
+    let fileName = image.split('\\')
+    fileName = fileName[fileName.length - 1]
     const imageObj =
       {
-        url: `${host}/${image}`,
+        url: fileName,
         title : image.filename,
         product_id: productId
       }
@@ -21,15 +23,18 @@ const create = async (productId, image, host) =>
   }
 }
 //(id, images) => create new images
-const createMany = async (productId, files, name, host) =>
+const createMany = async (productId, files, name) =>
 {
   try {
     const images = files.map(file => file.path)
     for ( let image of images) {
       image = image.replace('uploads\\', 'uploads/')
+      let fileName = image.split('\\')
+      fileName = fileName[fileName.length - 1]
+
       const imageObj =
         {
-          url: `${host}/${image}`,
+          url: fileName,
           title : name,
           product_id: productId
         }

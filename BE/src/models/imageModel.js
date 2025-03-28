@@ -45,8 +45,17 @@ const removeByUrl = async (url) => {
   try {
     const fileName = url.split('/').pop()
     const filePath = path.join(__dirname, `../../uploads/${fileName}`)
-    fs.unlink(filePath)
-    await GET_DB().collection(IMAGE_COLLECTION_NAME).deleteOne({ url: url })
+    // Check if file exists before attempting to delete
+    try {
+      await fs.access(filePath)
+      await fs.unlink(filePath)
+    } catch (error) {
+      // Silently ignore if file doesn't exist
+    }
+    let imagePath = `uploads/${fileName}`
+    console.log(imagePath)
+    // Delete from DB if exists, ignore if not
+    await GET_DB().collection(IMAGE_COLLECTION_NAME).deleteOne({ url: imagePath })
   } catch (error) {
     throw new Error(error)
   }
@@ -55,7 +64,10 @@ const removeByUrl = async (url) => {
 const removeById = async (id) => {
   try {
     const image = await GET_DB().collection(IMAGE_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
-    removeByUrl(image.url)
+    if (image) {
+      await removeByUrl(image.url)
+    }
+    // Silently ignore if image not found in DB
   } catch (error) {
     throw new Error(error)
   }

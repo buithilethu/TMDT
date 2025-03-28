@@ -7,7 +7,9 @@ import { generateUniqueSlug } from '~/utils/fommaters'
 const create = async (reqBody) =>
 {
   try {
-    reqBody.slug = generateUniqueSlug(reqBody.name)
+    const slug = await generateUniqueSlug(reqBody.name, 'categories')
+
+    reqBody.slug = slug
     const newCategory = categoryModel.create(reqBody)
 
     return newCategory
@@ -48,9 +50,15 @@ const findOneBySlug = async (slug) => {
   }
 }
 
-const findAll = async () => {
+const findAll = async (host) => {
   try {
     const categories = await categoryModel.findAll()
+    for (let category of categories)
+    {
+      if (category && category.image && category.image[0] && category.image[0].url) {
+        category.image[0].url = host + '/' + category.image[0].url
+      }
+    }
     return categories
   } catch (error) {
     throw new Error(error)
