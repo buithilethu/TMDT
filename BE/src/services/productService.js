@@ -11,13 +11,12 @@ const createNew = async (reqBody) =>
 {
 
   try {
-  const slug = await generateUniqueSlug(reqBody.name)
+    const slug = await generateUniqueSlug(reqBody.name)
     const newProduct = {
       ...reqBody,
       slug: slug
     }
 
-    console.log(newProduct)
     //create product
     const createdProduct = await productModel.createNew(newProduct)
 
