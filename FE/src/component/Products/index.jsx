@@ -229,7 +229,8 @@ const AddProduct = () => {
       alert(err.message || 'Có lỗi khi thêm danh mục!');
     }
   };
-
+  //Xóa danh mục 
+  
   // Xử lý form sửa sản phẩm
   const loadProductData = async (productId) => {
     if (!productId) {
