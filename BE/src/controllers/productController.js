@@ -48,7 +48,7 @@ const update = async (req, res, next) =>{
     const product ={
       name: json.name,
       description: json.description,
-      category_id: json.category,
+      category_id: json.category_id,
       price: json.price
     }
 
