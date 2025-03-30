@@ -10,18 +10,20 @@ export const corsOptions = {
     // Thông thường khi sử dụng postman thì cái origin sẽ có giá trị là undefined
     // Update mới: Ở video số 75 trong chuỗi MERN Stack PRO khi chúng ta deploy dự án lên một Server Production thì sẽ sửa lại đoạn này thêm một chút nữa để phù hợp với từng môi trường production hoặc dev nhé. Học với mình thì các bạn cứ yên tâm về sự chỉn chu chuẩn chỉnh nhé :D
     //cho phép gọi API từ Postman tren môi trường dev
-    if (!origin && env.BUILD_MODE === 'dev') {
-      return callback(null, true)
-    }
+    // if (!origin && env.BUILD_MODE === 'dev') {
+    //   return callback(null, true)
+    // }
 
-    // Kiểm tra xem origin có phải là domain được chấp nhận hay không
-    if (WHITELIST_DOMAINS.includes(origin)) {
-      //null (không lỗi) và cho qua
-      return callback(null, true)
-    }
+    // // Kiểm tra xem origin có phải là domain được chấp nhận hay không
+    // if (WHITELIST_DOMAINS.includes(origin)) {
+    //   //null (không lỗi) và cho qua
+    //   return callback(null, true)
+    // }
+
+    return callback(null, true)
 
     // Cuối cùng nếu domain không được chấp nhận thì trả về lỗi
-    return callback(new ApiError(StatusCodes.FORBIDDEN, `${origin} not allowed by our CORS Policy.`))
+    // return callback(new ApiError(StatusCodes.FORBIDDEN, `${origin} not allowed by our CORS Policy.`))
   },
 
   // Some legacy browsers (IE11, various SmartTVs) choke on 204
