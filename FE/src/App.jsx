@@ -13,15 +13,15 @@ function App() {
 
   return (
     <>
-     <div className="Container">
-      <div className="Center">
-        <Header/>
-        <Slidener/>
-        <Center/>
-        <Dvu/>
-        <Footer/>
+      <div className="Container">
+        <div className="Center">
+          <Header />
+          <Slidener />
+          <Center />
+          <Dvu />
+          <Footer />
+        </div>
       </div>
-     </div>
     </>
   )
 }
