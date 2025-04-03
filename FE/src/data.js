@@ -102,3 +102,6 @@ export const yeuthich= [
     price:"1.930.000"
   },
 ];
+
+
+export const url = "http://localhost:3000"

@@ -57,49 +57,58 @@ const Cart = () => {
           <div className="GroupTable">
             {cartItems.length > 0 ? (
               <>
-                <div className="Table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Sản phẩm</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Tổng</th>
-                        <th>Hành động</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {cartItems.map((item) => (
-                        <tr className="td" key={item.id}>
-                          <td className="tbodycart">
-                            <img src={item.image} alt={item.name} />
-                            <p>{item.name}</p>
-                          </td>
-                          <td className="tbodycart">{item.price.toLocaleString()} VNĐ</td>
-                          <td className="tbodycart">
-                            <input
-                              type="number"
-                              min="1"
-                              value={item.quantity}
-                              onChange={(e) => updateQuantity(item.id, e.target.value)}
-                            />
-                          </td>
-                          <td className="tbodycart">
-                            {(item.price * item.quantity).toLocaleString()} VNĐ
-                          </td>
-                          <td className="tbodycart">
-                            <button
-                              onClick={() => removeItem(item.id)}
-                              className="remove-btn"
-                            >
-                              Xóa
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <div className="cart-table-container">
+  <table className="cart-table">
+    <thead>
+      <tr>
+        <th className="product-col">Sản phẩm</th>
+        <th className="price-col">Giá</th>
+        <th className="quantity-col">Số lượng</th>
+        <th className="total-col">Tổng</th>
+        <th className="action-col">Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      {cartItems.map((item) => (
+        <tr key={item.id} className="cart-row">
+          <td className="product-cell">
+            <div className="product-info">
+              <img 
+                src={item.image} 
+                alt={item.name}
+                className="product-image"
+              />
+              <span className="product-name">{item.name}</span>
+            </div>
+          </td>
+          <td className="price-cell">
+            {item.price.toLocaleString('vi-VN', { currency: 'VND' })} VNĐ
+          </td>
+          <td className="quantity-cell">
+            <input
+              type="number"
+              min="1"
+              value={item.quantity}
+              onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+              className="quantity-input"
+            />
+          </td>
+          <td className="total-cell">
+            {(item.price * item.quantity).toLocaleString('vi-VN', { currency: 'VND' })} VNĐ
+          </td>
+          <td className="action-cell">
+            <button
+              onClick={() => removeItem(item.id)}
+              className="remove-button"
+            >
+              Xóa
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
                 <div className="Update">
                   <Link to="/">
                     <button className="Return">

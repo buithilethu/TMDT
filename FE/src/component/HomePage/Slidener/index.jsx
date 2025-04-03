@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Import Link từ react-router-dom
 import '../Slidener/style.css';
 import { banners } from '../../../data.js';
-
+import { url } from '../../../data.js';
 const Slidener = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [categories, setCategories] = useState([]);

@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 import '../Products/style.css';
-
+import { url } from '../../data.js';
 const AddProduct = () => {
   const [productName, setProductName] = useState('');
   const [productDescription, setProductDescription] = useState('');

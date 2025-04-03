@@ -83,19 +83,14 @@ p.home{
     font-size: 18px;
     font-weight: bold;
 }
-tbody{
-    display: flex;
-    flex-direction: column;
-    margin-top: 120px;
-    gap: 24px;
-}
-.banks{
+
+.banks , .cash{
     display: flex;
     gap: 190px;
     align-items: center;
-    
+    padding-bottom: 10px;
 }
-.bank{
+.bank ,.cash{
     display: flex;
     gap: 15px;
     font-size: 18px;
@@ -105,23 +100,22 @@ tbody{
     display: flex;
     gap: 20px;
 }
-.cash{
-    font-size: 18px;
-    font-weight: bold;
-}
+
 .radio{
     display: flex;
     gap: 20px;
     align-items: center;
+    padding-bottom: 10px;
 }
 
 .coupons{
     display: flex;
     gap: 16px;
+    padding-bottom: 10px;
 }
 .coupon input{
     padding: 15px 50px;
-    
+    padding-bottom: 10px;
 }
 .apply input{
     background-color: #DB4444;

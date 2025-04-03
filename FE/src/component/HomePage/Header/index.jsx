@@ -3,7 +3,8 @@ import '../Header/style.css';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
-const Header = () => {
+const Header = ({ cartItems = [] }) => {
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -49,11 +50,8 @@ const Header = () => {
         <Link to="/">Trang chủ</Link>
         <Link to="/Gioithieu">Giới thiệu</Link>
         <Link to="/Tuongtac">Tương tác</Link>
-        {/* Chỉ hiển thị Đăng ký khi chưa đăng nhập */}
         {!user && <Link to="/Dangky">Đăng ký</Link>}
-        {user?.isAdmin === true && (
-          <Link to="/Themsanpham">Thêm sản phẩm</Link>
-        )}
+        {user?.isAdmin === true && <Link to="/Themsanpham">Thêm sản phẩm</Link>}
       </div>
       <div className="GroupSearch">
         <input type="text" placeholder="Tìm kiếm..." />
@@ -68,6 +66,7 @@ const Header = () => {
         <div className="Cart">
           <Link to="/Giohang">
             <img src="/image/Header/Cart.png" alt="Giỏ hàng" />
+            {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
           </Link>
         </div>
         <div className="User">
@@ -75,7 +74,9 @@ const Header = () => {
             <div className="UserLoggedIn">
               <span>Xin chào, {user.lastName || user.email}</span>
               <div className="Dropdown">
-                <a href="#" onClick={handleLogout}>Đăng xuất</a>
+                <a href="#" onClick={handleLogout}>
+                  Đăng xuất
+                </a>
               </div>
             </div>
           ) : (
