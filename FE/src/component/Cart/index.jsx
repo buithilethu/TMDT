@@ -39,7 +39,7 @@ const Cart = () => {
   };
 
   return (
-    <div className="Cart">
+    <div className="Carts">
       <Header cartItems={cartItems} />
       <div className="cart">
         <div className="RoadMapCart">
