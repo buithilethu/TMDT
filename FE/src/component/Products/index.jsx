@@ -219,14 +219,29 @@ const AddProduct = () => {
       }
       await response.json();
       alert('Sản phẩm đã được thêm thành công!');
+
+      // Clear all image previews before resetting
+      productImagePreviews.forEach(preview => {
+        if (preview) URL.revokeObjectURL(preview);
+      });
+
+      // Reset form with clean image states
       setProductName('');
       setProductDescription('');
       setProductCategory('');
       setProductPrice('');
       setProductImages([null]);
+      setProductImagePreviews([]);
       setProductAttributes([{ name: '' }]);
       setProductVariants([]);
       setProductError([]);
+
+      // Reset file inputs
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      fileInputs.forEach(input => {
+        input.value = '';
+      });
+
       addProductVariant();
       fetchProducts();
     } catch (err) {
