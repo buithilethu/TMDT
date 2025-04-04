@@ -102,3 +102,9 @@ export const yeuthich= [
     price:"1.930.000"
   },
 ];
+<<<<<<< HEAD:FE/src/data.js
+=======
+
+
+export const url = "http://localhost:3000"
+>>>>>>> 0b5ce8e4e81e92fe0e20a35e05cc4efa7d86fa5e:FE/src/component/data.js

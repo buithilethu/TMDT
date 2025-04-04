@@ -96,3 +96,42 @@ p{
     font-size: 20px;
     padding-top: 10px;
 }
+/* Trong ../Header/style.css */
+
+/* Đảm bảo .Cart có position: relative để định vị .cart-count */
+.Cart {
+    position: relative;
+    display: inline-block; /* Giữ nguyên bố cục inline */
+  }
+  
+  /* Style cho biểu tượng giỏ hàng */
+  .Cart img {
+    width: 30px; /* Kích thước phù hợp với giao diện hiện tại */
+    height: 30px;
+  }
+  
+  /* Style cho số lượng giỏ hàng */
+  .cart-count {
+    position: absolute;
+    top: -8px; /* Đặt phía trên bên phải của biểu tượng giỏ hàng */
+    right: -8px;
+    background-color: #ff4d4d; /* Màu đỏ giống nút trong Cart.js */
+    color: #fff; /* Chữ trắng */
+    border-radius: 50%; /* Hình tròn */
+    width: 18px; /* Kích thước nhỏ gọn */
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px; /* Cỡ chữ nhỏ */
+    font-weight: bold; /* Chữ đậm */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Bóng nhẹ để nổi bật */
+  }
+  
+  /* Hover effect (tùy chọn) */
+  .Cart:hover .cart-count {
+    background-color: #e60000; /* Đậm hơn khi hover */
+  }
+  
+
+  

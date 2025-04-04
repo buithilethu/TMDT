@@ -88,11 +88,6 @@ const Checkout = () => {
                   <td className="bank">
                     <input name="paymentMethod" type="radio" value="Bank" /> Chuyển khoản ngân hàng
                   </td>
-                  <td className="imgageCheck">
-                    {['Bkash', 'Visa', 'Mastercard', 'Nagad'].map((method) => (
-                      <img key={method} src={`/image/Checkout/${method}.png`} alt={method} />
-                    ))}
-                  </td>
                 </tr>
                 <tr className="cash">
                   <td colSpan={2}>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Import Link từ react-router-dom
 import '../Slidener/style.css';
-import { banners } from '../../../data.js';
 
+import { url, banners } from '../../data.js';
 const Slidener = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [categories, setCategories] = useState([]);
@@ -25,7 +25,7 @@ const Slidener = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:3000/v1/categories/');
+        const response = await fetch(`${url}/v1/categories/`);
         const data = await response.json();
         setCategories(data);
       } catch (error) {

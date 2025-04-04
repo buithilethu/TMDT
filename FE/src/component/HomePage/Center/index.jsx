@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../Center/style.css';
+import { url } from '../../data.js';
+ 
+
 
 
 const Center = ({ cartItems, addToCart }) => {
@@ -16,7 +19,7 @@ const Center = ({ cartItems, addToCart }) => {
     const fetchXuhuong = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/v1/categories?page=${page}&limit=${limit}`
+          `${url}/v1/categories?page=${page}&limit=${limit}`
         );
         const data = await response.json();
         console.log()
@@ -29,7 +32,7 @@ const Center = ({ cartItems, addToCart }) => {
     const fetchYeuthich = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/v1/products?page=${page}&limit=${limit}`
+          `${url}/v1/products?page=${page}&limit=${limit}`
         );
         const data = await response.json();
         setYeuthich(data);
