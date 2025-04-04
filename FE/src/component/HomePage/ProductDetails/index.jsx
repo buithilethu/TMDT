@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import '../ProductDetails/style.css';
 import Header from '../Header';
 import Footer from '../Footer';
+import { url } from '../../data.js';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -19,7 +20,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/v1/products/${id}`);
+        const response = await fetch(`${url}/v1/products/${id}`);
         if (!response.ok) {
           throw new Error('Không thể tải sản phẩm');
         }
