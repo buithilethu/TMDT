@@ -62,7 +62,7 @@ const AddProduct = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:3000/v1/categories/');
+      const response = await fetch(`${url}/v1/categories/`);
       const data = await response.json();
       setCategories(data);
     } catch (err) {
@@ -72,7 +72,7 @@ const AddProduct = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:3000/v1/products/');
+      const response = await fetch(`${url}/v1/products/`)
       const data = await response.json();
       setProducts(data);
     } catch (err) {
