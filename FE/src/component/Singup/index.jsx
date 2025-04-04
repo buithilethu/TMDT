@@ -4,8 +4,8 @@ import Cookies from 'js-cookie';
 import '../Singup/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
-
-const Signup = () => {
+import {url} from '../data.js'
+ const Signup = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -33,7 +33,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/v1/auth/register', {
+      const response = await fetch(`${url}/v1/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstName, lastName, email, password }),

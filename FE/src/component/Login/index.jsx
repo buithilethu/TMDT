@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import '../Login/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
-
+import {url} from '../data.js'
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +27,7 @@ const Login = () => {
     }
 
     try {
-      const loginResponse = await fetch('http://localhost:3000/v1/auth/login', {
+      const loginResponse = await fetch(`${url}/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
