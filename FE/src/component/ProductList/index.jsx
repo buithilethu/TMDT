@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import '../ProductList/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
-
+import {url } from '../data.js'
 const ProductList = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -22,14 +22,14 @@ const ProductList = () => {
       setError(null);
 
       try {
-        const productResponse = await fetch(`http://localhost:3000/v1/products?category=${categorySlug}`);
+        const productResponse = await fetch(`${url}/v1/products?category=${categorySlug}`);
         if (!productResponse.ok) throw new Error('Không thể lấy dữ liệu sản phẩm');
         const productData = await productResponse.json();
 
         // Log dữ liệu sản phẩm để kiểm tra
         setProducts(productData);
 
-        const categoryResponse = await fetch('http://localhost:3000/v1/categories/');
+        const categoryResponse = await fetch(`${url}/v1/categories/`);
         if (!categoryResponse.ok) throw new Error('Không thể lấy dữ liệu danh mục');
         const categoryData = await categoryResponse.json();
         const category = categoryData.find(cat => cat.slug === categorySlug);
