@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../Center/style.css';
 
+
 const Center = ({ cartItems, addToCart }) => {
   const [xuhuong, setXuhuong] = useState([]);
   const [yeuthich, setYeuthich] = useState([]);
@@ -18,6 +19,7 @@ const Center = ({ cartItems, addToCart }) => {
           `http://localhost:3000/v1/categories?page=${page}&limit=${limit}`
         );
         const data = await response.json();
+        console.log()
         setXuhuong(data);
       } catch (error) {
         console.error('Error fetching xu huong:', error);

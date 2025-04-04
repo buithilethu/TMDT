@@ -15,7 +15,11 @@ export const env ={
 
   JWT_ACCESS_KEY: process.env.JWT_ACCESS_KEY,
 
-  JWT_REFRESH_KEY: process.env.JWT_REFRESH_KEY
+  JWT_REFRESH_KEY: process.env.JWT_REFRESH_KEY,
+
+  PAYOS_CLIENT_ID: process.env.PAYOS_CLIENT_ID,
+  PAYOS_API_KEY: process.env.PAYOS_API_KEY,
+  PAYOS_CHECKSUM_KEY: process.env.PAYOS_CHECKSUM_KEY
 }
 
 //lưu trữ biến môi trường trong file .env

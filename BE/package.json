@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.22.10",
+    "@payos/node": "^1.0.10",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",
