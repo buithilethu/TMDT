@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import '../Cart/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
-
+import {url} from '../data.js'
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ const Cart = () => {
   useEffect(() => {
     const checkLoginAndFetchCart = async () => {
       const token = getCookie('token'); // Giả sử cookie tên là 'token'
-
+      console.log(token)
       if (token) {
         // Nếu có token, coi như đã đăng nhập và lấy giỏ hàng từ API
         setIsLoggedIn(true);
@@ -35,13 +35,15 @@ const Cart = () => {
 
     const fetchCartItems = async (token) => {
       try {
-        const response = await fetch('http://localhost:3000/v1/cart', {
+        const response = await fetch(`${url}/v1/cart`, {
+          method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // gửi token vào header
           },
           credentials: 'include',
         });
-
+        console.log(response)
         if (!response.ok) {
           throw new Error('Không thể tải giỏ hàng');
         }
@@ -95,7 +97,7 @@ const Cart = () => {
     const token = getCookie('token');
     if (isLoggedIn && token) {
       try {
-        await fetch(`http://localhost:3000/v1/cart/${id}`, {
+        await fetch(`${url}/v1/cart/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -159,7 +161,7 @@ const Cart = () => {
                           <td className="product-cell">
                             <div className="product-info">
                               <img 
-                                src={`http://localhost:3000/${item.image}`}
+                                src={`${url}/${item.image}`}
                                 alt={item.name}
                                 className="product-image"
                                 onError={(e) => e.target.src = 'default-image.jpg'}

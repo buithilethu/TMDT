@@ -104,4 +104,4 @@ export const yeuthich= [
 ];
 
 
-export const url = "http://localhost:3000"
+export const url = "https://thuonggiaapi.ecotech2a.com"
