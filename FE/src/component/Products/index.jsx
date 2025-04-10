@@ -208,7 +208,7 @@ const AddProduct = () => {
     formData.append('data', JSON.stringify(data));
     validImages.forEach(image => formData.append('images', image));
     try {
-      const response = await fetch('http://localhost:3000/v1/products/', {
+      const response = await fetch(url + '/v1/products/', {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -265,7 +265,7 @@ const AddProduct = () => {
     formData.append('name', categoryName);
     if (categoryImage) formData.append('images', categoryImage);
     try {
-      const response = await fetch('http://localhost:3000/v1/categories/', {
+      const response = await fetch(url + '/v1/categories/', {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -292,7 +292,7 @@ const AddProduct = () => {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:3000/v1/products/${productId}`);
+      const response = await fetch(url + `/v1/products/${productId}`);
       const product = await response.json();
       setSelectedProduct(product);
       setEditProductId(product._id);
@@ -301,7 +301,7 @@ const AddProduct = () => {
       setEditPrice(product.price || '');
       setEditCategory(product.category_id || (product.category && product.category[0]?._id) || '');
       const formattedImages = product.images?.map(img => ({
-        url: img.url || `http://localhost:3000/${img}`,
+        url: img.url || url + `/${img}`,
         _id: img._id
       })) || [];
       setEditImages(formattedImages);
@@ -446,7 +446,7 @@ const AddProduct = () => {
       if (image && !image.url) formData.append('images', image);
     });
     try {
-      const response = await fetch(`http://localhost:3000/v1/products/${editProductId}`, {
+      const response = await fetch(url + `/v1/products/${editProductId}`, {
         method: 'PUT',
         body: formData,
         credentials: 'include',
@@ -472,7 +472,7 @@ const AddProduct = () => {
     }
     if (!window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
     try {
-      const response = await fetch(`http://localhost:3000/v1/products/${editProductId}`, {
+      const response = await fetch(url + `/v1/products/${editProductId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
