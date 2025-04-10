@@ -10,14 +10,14 @@ const Router = express.Router()
 Router.route('/')
   .get(productController.getAllProducts)
   .post(authorizedMiddlewares.authorizedMiddlewareAdmin,
-    upload.array('images', 10),
+    upload.array('images', 30),
     resizeImages,
     productValidation.createNew,
     productController.createNew)
 Router.route('/:id')
   .get(productController.getProduct)
   .put(authorizedMiddlewares.authorizedMiddlewareAdmin,
-    upload.array('images', 10),
+    upload.array('images', 30),
     resizeImages,
     productValidation.update,
     productController.update)

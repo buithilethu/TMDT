@@ -48,8 +48,6 @@ const removeByUrl = async (url) => {
     const filePath = path.join(rootDir, 'uploads', fileName)
     const resizedFile = fileName.replace(/^images-/, 'resized-')
 
-    const originalPath = path.join(rootDir, 'uploads', fileName)
-    const resizedPath = path.join(rootDir, 'uploads', resizedFile)
 
     // Check if file exists before attempting to delete
     try {
