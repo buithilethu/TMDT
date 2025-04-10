@@ -94,14 +94,10 @@ const removeMany = async (idOrUrls) => {
   }
 }
 
-const remove = async (idOrUrl) => {
+const remove = async (id) => {
   try {
-    if (idOrUrl.includes('http')) {
-      await imageModel.removeByUrl(idOrUrl)
-    } else {
-      const image = await imageModel.findOneByProductId(idOrUrl)
-      await imageModel.removeById(image._id)
-    }
+    let result = imageModel.removeById(id)
+    return result
   } catch (error) {
     throw new Error(error)
   }
