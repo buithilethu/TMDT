@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken'
 import { env } from '~/config/environment'
 //xác thực người dùng
 const authorizedMiddleware = (req, res, next) => {
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
+  const token = req.cookies.token
+
   if (!token) {
     return res.status(401).json({ message: 'Please login!', isSuccess: false })
   }
