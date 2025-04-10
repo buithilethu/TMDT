@@ -79,7 +79,6 @@ const update = async (req, res, next) => {
         }),
       description: Joi.string()
         .trim()
-        .min(10)
         .required()
         .messages({
           'string.min': 'Mô tả phải có ít nhất 10 ký tự',

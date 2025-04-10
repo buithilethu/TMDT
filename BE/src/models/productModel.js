@@ -17,7 +17,6 @@ const PRODUCT_COLLECTION_SCHEMA = Joi.object({
     }),
   description: Joi.string()
     .trim()
-    .min(10)
     .required()
     .messages({
       'string.min': 'Mô tả phải có ít nhất 10 ký tự',

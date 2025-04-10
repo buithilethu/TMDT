@@ -44,13 +44,22 @@ const update = async (id, data) => {
 const removeByUrl = async (url) => {
   try {
     const fileName = url.split('/').pop()
-    const filePath = path.join(__dirname, `../../uploads/${fileName}`)
+    const rootDir = path.resolve(__dirname, '../../') // thư mục BE
+    const filePath = path.join(rootDir, 'uploads', fileName)
+    const resizedFile = fileName.replace(/^images-/, 'resized-')
+
+    const originalPath = path.join(rootDir, 'uploads', fileName)
+    const resizedPath = path.join(rootDir, 'uploads', resizedFile)
+
     // Check if file exists before attempting to delete
     try {
       await fs.access(filePath)
       await fs.unlink(filePath)
-    } catch (error) {
-      // Silently ignore if file doesn't exist
+      console.log('🗑️ Xoá file:', filePath)
+    } catch (err) {
+      if (err.code !== 'ENOENT') {
+        console.warn('⚠️ Không thể xoá file:', filePath, err.message)
+      }
     }
     let imagePath = `uploads/${fileName}`
     console.log(imagePath)

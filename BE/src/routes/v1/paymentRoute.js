@@ -1,6 +1,5 @@
-import express from 'express';
-import { paymentController } from '~/controllers/paymentController';
-
+import express from 'express'
+import { paymentController } from '~/controllers/paymentController'
 
 const Router = express.Router()
 

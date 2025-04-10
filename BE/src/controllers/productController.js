@@ -33,25 +33,6 @@ const createNew = async (req, res, next) => {
     await imageService.createMany(product_id, req.files, json.name)
     const result = await productService.findOne({ _id: new ObjectId(product_id) })
 
-//resize images
-// const files = req.files// Danh sách các file đã upload
-
-//     if (!files || files.length === 0) {
-//       return res.status(400).send('Không có file nào được upload')
-//     }
-
-//     // Duyệt qua từng file và resize
-//     const resizePromises = files.map(async (file) => {
-//       const outputPath = `uploads/resized-${file.filename}`
-//       const filePath = file.path// Đường dẫn file gốc
-//       await sharp(filePath)
-//         .withMetadata({ density: 72 })
-//         .toFile(outputPath) // Ghi đè lên file gốc
-//       return filePath
-//     })
-
-//     const resizedFiles = await Promise.all(resizePromises)
-
     res.status(StatusCodes.CREATED).json(result)
   } catch (error) {
 

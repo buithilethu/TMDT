@@ -13,7 +13,7 @@ const createPaymentLink = async (req, res, next) => {
   //get cart item where user_id = req.id
 
 
-  const YOUR_DOMAIN = 'http://localhost:3000'
+  const YOUR_DOMAIN = 'https://thuonggia.ecotech2a.com'
   const body = {
     orderCode: Number(String(Date.now()).slice(-6)),
     amount: 9999,
@@ -36,7 +36,7 @@ const createPaymentLink = async (req, res, next) => {
   }
 
   try {
-    const paymentLinkResponse = await payos.createPaymentLink(body);
+    const paymentLinkResponse = await payos.createPaymentLink(body)
 
     res.json( { url : paymentLinkResponse.checkoutUrl } )
   } catch (error) {
