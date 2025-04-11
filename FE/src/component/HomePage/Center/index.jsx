@@ -33,10 +33,10 @@ const Center = ({ cartItems, addToCart }) => {
         const response = await fetch(`${url}/v1/products`);
         const data = await response.json();
 
-        setTotalProducts(data.length);
+        setTotalProducts(data.count);
 
         // Xáo trộn và phân trang
-        const shuffled = data.sort(() => 0.5 - Math.random());
+        const shuffled = data.products.sort(() => 0.5 - Math.random());
         const startIndex = (page - 1) * productsPerPage;
         const paginated = shuffled.slice(startIndex, startIndex + productsPerPage);
 
@@ -92,7 +92,7 @@ const Center = ({ cartItems, addToCart }) => {
             <div className="SP" key={item._id}>
               <Link to={`/products/?categories=${item.slug}`}>
                 <div className="images">
-                  <img src={item.image?.[0]?.url || '/images/placeholder-image.jpg'} alt={item.name} />
+                  <img src={item?.images?.[0]?.url || '/images/placeholder-image.jpg'} alt={item.name} />
                 </div>
                 <div className="text">
                   <span>{item.name}</span>
