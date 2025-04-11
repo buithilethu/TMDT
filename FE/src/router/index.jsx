@@ -10,6 +10,10 @@ import ProductDetail from "../component/HomePage/ProductDetails/index.jsx";
 
 import AddProduct from "../component/Products/index.jsx";
 import ProductList from "../component/ProductList/index.jsx";
+import Slidener from "../component/HomePage/Slidener/index.jsx";
+import Center from "../component/HomePage/Center/index.jsx";
+import Dvu from "../component/HomePage/Dvu/index.jsx";
+
 const router = createBrowserRouter([
     {
         path: "/",
