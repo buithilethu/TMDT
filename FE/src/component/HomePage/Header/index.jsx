@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import '../Header/style.css';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-
+import {url} from '../../data.js'
 const Header = ({ cartItems = [] }) => {
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const [user, setUser] = useState(null);
@@ -17,7 +17,7 @@ const Header = ({ cartItems = [] }) => {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch('http://localhost:3000/v1/auth/login', {
+      const response = await fetch(`${url}/v1/auth/login`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
