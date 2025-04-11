@@ -65,7 +65,7 @@ const AddProduct = () => {
     try {
       const response = await fetch(`${url}/v1/products/`);
       const data = await response.json();
-      setProducts(data);
+      setProducts(data.products);
     } catch (err) {
       console.error('Lỗi tải sản phẩm:', err);
     }
@@ -592,7 +592,7 @@ const AddProduct = () => {
           {paginatedProducts.map(product => (
             <div key={product._id} className="col">
               <div className="card h-100">
-                <img src={product.images?.url} alt={product.name} className="card-img-top" style={{ height: '200px', objectFit: 'cover' }} />
+                <img src={product.images?.[0].url} alt={product.name} className="card-img-top" style={{ height: '200px', objectFit: 'cover' }} />
                 <div className="card-body ">
                   <div>
                     <h5 className="card-title mb-1">{product.name}</h5>
@@ -622,7 +622,7 @@ const AddProduct = () => {
                       {editingProduct.images?.map((image, index) => (
                         <div key={image._id} className="col-md-4 mb-3">
                           <img
-                            src={image.url}
+                            src={image?.url}
                             alt={`Ảnh ${index + 1}`}
                             className="img-fluid"
                             style={{ height: 150, objectFit: 'cover', width: '100%' }}

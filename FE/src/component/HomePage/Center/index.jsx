@@ -17,7 +17,9 @@ const Center = ({ cartItems, addToCart }) => {
     const queryParams = new URLSearchParams(location.search);
     const page = parseInt(queryParams.get('page')) || 1;
     setCurrentPage(page);
+  }, [location.search]);
 
+  useEffect(() => {
     const fetchXuhuong = async () => {
       try {
         const response = await fetch(`${url}/v1/categories?page=4&limit=30`);
@@ -27,28 +29,26 @@ const Center = ({ cartItems, addToCart }) => {
         console.error('Error fetching xu huong:', error);
       }
     };
+  
+    fetchXuhuong();
+  }, []);
 
+
+  useEffect(() => {
     const fetchYeuthich = async () => {
       try {
-        const response = await fetch(`${url}/v1/products`);
+        const response = await fetch(`${url}/v1/products?page=${currentPage}&limit=${productsPerPage}`);
         const data = await response.json();
-
+  
         setTotalProducts(data.count);
-
-        // Xáo trộn và phân trang
-        const shuffled = data.products.sort(() => 0.5 - Math.random());
-        const startIndex = (page - 1) * productsPerPage;
-        const paginated = shuffled.slice(startIndex, startIndex + productsPerPage);
-
-        setYeuthich(paginated);
+        setYeuthich(data.products);
       } catch (error) {
         console.error('Error fetching yeu thich:', error);
       }
     };
-
-    fetchXuhuong();
+  
     fetchYeuthich();
-  }, [location.search]);
+  }, [currentPage]);
 
   const totalPages = Math.ceil(totalProducts / productsPerPage);
 
@@ -92,7 +92,7 @@ const Center = ({ cartItems, addToCart }) => {
             <div className="SP" key={item._id}>
               <Link to={`/products/?categories=${item.slug}`}>
                 <div className="images">
-                  <img src={item?.images?.[0]?.url || '/images/placeholder-image.jpg'} alt={item.name} />
+                  <img src={item?.image?.[0]?.url || '/images/placeholder-image.jpg'} alt={item.name} />
                 </div>
                 <div className="text">
                   <span>{item.name}</span>
@@ -110,7 +110,7 @@ const Center = ({ cartItems, addToCart }) => {
             <div className="SPYT" key={item._id}>
               <Link to={`/product/${item.slug}`}>
                 <div className="imagesyt">
-                  <img src={item.images?.url || '/images/placeholder-image.jpg'} alt={item.name} />
+                  <img src={item.images?.[0].url || '/images/placeholder-image.jpg'} alt={item.name} />
                 </div>
                 <div className="textyt">
                   <p className="title">{item.name}</p>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import './style.css';
-const url = 'https:localhost:3000'
+const url = 'http:localhost:3000'
 const Cart = () => {
   const context = useOutletContext();
   const { cartItems = [], setCartItems } = context || {};
@@ -16,14 +16,10 @@ const Cart = () => {
     return null;
   };
 
-  const fetchCartItems = async (token) => {
+  const fetchCartItems = async () => {
     try {
       const response = await fetch(`${url}/v1/cart`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
         credentials: 'include',
       });
 

@@ -27,7 +27,7 @@ const ProductList = () => {
         const productData = await productResponse.json();
 
         // Log dữ liệu sản phẩm để kiểm tra
-        setProducts(productData);
+        setProducts(productData.products);
 
         const categoryResponse = await fetch(`${url}/v1/categories/`);
         if (!categoryResponse.ok) throw new Error('Không thể lấy dữ liệu danh mục');
@@ -76,7 +76,7 @@ const ProductList = () => {
                   <a href={`/product/${product.slug}`}>
                     <div className="imagesyt">
                       <img
-                        src={product.images?.url || '/images/placeholder-image.jpg'}
+                        src={product.images?.[0].url || '/images/placeholder-image.jpg'}
                         alt={product.name}
                         onError={(e) => (e.target.src = '/images/placeholder-image.jpg')}
                       />
