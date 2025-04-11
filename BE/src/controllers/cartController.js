@@ -1,4 +1,3 @@
-//Controller này sẽ xử lý các request liên quan đến board
 import { StatusCodes } from 'http-status-codes'
 import { cartService } from '~/services/cartService'
 
@@ -72,7 +71,7 @@ const getCart = async (req, res, next) => {
   //()
   const userId = req.user.id
   const cart = await cartService.getCart(userId)
-
+  console.log(userId)
   return res.status(StatusCodes.OK).json(cart)
 }
 

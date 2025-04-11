@@ -116,15 +116,16 @@ const findOne = async (query) => {
 
 const findAll = async (search, categorySlug, isDestroy) => {
   try {
-    const matchStage = { _destroy: isDestroy }
+    const matchStage = { _destroy: isDestroy };
+
     if (search) {
-      matchStage.name = { $regex: search, $options: 'i' }
+      matchStage.name = { $regex: search, $options: 'i' };
     }
 
     if (categorySlug) {
-      const category = await GET_DB().collection('categories').findOne({ slug: categorySlug })
-      if (!category) return []
-      matchStage.category_id = category._id
+      const category = await GET_DB().collection('categories').findOne({ slug: categorySlug });
+      if (!category) return { products: [], count: 0 };
+      matchStage.category_id = category._id;
     }
 
     const pipeline = [
@@ -136,14 +137,19 @@ const findAll = async (search, categorySlug, isDestroy) => {
           foreignField: 'product_id',
           as: 'images'
         }
-      }
-    ]
+      },
+      { $sort: { _id: -1 } } // hoặc sort theo name, price,...
+    ];
 
-    return await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate(pipeline).toArray()
+    const products = await GET_DB().collection(PRODUCT_COLLECTION_NAME).aggregate(pipeline).toArray();
+    const count = await GET_DB().collection(PRODUCT_COLLECTION_NAME).countDocuments(matchStage);
+
+    return { products, count };
   } catch (error) {
-    throw new Error(`Error finding products: ${error.message}`)
+    throw new Error(`Error finding products: ${error.message}`);
   }
-}
+};
+
 
 // const findAll = async (search, categorySlug, isDestroy) => {
 //   try {
@@ -234,6 +240,16 @@ const deleteProduct = async (id) => {
   }
 }
 
+const getProductCount = async () => {
+  try {
+    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find().count()
+    console.log(result) // Add this line to log the result to the console for debugging purposes
+    return result
+  } catch (error) {
+    throw new Error(`Error getting product count: ${error.message}`)
+  }
+}
+
 
 export const productModel = {
   PRODUCT_COLLECTION_NAME,
@@ -243,5 +259,6 @@ export const productModel = {
   findAll,
   update,
   deleteProduct,
-  findOneById
+  findOneById,
+  getProductCount
 }

@@ -106,63 +106,76 @@ const findUserCartItem = async (userId, variantId) => {
 const getCart = async (userId) => {
   try {
     const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).aggregate([
-      {
-        $match: {
-          userId: new ObjectId(userId)
-        }
+  {
+    $match: {
+      userId: new ObjectId(userId)
+    }
+  },
+  {
+    $lookup: {
+      from: 'variants',
+      localField: 'variantId',
+      foreignField: '_id',
+      as: 'variant'
+    }
+  },
+  {
+    $unwind: {
+      path: '$variant',
+      preserveNullAndEmptyArrays: true
+    }
+  },
+  {
+    $lookup: {
+      from: 'products',
+      localField: 'variant.product_id',
+      foreignField: '_id',
+      as: 'product'
+    }
+  },
+  {
+    $unwind: {
+      path: '$product',
+      preserveNullAndEmptyArrays: true
+    }
+  },
+  {
+    $lookup: {
+      from: 'images',
+      localField: 'product._id',
+      foreignField: 'product_id',
+      as: 'images'
+    }
+  },
+  {
+    $project: {
+      _id: 1,
+      quantity: 1,
+      addedAt: 1,
+      variant: {
+        _id: '$variant._id',
+        price: '$variant.price',
+        attributes: '$variant.attributes',
+        size: '$variant.size',
+        stock: '$variant.stock'
       },
-      {
-        $lookup: {
-          from: 'variants',
-          localField: 'variantId',
-          foreignField: '_id',
-          as: 'variant'
-        }
+      product: {
+        name: '$product.name',
+        price: '$product.price'
       },
-      {
-        $unwind: '$variant'
-      },
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'variant.product_id',
-          foreignField: '_id',
-          as: 'product'
-        }
-      },
-      {
-        $unwind: '$product'
-      },
-      {
-        $lookup: {
-          from: 'images',
-          localField: 'product._id',
-          foreignField: 'product_id',
-          as: 'images'
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          quantity: 1,
-          addedAt: 1,
-          variant: {
-            _id: 1,
-            price: 1,
-            attributes: 1,
-            size: 1,
-            stock: 1
-          },
-          product: {
-            name: 1,
-            price: 1
-          },
-          images: {
-            url: 1
+      images: {
+        $map: {
+          input: '$images',
+          as: 'img',
+          in: {
+            url: '$$img.url'
           }
         }
       }
-    ]).toArray()
+    }
+  }
+]).toArray();
+
 
     return result
   } catch (error) {
