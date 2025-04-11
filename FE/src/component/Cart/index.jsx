@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import './style.css';
-const url = 'https://thuonggiaapi.ecotech2a.com';
-
+const url = 'https:localhost:3000'
 const Cart = () => {
   const context = useOutletContext();
   const { cartItems = [], setCartItems } = context || {};
