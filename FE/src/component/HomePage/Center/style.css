@@ -71,17 +71,29 @@ p{
     height: auto;
     border-radius: 5px;
 }
-
+.textyt {
+    padding: 15px;
+    text-align: center;
+  }
 .textyt .title {
-    font-size: 16px;
-    margin: 10px ;
-}
-
-.textyt .price {
-    font-size: 14px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+    margin: 0 0 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+ 
+  
+  .textyt .price {
+    font-size: 1rem;
+    font-weight: 600;
     color: #e91e63;
-    margin: 5px 0;
-}
+    margin: 0;
+  }
 span{
     color: black;
     font-size: 16px;
@@ -91,7 +103,7 @@ a{
     text-decoration: none !important;;
 }
 .yeuthich button {
-    background-color: #4CAF50;
+
     color: white;
     border: none;
     padding: 8px 16px;
@@ -100,5 +112,35 @@ a{
 }
 
  button:hover {
-    background-color: #45a049;
+    background-color: #e91e1e;
+}
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.page-btn {
+  margin: 0 5px;
+  padding: 6px 12px;
+  background-color: #e53935; /* đỏ chính */
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: #a92222; /* đỏ đậm khi hover */
+}
+
+.page-btn.active {
+  background-color: #b71c1c; /* đỏ đậm cho active */
+  font-weight: bold;
+}
+
+.page-btn:disabled {
+  background-color: #ffcdd2; /* đỏ nhạt cho disabled */
+  color: #888;
+  cursor: not-allowed;
 }

@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import '../Cart/style.css';
-import Header from '../HomePage/Header';
-import Footer from '../HomePage/Footer';
-import {url} from '../data.js'
+import { Link, useOutletContext } from 'react-router-dom';
+import './style.css';
+const url = 'https:localhost:3000'
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([]);
+  const context = useOutletContext();
+  const { cartItems = [], setCartItems } = context || {};
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Hàm lấy token từ cookie
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -18,74 +16,96 @@ const Cart = () => {
     return null;
   };
 
+  const fetchCartItems = async (token) => {
+    try {
+      const response = await fetch(`${url}/v1/cart`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Không thể tải giỏ hàng');
+      }
+
+      const data = await response.json();
+      const formattedItems = data.map((item) => ({
+        id: item._id,
+        quantity: item.quantity,
+        price: item.variant?.price || item.product?.price,
+        name: item.product?.name,
+        image: item.product?.images?.[0]?.url || 'default-image.jpg',
+        productId: item.product?._id,
+        variantId: item.variant?._id,
+      }));
+
+      setCartItems(formattedItems);
+    } catch (err) {
+      setError(err.message);
+      loadCartFromLocalStorage();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadCartFromLocalStorage = () => {
+    const savedCartItems = localStorage.getItem('cartItems');
+    if (savedCartItems) {
+      setCartItems(JSON.parse(savedCartItems));
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     const checkLoginAndFetchCart = async () => {
-      const token = getCookie('token'); // Giả sử cookie tên là 'token'
-      console.log(token)
+      const token = getCookie('token');
       if (token) {
-        // Nếu có token, coi như đã đăng nhập và lấy giỏ hàng từ API
         setIsLoggedIn(true);
         await fetchCartItems(token);
       } else {
-        // Nếu không có token, lấy từ localStorage
         setIsLoggedIn(false);
         loadCartFromLocalStorage();
       }
     };
 
-    const fetchCartItems = async (token) => {
+    checkLoginAndFetchCart();
+  }, [setCartItems]);
+
+  const updateQuantity = async (id, quantity) => {
+    const token = getCookie('token');
+    const newQuantity = Math.max(1, parseInt(quantity, 10) || 1);
+
+    if (isLoggedIn && token) {
       try {
-        const response = await fetch(`${url}/v1/cart`, {
-          method: 'GET',
+        const itemToUpdate = cartItems.find((item) => item.id === id);
+        const response = await fetch(`${url}/v1/cart/update`, {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // gửi token vào header
+            Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({
+            items: [
+              {
+                _id: id,
+                quantity: newQuantity,
+                productId: itemToUpdate.productId,
+                variantId: itemToUpdate.variantId || null,
+              },
+            ],
+          }),
           credentials: 'include',
         });
-        console.log(response)
-        if (!response.ok) {
-          throw new Error('Không thể tải giỏ hàng');
-        }
 
-        const data = await response.json();
-        const formattedItems = data.map(item => ({
-          id: item._id,
-          quantity: item.quantity,
-          price: item.variant.price,
-          name: item.product.name,
-          image: item.images[0]?.url || 'default-image.jpg'
-        }));
-
-        setCartItems(formattedItems);
-        localStorage.setItem('cartItems', JSON.stringify(formattedItems));
+        if (!response.ok) throw new Error('Không thể cập nhật số lượng');
       } catch (err) {
-        setError(err.message);
-        loadCartFromLocalStorage(); // Nếu lỗi API, fallback về localStorage
-      } finally {
-        setLoading(false);
+        console.error('Lỗi khi cập nhật số lượng:', err);
       }
-    };
+    }
 
-    const loadCartFromLocalStorage = () => {
-      const savedCartItems = localStorage.getItem('cartItems');
-      if (savedCartItems) {
-        setCartItems(JSON.parse(savedCartItems));
-      } else {
-        setCartItems([]);
-      }
-      setLoading(false);
-    };
-
-    checkLoginAndFetchCart();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  const updateQuantity = (id, quantity) => {
-    const newQuantity = Math.max(1, parseInt(quantity, 10) || 1);
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id ? { ...item, quantity: newQuantity } : item
@@ -97,18 +117,49 @@ const Cart = () => {
     const token = getCookie('token');
     if (isLoggedIn && token) {
       try {
-        await fetch(`${url}/v1/cart/${id}`, {
+        const response = await fetch(`${url}/v1/cart/deleteItem/${id}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
           credentials: 'include',
         });
+
+        if (!response.ok) throw new Error('Không thể xóa sản phẩm');
       } catch (err) {
-        console.error('Lỗi khi xóa item từ server:', err);
+        console.error('Lỗi khi xóa item:', err);
       }
     }
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  };
+
+  const handleUpdateCart = async () => {
+    const token = getCookie('token');
+    if (isLoggedIn && token) {
+      try {
+        const response = await fetch(`${url}/v1/cart/update`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            items: cartItems.map((item) => ({
+              _id: item.id,
+              productId: item.productId,
+              variantId: item.variantId || null,
+              quantity: item.quantity,
+            })),
+          }),
+          credentials: 'include',
+        });
+
+        if (!response.ok) throw new Error('Không thể cập nhật giỏ hàng');
+        console.log('Giỏ hàng đã được cập nhật:', cartItems);
+      } catch (err) {
+        console.error('Lỗi khi cập nhật giỏ hàng:', err);
+      }
+    }
   };
 
   const calculateSubtotal = () =>
@@ -118,26 +169,17 @@ const Cart = () => {
   const shipping = 0;
   const total = subtotal + shipping;
 
-  const handleUpdateCart = () => {
-    console.log('Giỏ hàng đã được cập nhật:', cartItems);
-  };
-
   if (loading) return <div>Đang tải giỏ hàng...</div>;
   if (error) return <div>Lỗi: {error}</div>;
 
   return (
     <div className="Carts">
-      <Header cartItems={cartItems} />
       <div className="cart">
         <div className="RoadMapCart">
           <div className="Roadmap">
-            <Link to="/">
-              <span className="home">Trang chủ</span>
-            </Link>
-            <span className="home">/</span>
-            <Link to="/cart">
-              <span>Giỏ hàng</span>
-            </Link>
+            <Link to="/">Trang chủ</Link>
+            <span>/</span>
+            <Link to="/Giohang">Giỏ hàng</Link>
           </div>
         </div>
         <div className="ContentCart">
@@ -160,29 +202,38 @@ const Cart = () => {
                         <tr key={item.id} className="cart-row">
                           <td className="product-cell">
                             <div className="product-info">
-                              <img 
-                                src={`${url}/${item.image}`}
+                              <img
+                                src={item.image}
                                 alt={item.name}
                                 className="product-image"
-                                onError={(e) => e.target.src = 'default-image.jpg'}
+                                onError={(e) => (e.target.src = 'default-image.jpg')}
                               />
                               <span className="product-name">{item.name}</span>
                             </div>
                           </td>
                           <td className="price-cell">
-                            {item.price.toLocaleString('vi-VN', { currency: 'VND' })} VNĐ
+                            {item.price.toLocaleString('vi-VN', {
+                              currency: 'VND',
+                            })}{' '}
+                            VNĐ
                           </td>
                           <td className="quantity-cell">
                             <input
                               type="number"
                               min="1"
                               value={item.quantity}
-                              onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                              onChange={(e) =>
+                                updateQuantity(item.id, parseInt(e.target.value))
+                              }
                               className="quantity-input"
                             />
                           </td>
                           <td className="total-cell">
-                            {(item.price * item.quantity).toLocaleString('vi-VN', { currency: 'VND' })} VNĐ
+                            {(item.price * item.quantity).toLocaleString(
+                              'vi-VN',
+                              { currency: 'VND' }
+                            )}{' '}
+                            VNĐ
                           </td>
                           <td className="action-cell">
                             <button
@@ -232,7 +283,11 @@ const Cart = () => {
                   </tr>
                   <tr className="hr">
                     <td className="Name">Phí vận chuyển:</td>
-                    <td className="Price">{shipping === 0 ? 'Miễn phí' : `${shipping.toLocaleString()} VNĐ`}</td>
+                    <td className="Price">
+                      {shipping === 0
+                        ? 'Miễn phí'
+                        : `${shipping.toLocaleString()} VNĐ`}
+                    </td>
                   </tr>
                   <tr className="hr">
                     <td className="Name">Tổng cộng:</td>
@@ -247,7 +302,6 @@ const Cart = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

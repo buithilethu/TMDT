@@ -14,7 +14,7 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-  const productsPerPage = 12; // Số sản phẩm mỗi trang
+  const productsPerPage = 10; // Số sản phẩm mỗi trang
 
   useEffect(() => {
     const fetchData = async () => {

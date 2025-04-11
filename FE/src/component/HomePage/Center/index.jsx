@@ -1,28 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../Center/style.css';
 import { url } from '../../data.js';
- 
-
-
 
 const Center = ({ cartItems, addToCart }) => {
   const [xuhuong, setXuhuong] = useState([]);
   const [yeuthich, setYeuthich] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const productsPerPage = 20;
+
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const page = queryParams.get('page') || 1;
-    const limit = queryParams.get('limit') || 10;
+    const page = parseInt(queryParams.get('page')) || 1;
+    setCurrentPage(page);
 
     const fetchXuhuong = async () => {
       try {
-        const response = await fetch(
-          `${url}/v1/categories?page=${page}&limit=${limit}`
-        );
+        const response = await fetch(`${url}/v1/categories?page=4&limit=30`);
         const data = await response.json();
-        console.log()
         setXuhuong(data);
       } catch (error) {
         console.error('Error fetching xu huong:', error);
@@ -31,11 +30,17 @@ const Center = ({ cartItems, addToCart }) => {
 
     const fetchYeuthich = async () => {
       try {
-        const response = await fetch(
-          `${url}/v1/products?page=${page}&limit=${limit}`
-        );
+        const response = await fetch(`${url}/v1/products`);
         const data = await response.json();
-        setYeuthich(data);
+
+        setTotalProducts(data.length);
+
+        // Xáo trộn và phân trang
+        const shuffled = data.sort(() => 0.5 - Math.random());
+        const startIndex = (page - 1) * productsPerPage;
+        const paginated = shuffled.slice(startIndex, startIndex + productsPerPage);
+
+        setYeuthich(paginated);
       } catch (error) {
         console.error('Error fetching yeu thich:', error);
       }
@@ -44,6 +49,39 @@ const Center = ({ cartItems, addToCart }) => {
     fetchXuhuong();
     fetchYeuthich();
   }, [location.search]);
+
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    navigate(`?page=${page}`);
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    const maxButtons = 4;
+    let start = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+    let end = start + maxButtons - 1;
+
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - maxButtons + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => goToPage(i)}
+          className={`page-btn ${currentPage === i ? 'active' : ''}`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return pages;
+  };
 
   return (
     <div className="Main">
@@ -64,8 +102,9 @@ const Center = ({ cartItems, addToCart }) => {
           ))}
         </div>
       </div>
+
       <div className="yeuthich">
-        <h2>Sản phẩm yêu thích</h2>
+        <h2>Sản phẩm</h2>
         <div className="GroupYT">
           {yeuthich.map((item) => (
             <div className="SPYT" key={item._id}>
@@ -82,6 +121,27 @@ const Center = ({ cartItems, addToCart }) => {
             </div>
           ))}
         </div>
+
+        {/* Phân trang */}
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="page-btn"
+            >
+              Trước
+            </button>
+            {renderPageNumbers()}
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="page-btn"
+            >
+              Sau
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
