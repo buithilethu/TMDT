@@ -23,4 +23,7 @@ Router.route('/:id')
     productController.update)
   .delete(authorizedMiddlewares.authorizedMiddlewareAdmin, productController.deleteProduct)
 
+Router.route('/count')
+  .get(productController.getProductCount)
+
 export const productRoute = Router

@@ -109,22 +109,27 @@ const getProduct = async (req, res, next) => {
 
 const getAllProducts = async (req, res, next) => {
   try {
-    //req.query => {search: 'abc', page: 1, limit: 10, category: 'abc-cde'}
-    const currentUrl = req.protocol + '://' + req.get('host')
-    const search = req.query.search
-    const page = req.query.page || 1
-    const limit = req.query.limit
-    const categorySlug = req.query.category
-    const isDestroy = req.query.isdestroy === 'true' ? true : false
-    const products = await productService.findAll(search, page, limit, categorySlug, isDestroy, currentUrl)
+    const currentUrl = `${req.protocol}://${req.get('host')}`;
+    const search = req.query.search || '';
+    const page = parseInt(req.query.page) || 1;
+    const limit = req.query.limit ? parseInt(req.query.limit) : null;
+    const categorySlug = req.query.category || null;
+    const isDestroy = req.query.isdestroy === 'true';
 
-    res.status(StatusCodes.OK).json(products)
+    const { products, size } = await productService.findAll(
+      search,
+      page,
+      limit,
+      categorySlug,
+      isDestroy,
+      currentUrl
+    );
+
+    res.status(StatusCodes.OK).json({ products, count: size });
   } catch (error) {
-
-    next(error)
-
+    next(error);
   }
-}
+};
 
 const deleteProduct = async (req, res, next) => {
   //req.params => {id: 'abc'} -? productId
@@ -137,10 +142,21 @@ const deleteProduct = async (req, res, next) => {
   }
 }
 
+const getProductCount = async (req, res, next) => {
+  try {
+    const count = await productService.getProductCount()
+    res.status(StatusCodes.OK).json({ Productcount: count })
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
 export const productController = {
   createNew,
   getProduct,
   getAllProducts,
   update,
-  deleteProduct
+  deleteProduct,
+  getProductCount
 }

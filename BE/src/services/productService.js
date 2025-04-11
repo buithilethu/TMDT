@@ -61,30 +61,36 @@ const findOne = async (query, url) => {
 
 const findAll = async (search, page, limit, categorySlug, isDestroy, url) => {
   try {
-    const products = await productModel.findAll(search, categorySlug, isDestroy)
+    const  { products, count } = await productModel.findAll(search, categorySlug, isDestroy);
 
-    //remove variants
-    delete products['variants']
+    // Tổng số sản phẩm (trước khi phân trang)
+    const size = products.length;
 
+    // Xử lý từng sản phẩm
     for (let i = 0; i < products.length; i++) {
-      //host/uploads/abc.jpg
-      if (products[i].images.length > 0)
-      {
-        let image = products[i].images[0]
-        image.url = url + '/' + products[i].images[0].url
-        products[i].images = image
+      // Xoá variants nếu có
+      delete products[i].variants;
+
+      // Xử lý ảnh
+      if (Array.isArray(products[i].images) && products[i].images.length > 0) {
+        products[i].images[0].url = url + '/' + products[i].images[0].url;
+        products[i].images = [products[i].images[0]]; // giữ lại 1 ảnh đầu
       }
     }
-    if (!limit)
-    {
-      return products
+
+    // Nếu không giới hạn, trả hết
+    if (!limit) {
+      return { products, size: count };
     }
 
-    return products.slice((page - 1) * limit, page * limit)
+    // Phân trang và trả về kèm size
+    const paginatedProducts = products.slice((page - 1) * limit, page * limit);
+    return { products: paginatedProducts, size };
   } catch (error) {
-    throw new Error(error)
+    throw new Error(error);
   }
-}
+};
+
 
 const deleteProduct = async (id) => {
   try {
@@ -93,6 +99,7 @@ const deleteProduct = async (id) => {
     throw new Error(error)
   }
 }
+
 
 export const productService = {
   createNew,
