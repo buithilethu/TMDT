@@ -46,10 +46,19 @@ const add = async (data) => {
 
 const update = async (userId, variantId, data) => {
   try {
-    data.quantity = parseInt(data.quantity)
     if (data.quantity <= 0) {
       throw new Error('Quantity must be greater than 0')
     }
+
+    const variant = await GET_DB().collection('variants').findOne({ _id: new ObjectId(variantId) })
+    if (!variant) {
+      throw new Error('Variant not found')
+    } else if (variant.stock < data.quantity) {
+      throw new Error('Not enough stock')
+    } else {
+      data.quantity = parseInt(data.quantity)
+    }
+
     const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).updateOne({ userId: new ObjectId(userId), variantId: new ObjectId(variantId) }, { $set: data })
     return result
   } catch (error) {

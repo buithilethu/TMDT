@@ -13,10 +13,10 @@ Router.post('/add', authorizedMiddlewares.authorizedMiddleware, cartController.a
 Router.put('/update', authorizedMiddlewares.authorizedMiddleware, cartController.update)
 
 //increase cart item quantity
-Router.put('/increase/:id', authorizedMiddlewares.authorizedMiddleware, cartController.increase)
+Router.post('/increase/:id', authorizedMiddlewares.authorizedMiddleware, cartController.increase)
 
 //decrease cart item quantity
-Router.put('/decrease/:id', authorizedMiddlewares.authorizedMiddleware, cartController.decrease)
+Router.post('/decrease/:id', authorizedMiddlewares.authorizedMiddleware, cartController.decrease)
 
 //delete cart
 Router.delete('/deleteItem/:id', authorizedMiddlewares.authorizedMiddleware, cartController.deleteItem)

@@ -13,13 +13,15 @@ const add = async (req, res, next) => {
     next(error)
   }
 }
+
+
 //usuallly update quantity
 const update = async (req, res, next) => {
   try {
     //req.body => {variantId: 'abc', quantity: 1}
     const { variantId, quantity } = req.body
     const userId = req.user.id
-    const cart = await cartService.update(userId, variantId, { quantity : quantity})
+    const cart = await cartService.update(userId, variantId, { quantity : quantity })
 
     return res.status(StatusCodes.OK).json(cart)
   } catch (error) {
@@ -32,6 +34,7 @@ const increase = async (req, res, next) => {
     //req.params => {id: 'abc'} -? variantId
     const { id } = req.params
     const userId = req.user.id
+    console.log(id)
     const cart = await cartService.increase(userId, id)
 
     return res.status(StatusCodes.OK).json(cart)
