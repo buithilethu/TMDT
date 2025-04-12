@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import './style.css';
-const url = 'http:localhost:3000'
+
+const url = 'http://localhost:3000';
+
 const Cart = () => {
-  const context = useOutletContext();
-  const { cartItems = [], setCartItems } = context || {};
+  const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -23,29 +24,32 @@ const Cart = () => {
         credentials: 'include',
       });
 
-      if (!response.ok) {
-        throw new Error('Không thể tải giỏ hàng');
-      }
-
+      if (!response.ok) throw new Error('Không thể tải giỏ hàng');
       const data = await response.json();
+
+
       const formattedItems = data.map((item) => ({
         id: item._id,
         quantity: item.quantity,
         price: item.variant?.price || item.product?.price,
         name: item.product?.name,
-        image: item.product?.images?.[0]?.url || 'default-image.jpg',
+        // Update image path to use the images array directly from response
+        image: item.images?.[0]?.url
+          ? `${url}/${item.images[0].url}`
+          : 'default-image.jpg',
         productId: item.product?._id,
         variantId: item.variant?._id,
       }));
 
+      console.log('Formatted cart items:', formattedItems); // Debug log
       setCartItems(formattedItems);
     } catch (err) {
+      console.error('Error fetching cart:', err);
       setError(err.message);
-      loadCartFromLocalStorage();
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const loadCartFromLocalStorage = () => {
     const savedCartItems = localStorage.getItem('cartItems');
@@ -53,22 +57,50 @@ const Cart = () => {
       setCartItems(JSON.parse(savedCartItems));
     }
     setLoading(false);
-  };
+  }
 
   useEffect(() => {
     const checkLoginAndFetchCart = async () => {
       const token = getCookie('token');
       if (token) {
         setIsLoggedIn(true);
-        await fetchCartItems(token);
+        try {
+          const response = await fetch(`${url}/v1/cart`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (!response.ok) throw new Error('Không thể tải giỏ hàng');
+
+          const data = await response.json();
+          console.log('Server response:', data); // Debug log
+
+          const formattedItems = data.map((item) => ({
+            id: item._id,
+            quantity: item.quantity,
+            price: item.variant?.price || item.product?.price,
+            name: item.product?.name,
+            image: item.images?.[0]?.url
+              ? `${url}/${item.images[0].url}`
+              : 'default-image.jpg',
+            productId: item.product?._id,
+            variantId: item.variant?._id,
+          }));
+
+          setCartItems(formattedItems);
+        } catch (err) {
+          console.error('Error:', err);
+          setError(err.message);
+        }
       } else {
         setIsLoggedIn(false);
         loadCartFromLocalStorage();
       }
+      setLoading(false);
     };
 
     checkLoginAndFetchCart();
-  }, [setCartItems]);
+  }, []);
 
   const updateQuantity = async (id, quantity) => {
     const token = getCookie('token');
@@ -77,7 +109,7 @@ const Cart = () => {
     if (isLoggedIn && token) {
       try {
         const itemToUpdate = cartItems.find((item) => item.id === id);
-        const response = await fetch(`${url}/v1/cart/update`, {
+        await fetch(`${url}/v1/cart/update`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -95,8 +127,6 @@ const Cart = () => {
           }),
           credentials: 'include',
         });
-
-        if (!response.ok) throw new Error('Không thể cập nhật số lượng');
       } catch (err) {
         console.error('Lỗi khi cập nhật số lượng:', err);
       }
@@ -113,19 +143,18 @@ const Cart = () => {
     const token = getCookie('token');
     if (isLoggedIn && token) {
       try {
-        const response = await fetch(`${url}/v1/cart/deleteItem/${id}`, {
+        await fetch(`${url}/v1/cart/deleteItem/${id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${token}`,
           },
           credentials: 'include',
         });
-
-        if (!response.ok) throw new Error('Không thể xóa sản phẩm');
       } catch (err) {
         console.error('Lỗi khi xóa item:', err);
       }
     }
+
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
@@ -133,7 +162,7 @@ const Cart = () => {
     const token = getCookie('token');
     if (isLoggedIn && token) {
       try {
-        const response = await fetch(`${url}/v1/cart/update`, {
+        await fetch(`${url}/v1/cart/update`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -149,8 +178,6 @@ const Cart = () => {
           }),
           credentials: 'include',
         });
-
-        if (!response.ok) throw new Error('Không thể cập nhật giỏ hàng');
         console.log('Giỏ hàng đã được cập nhật:', cartItems);
       } catch (err) {
         console.error('Lỗi khi cập nhật giỏ hàng:', err);
@@ -202,16 +229,16 @@ const Cart = () => {
                                 src={item.image}
                                 alt={item.name}
                                 className="product-image"
-                                onError={(e) => (e.target.src = 'default-image.jpg')}
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = 'default-image.jpg';
+                                }}
                               />
                               <span className="product-name">{item.name}</span>
                             </div>
                           </td>
                           <td className="price-cell">
-                            {item.price.toLocaleString('vi-VN', {
-                              currency: 'VND',
-                            })}{' '}
-                            VNĐ
+                            {item.price.toLocaleString('vi-VN')} VNĐ
                           </td>
                           <td className="quantity-cell">
                             <input
@@ -219,17 +246,13 @@ const Cart = () => {
                               min="1"
                               value={item.quantity}
                               onChange={(e) =>
-                                updateQuantity(item.id, parseInt(e.target.value))
+                                updateQuantity(item.id, e.target.value)
                               }
                               className="quantity-input"
                             />
                           </td>
                           <td className="total-cell">
-                            {(item.price * item.quantity).toLocaleString(
-                              'vi-VN',
-                              { currency: 'VND' }
-                            )}{' '}
-                            VNĐ
+                            {(item.price * item.quantity).toLocaleString('vi-VN')} VNĐ
                           </td>
                           <td className="action-cell">
                             <button
@@ -257,8 +280,7 @@ const Cart = () => {
               </>
             ) : (
               <p>
-                Giỏ hàng của bạn đang trống.{' '}
-                <Link to="/">Mua sắm ngay</Link>
+                Giỏ hàng của bạn đang trống. <Link to="/">Mua sắm ngay</Link>
               </p>
             )}
           </div>
@@ -271,7 +293,9 @@ const Cart = () => {
               <table className="CartTotal">
                 <tbody className="tableCart">
                   <tr>
-                    <h2>Tổng giỏ hàng</h2>
+                    <td colSpan="2">
+                      <h2>Tổng giỏ hàng</h2>
+                    </td>
                   </tr>
                   <tr className="hr">
                     <td className="Name">Tạm tính:</td>

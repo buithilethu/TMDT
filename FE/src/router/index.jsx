@@ -1,4 +1,4 @@
-import {createBrowserRouter} from"react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import App from "../App.jsx";
 import About from "../component/About/index.jsx";
 import Contact from "../component/Contact/index.jsx";
@@ -17,43 +17,44 @@ import Dvu from "../component/HomePage/Dvu/index.jsx";
 const router = createBrowserRouter([
     {
         path: "/",
-        element:<App/>
+        element: <App />
     },
     {
         path: "/Gioithieu",
-        element:<About/>
+        element: <About />
     },
     {
         path: "/Tuongtac",
-        element:<Contact/>
+        element: <Contact />
     },
     {
-        path:"/Dangky",
-        element:<Singup/>
+        path: "/Dangky",
+        element: <Singup />
     },
     {
-        path:"/Dangnhap",
-        element:<Login/>
+        path: "/Dangnhap",
+        element: <Login />
     },
     {
-        path:"/Giohang",
-        element:<Cart/>
+        path: "/Giohang",
+        element: <Cart />
     },
     {
         path: "/Thanhtoan",
-        element:<Checkout/>
+        element: <Checkout />
     },
-    { path:"/product/:id",
-         element:<ProductDetail/> 
-        },
-         {
-            path: "/Themsanpham",
-            element:<AddProduct/>
-         },
-        {
-            path:"/products",
-            element:<ProductList/>
-        }
+    {
+        path: "/product/:id",
+        element: <ProductDetail />
+    },
+    {
+        path: "/Themsanpham",
+        element: <AddProduct />
+    },
+    {
+        path: "/products",
+        element: <ProductList />
+    }
 
 ]);
 export default router;

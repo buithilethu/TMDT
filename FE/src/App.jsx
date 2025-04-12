@@ -93,9 +93,9 @@ function App() {
   return (
     <div className="Container">
       <Header cartItems={cartItems} />
-      <Slidener/>
-      <Center/>
-      <Dvu/>
+      <Slidener />
+      <Center />
+      <Dvu />
       <Outlet context={{ cartItems, setCartItems, addToCart }} />
       <Footer />
     </div>
