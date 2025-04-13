@@ -1,81 +1,185 @@
-.Header{
+/* ---------- HEADER CHÍNH ---------- */
+.Header {
     display: flex;
     align-items: center;
-    gap:70px;
-    padding: 10px;
+    justify-content: space-between;
     color: white;
-    z-index: 5;
+    z-index: 1000;
     background-color: rgb(10, 10, 10);
     width: 100%;
     box-sizing: border-box;
-}
-.Header{
     position: fixed;
     top: 0;
-}
-.Menu a{
-    cursor: pointer;
-    text-decoration: none;
-    color: white;
-}
-.UserLoggedIn span {
-    color:white;
-}
-.Name{
-    font-size: 20px;
-    font-weight: bold;
-    padding: 0px 40px;
-}
-.Menu{
-    display: flex;
-    gap: 60px;
-    align-items: center;
-    font-size: 18px;
-    padding: 0px 40px;
-}
-a:hover{
-    color: blueviolet;
-}
-.GroupSearch{
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-.GroupSearch input{
-    padding: 10px;
-    width: 200px;
-    border-radius: 5px;
-    border: none;
-    outline: none;
-}
-.Search button{
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    outline: none;
-    color: black;
-    background-color: white;
-    cursor: pointer;
-}
-.Logo{
-  display: flex;
-  align-items: center;
-  gap: 20px;
+    left: 0;
+    padding: 10px 30px;
+    transition: transform 0.5s ease;
 }
 
+.Header.hidden {
+    transform: translateY(-100%);
+}
+
+/* ---------- TÊN THƯƠNG HIỆU ---------- */
+.Name {
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.Name p {
+    margin: 0;
+}
+
+/* ---------- MENU CHÍNH ---------- */
+.Menu {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+.Menu a {
+    color: white;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.Menu a:hover {
+    color: blueviolet;
+}
+
+.Logo img {
+    width: 30px;
+    height: 30px;
+}
+
+/* ---------- TÌM KIẾM ---------- */
+.GroupSearch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.search-toggle {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px 12px;
+    transition: transform 0.3s ease, font-size 0.3s ease;
+    white-space: nowrap;
+}
+
+.search-toggle.active {
+    font-size: 13px;
+    transform: scale(0.95);
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background-color: white;
+    border-radius: 5px;
+    padding: 5px 10px;
+    animation: fadeIn 0.3s ease;
+}
+
+.search-box input {
+    width: 200px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.search-box button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: background-color 0.3s ease;
+}
+
+.search-box button:hover {
+    background-color: #0056b3;
+}
+
+/* ---------- GIỎ HÀNG / NGƯỜI DÙNG ---------- */
+.Logo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.Cart {
+    position: relative;
+}
+
+.Cart img {
+    width: 30px;
+    height: 30px;
+}
+
+.cart-count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background-color: #ff4d4d;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* ---------- NGƯỜI DÙNG ---------- */
 .User {
     position: relative;
     display: inline-block;
-    cursor: pointer;
 }
 
 .Dropdown {
     display: none;
     position: absolute;
+    right: 0;
+    top: 100%;
     background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+    z-index: 10;
+}
+
+.UserLoggedIn span {
+    white-space: nowrap;
+    color: white;
+}
+
+.User:hover .Dropdown {
+    display: block;
 }
 
 .Dropdown a {
@@ -89,49 +193,103 @@ a:hover{
     background-color: #f1f1f1;
 }
 
-.User:hover .Dropdown {
-    display: block;
+/* ---------- NÚT TOGGLE MENU MOBILE ---------- */
+.menu-toggle {
+    display: none;
+    font-size: 24px;
+    background: none;
+    color: white;
+    border: none;
+    cursor: pointer;
 }
-p{
-    font-size: 20px;
-    padding-top: 10px;
+
+/* ---------- ANIMATION ---------- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
-/* Trong ../Header/style.css */
 
-/* Đảm bảo .Cart có position: relative để định vị .cart-count */
-.Cart {
-    position: relative;
-    display: inline-block; /* Giữ nguyên bố cục inline */
-  }
-  
-  /* Style cho biểu tượng giỏ hàng */
-  .Cart img {
-    width: 30px; /* Kích thước phù hợp với giao diện hiện tại */
-    height: 30px;
-  }
-  
-  /* Style cho số lượng giỏ hàng */
-  .cart-count {
-    position: absolute;
-    top: -8px; /* Đặt phía trên bên phải của biểu tượng giỏ hàng */
-    right: -8px;
-    background-color: #ff4d4d; /* Màu đỏ giống nút trong Cart.js */
-    color: #fff; /* Chữ trắng */
-    border-radius: 50%; /* Hình tròn */
-    width: 18px; /* Kích thước nhỏ gọn */
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px; /* Cỡ chữ nhỏ */
-    font-weight: bold; /* Chữ đậm */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Bóng nhẹ để nổi bật */
-  }
-  
-  /* Hover effect (tùy chọn) */
-  .Cart:hover .cart-count {
-    background-color: #e60000; /* Đậm hơn khi hover */
-  }
-  
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+    .Header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 20px;
+    }
 
-  
+    .menu-toggle {
+        display: block;
+        align-self: flex-end;
+    }
+
+    .Menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: #111;
+        padding: 10px 0;
+    }
+
+    .Menu.open {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .GroupSearch {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .search-box input {
+        max-width: 180px;
+    }
+
+    .Logo {
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .Name {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        white-space: nowrap;
+        font-size: 18px;
+        width: 100%;
+    }
+
+    .Cart img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .cart-count {
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+    }
+
+    .search-box input {
+        max-width: 160px;
+    }
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover {
+    color: white;
+}

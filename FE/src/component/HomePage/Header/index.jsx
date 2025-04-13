@@ -2,10 +2,40 @@ import { Link } from 'react-router-dom';
 import '../Header/style.css';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import {url} from '../../data.js'
+import { url } from '../../data.js';
+import { useNavigate } from 'react-router-dom';
+
 const Header = ({ cartItems = [] }) => {
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const [user, setUser] = useState(null);
+  const [isSearchVisible, setSearchVisible] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  const toggleSearch = () => {
+    setSearchVisible(!isSearchVisible);
+  };
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const header = document.querySelector('.Header');
+      if (window.scrollY > lastScrollY) {
+        header.classList.add('hidden');
+      } else {
+        header.classList.remove('hidden');
+      }
+      lastScrollY = window.scrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const storedUser = Cookies.get('user');
@@ -18,9 +48,8 @@ const Header = ({ cartItems = [] }) => {
   const fetchUserData = async (token) => {
     try {
       const response = await fetch(`${url}/v1/auth/login`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        method: 'POST',
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
@@ -38,56 +67,85 @@ const Header = ({ cartItems = [] }) => {
 
   const handleLogout = () => {
     Cookies.remove('user');
+    Cookies.remove('token');
+
+    // Gọi API để đăng xuất
+    fetch(`${url}/v1/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+
     setUser(null);
   };
 
   return (
     <div className="Header">
       <div className="Name">
-        <p>TDB JEWELRY</p>
+        <p><Link to={"/"} style={{ textDecoration: "none", color: 'white' }}>TDB JEWELRY</Link></p>
+        <button className="menu-toggle" onClick={toggleMenu}>
+          ☰
+        </button>
       </div>
-      <div className="Menu">
+
+      {/* Nút toggle menu chỉ hiện khi mobile */}
+
+
+      {/* Menu chính */}
+      <div className={`Menu ${menuOpen ? 'open' : ''}`}>
         <Link to="/">Trang chủ</Link>
         <Link to="/Gioithieu">Giới thiệu</Link>
         <Link to="/Tuongtac">Tương tác</Link>
         {!user && <Link to="/Dangky">Đăng ký</Link>}
-        {user?.isAdmin === true && <Link to="/Themsanpham">Thêm sản phẩm</Link>}
-      </div>
-      <div className="GroupSearch">
-        <input type="text" placeholder="Tìm kiếm..." />
-        <div className="Search">
-          <button>Tìm kiếm</button>
-        </div>
-      </div>
-      <div className="Logo">
-        <div className="Wishlist">
-          <img src="/image/Header/Tym.png" alt="Wishlist" />
-        </div>
-        <div className="Cart">
-          <Link to="/Giohang">
-            <img src="/image/Header/Cart.png" alt="Giỏ hàng" />
-            {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
-          </Link>
-        </div>
-        <div className="User">
-          {user ? (
-            <div className="UserLoggedIn">
-              <span>Xin chào, {user.lastName || user.email}</span>
-              <div className="Dropdown">
-                <a href="#" onClick={handleLogout}>
-                  Đăng xuất
-                </a>
-              </div>
+        {user?.isAdmin && <Link to="/Themsanpham">Thêm sản phẩm</Link>}
+
+        {/* Thanh tìm kiếm toggle */}
+        <div className="GroupSearch">
+          {isSearchVisible && (
+            <div className="search-box">
+              <input type="text" placeholder="Tìm kiếm..." />
+              <button>Tìm</button>
             </div>
-          ) : (
-            <>
-              <img src="/image/Header/user.png" alt="User" />
-              <div className="Dropdown">
-                <Link to="/Dangnhap">Đăng nhập</Link>
-                <Link to="/Dangky">Đăng ký</Link>
-              </div>
-            </>
           )}
+          <button
+            className={`search-toggle ${isSearchVisible ? 'active' : ''}`}
+            onClick={toggleSearch}
+          >
+            {isSearchVisible ? '✕' : 'Tìm kiếm'}
+          </button>
+        </div>
+
+        <div className="Logo">
+          <div className="Wishlist">
+            <img src="/image/Header/Tym.png" alt="Wishlist" />
+          </div>
+          <div className="Cart">
+            <Link to="/Giohang">
+              <img src="/image/Header/Cart.png" alt="Giỏ hàng" />
+              {totalItems > 0 && (
+                <span className="cart-count">{totalItems}</span>
+              )}
+            </Link>
+          </div>
+          <div className="User">
+            {user ? (
+              <div className="UserLoggedIn">
+                <span>Xin chào, {user.firstName || user.email}</span>
+                <div className="Dropdown">
+                  <a href="#" onClick={handleLogout}>
+                    Đăng xuất
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <>
+                <img src="/image/Header/user.png" alt="User" />
+                <div className="Dropdown">
+                  <Link to="/Dangnhap">Đăng nhập</Link>
+                  <Link to="/Dangky">Đăng ký</Link>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

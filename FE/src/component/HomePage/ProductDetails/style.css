@@ -98,21 +98,24 @@
   color: #e74c3c;
   margin-bottom: 20px;
 }
-.quantity-controls{
+
+.quantity-controls {
   display: flex;
- 
+
   align-items: center;
   gap: 10px;
 }
-.quantity-controls button{
+
+.quantity-controls button {
   background-color: #f9f9f9;
   border: none;
- 
+
   font-size: 16px;
   color: #333;
   border-radius: 50%;
   cursor: pointer;
 }
+
 /* Nút Thêm vào giỏ hàng */
 .add-to-cart {
   background: linear-gradient(135deg, #007bff, #0056b3);
@@ -126,20 +129,44 @@
   display: inline-block;
   margin-top: 20px;
 }
-.variant-buttons{
+
+.variant-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
+
 .add-to-cart:hover {
   background: linear-gradient(135deg, #0056b3, #003f7f);
   transform: translateY(-2px);
 }
-.quantity{
+
+.quantity {
   display: flex;
   align-items: center;
   gap: 5px;
 }
+
+.variant-button {
+  background-color: #e74c3c;
+  border: 1px solid #ccc;
+  margin-right: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.variant-button:hover {
+  background-color: #c0392b;
+}
+
+.variant-button.selected {
+  background-color: #c0392b;
+  color: white;
+  border-color: #c0392b;
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .product-detail-container {

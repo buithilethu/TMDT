@@ -7,7 +7,7 @@ const Router = express.Router()
 Router.get('/', authorizedMiddlewares.authorizedMiddleware, cartController.getCart)
 //add to cart
 
-Router.post('/add', authorizedMiddlewares.authorizedMiddleware, cartController.add)
+Router.post('/', authorizedMiddlewares.authorizedMiddleware, cartController.add)
 
 //update cart item quantity
 Router.put('/update', authorizedMiddlewares.authorizedMiddleware, cartController.update)

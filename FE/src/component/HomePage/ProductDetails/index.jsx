@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useParams, Link } from 'react-router-dom';
 import '../ProductDetails/style.css';
 import Header from '../Header';
 import Footer from '../Footer';
 import { url } from '../../data.js';
 
+
 const ProductDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -151,6 +154,35 @@ const ProductDetail = () => {
   const isVariantSelected = selectedVariant !== null;
   const isOutOfStock = selectedVariant?.stock === 0;
 
+  const handleAddToCart = async () => {
+    if (!selectedVariantId || quantity < 1) return;
+
+    try {
+      const response = await fetch(`${url}/v1/cart`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          variantId: selectedVariantId,
+          quantity: quantity
+        }),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Thêm vào giỏ hàng thất bại');
+      }
+      // const result = await response.json();
+      alert('Đã thêm vào giỏ hàng!');
+      navigate('/giohang');
+      // Hoặc toast notification
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+
   return (
     <div className="ProductDetail">
       <Header />
@@ -212,7 +244,7 @@ const ProductDetail = () => {
             <div className="stock">
               <div>Tồn kho: <span className="stock-value">{selectedVariant.stock}</span></div>
               {stockWarning && <div className="stock-warning">{stockWarning}</div>}
-              {selectedVariantId && <div className="variant-id">Mã biến thể: {selectedVariantId}</div>}
+              {/* {selectedVariantId && <div className="variant-id">Mã biến thể: {selectedVariantId}</div>} */}
             </div>
           )}
 
@@ -239,6 +271,7 @@ const ProductDetail = () => {
           <button
             className="add-to-cart"
             disabled={!isVariantSelected || isOutOfStock}
+            onClick={handleAddToCart}
           >
             {isOutOfStock ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
           </button>

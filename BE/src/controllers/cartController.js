@@ -4,6 +4,8 @@ import { cartService } from '~/services/cartService'
 const add = async (req, res, next) => {
   try {
     //req.body => {variantId: 'abc', quantity: 1}
+    console.log(req.body)
+
     const { variantId, quantity } = req.body
     const userId = req.user.id
     const cart = await cartService.add({ userId, variantId, quantity })
@@ -34,7 +36,7 @@ const increase = async (req, res, next) => {
     //req.params => {id: 'abc'} -? variantId
     const { id } = req.params
     const userId = req.user.id
-    console.log(id)
+
     const cart = await cartService.increase(userId, id)
 
     return res.status(StatusCodes.OK).json(cart)

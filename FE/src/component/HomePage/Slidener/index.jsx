@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom'; // Import Link từ react-router-dom
 import '../Slidener/style.css';
 
 import { url, banners } from '../../data.js';
+
 const Slidener = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [categories, setCategories] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const sliderRef = useRef(null);
 
   // Chuyển banner tiếp theo
   const handleNextImage = () => {
@@ -35,18 +40,47 @@ const Slidener = () => {
     fetchCategories();
   }, []);
 
+  // Logic drag-to-scroll
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - sliderRef.current.offsetLeft);
+    setScrollLeft(sliderRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    sliderRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
   return (
     <div className="Up">
       <div className="RouterProducts">
-        {categories.map((category) => (
-          <Link
-            key={category._id}
-            to={`/products/?categories=${category.slug}`} // Điều hướng đến trang sản phẩm với slug
-            className="category-link"
-          >
-            {category.name}
-          </Link>
-        ))}
+        <div
+          ref={sliderRef}
+          className="category-slider"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          {categories.map((category) => (
+            <Link
+              key={category._id}
+              to={`/products/?categories=${category.slug}`}
+              className="category-link"
+              draggable={false}
+            >
+              {category.name}
+            </Link>
+          ))}
+        </div>
       </div>
       <div className="banner">
         <div className="banner_text">

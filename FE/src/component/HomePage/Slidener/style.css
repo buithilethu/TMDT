@@ -1,74 +1,128 @@
-.Up{
+.Up {
     display: flex;
     flex-direction: column;
     gap: 40px;
     align-items: center;
     justify-content: center;
     margin: 40px 0;
-    padding: 80px;
+    padding: 50px 10px;
 }
-.RouterProducts{
+
+.RouterProducts {
     display: flex;
     justify-content: center;
-    gap: 60px;
-    font-size: 18px;
-    font-weight: bold;
+    align-items: center;
+    overflow-x: auto;
+    width: 100%;
+    padding: 10px 0;
+    -webkit-overflow-scrolling: touch;
 }
-.RouterProducts a{
-    color: black;
+
+.category-slider {
+    display: flex;
+    overflow-x: auto;
+    cursor: grab;
+    user-select: none;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.category-slider::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
+}
+
+.category-slider:active {
+    cursor: grabbing;
+}
+
+.category-link {
+    flex: 0 0 auto;
+    padding: 10px 20px;
+    margin: 0 5px;
+    white-space: nowrap;
+}
+
+.category-link {
+    flex: 0 0 auto;
+    padding: 10px 16px;
+    border-radius: 20px;
+    background-color: #eee;
+    color: #333;
     text-decoration: none;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    transition: background-color 0.3s ease;
 }
-a:hover{
+
+.category-link:hover {
+    background-color: #ddd;
+}
+
+
+a:hover {
     color: cornflowerblue;
 }
-.banner{
-    color:black;
+
+.banner {
+    color: black;
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    width:1000px ;
+    width: 1000px;
     height: 344px;
 
 }
-.Banner{
-    padding-left:100px ;
+
+.Banner {
+    padding-left: 100px;
 }
-.banner_text{
+
+.banner_text {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
-.iphone_icon{
+
+.iphone_icon {
     display: flex;
-    align-items:flex-start;
+    align-items: flex-start;
     gap: 24px;
 }
-h1{
+
+h1 {
     font-size: 48px;
 }
-.anh img{
+
+.anh img {
     display: flex;
     align-items: center;
-    width:396px;
+    width: 396px;
     height: 300px;
- 
+
 }
-.shop_now{
+
+.shop_now {
     display: flex;
     align-items: center;
     padding-left: 100px;
     font-size: 20px;
 }
- .shop_now a{
+
+.shop_now a {
     color: plum;
     text-decoration: none;
     font-weight: bold;
- }
- img {
+}
+
+img {
     width: 100%;
     height: auto;
     object-fit: contain;
-    image-rendering: -webkit-optimize-contrast;  
-    
-    
+    image-rendering: -webkit-optimize-contrast;
+
+
 }
