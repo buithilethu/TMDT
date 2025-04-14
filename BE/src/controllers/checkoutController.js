@@ -91,6 +91,11 @@ const webhook = async (req, res, next) => {
   if (desc === 'success') {
     await orderModel.updateOrderInfo(orderCode, { status: 'paid' })
   }
+  const cartItems = await cartItemModel.getCart(order.userId)
+
+  const adjustVariantsQuantity = cartItems.map(async (item) => {
+    await cartItemModel.decreaseVariantStock(item.variant._id.toString(), item.quantity)
+  })
 
   cartItemModel.clearUserCart(order.userId)
 

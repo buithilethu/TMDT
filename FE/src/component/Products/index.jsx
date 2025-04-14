@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-
-
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 import '../Products/style.css';
 import { url } from '../data.js';
+import axios from 'axios';
 
 const AddProduct = () => {
   const [productName, setProductName] = useState('');
@@ -41,6 +39,9 @@ const AddProduct = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const [activeTab, setActiveTab] = useState('images');
+
 
   useEffect(() => {
     fetchCategories();
@@ -394,7 +395,35 @@ const AddProduct = () => {
     setProductVariants(variants);
   };
 
+  const handleStockChange = (index, value) => {
+    const updatedProduct = { ...editingProduct };
+    updatedProduct.variants[index].stock = parseInt(value);
+    setEditingProduct(updatedProduct);
+  };
+
   //sidebar
+  const handleUpdateProduct = async () => {
+    if (!editingProduct) return;
+
+    try {
+      const updatedData = {
+        variants: editingProduct.variants.map(v => ({
+          _id: v._id,
+          stock: Number(v.stock) || 0, // đảm bảo là số
+        })),
+      };
+
+      await axios.put(`/api/products/${editingProduct._id}`, updatedData);
+
+      // Làm mới data & đóng modal
+      await fetchProductDetail(editingProduct.slug);
+      await fetchProducts();
+      setEditingProduct(null);
+    } catch (err) {
+      console.error("Lỗi khi cập nhật tồn kho sản phẩm:", err);
+      alert("Cập nhật tồn kho thất bại.");
+    }
+  };
 
 
   return (
@@ -618,31 +647,87 @@ const AddProduct = () => {
                   <div className="modal-body">
                     <p><strong>{editingProduct.name}</strong></p>
 
-                    <div className="row">
-                      {editingProduct.images?.map((image, index) => (
-                        <div key={image._id} className="col-md-4 mb-3">
-                          <img
-                            src={image?.url}
-                            alt={`Ảnh ${index + 1}`}
-                            className="img-fluid"
-                            style={{ height: 150, objectFit: 'cover', width: '100%' }}
-                          />
-                          <button
-                            className="btn btn-sm btn-danger mt-2 w-100"
-                            onClick={() => handleDeleteImage(image._id, image.productId)}
-                          >
-                            Xoá ảnh
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    {/* Tabs */}
+                    <ul className="nav nav-tabs mb-3">
+                      <li className="nav-item">
+                        <button
+                          className={`nav-link ${activeTab === 'images' ? 'active' : ''}`}
+                          onClick={() => setActiveTab('images')}
+                        >
+                          Ảnh sản phẩm
+                        </button>
+                      </li>
+                      <li className="nav-item">
+                        <button
+                          className={`nav-link ${activeTab === 'variants' ? 'active' : ''}`}
+                          onClick={() => setActiveTab('variants')}
+                        >
+                          Biến thể
+                        </button>
+                      </li>
+                    </ul>
 
-                    <label className="form-label mt-3">Thêm ảnh mới:</label>
-                    <input type="file" onChange={handleImageChange} className="form-control" />
+                    {/* Tab Content */}
+                    {activeTab === 'images' && (
+                      <>
+                        <div className="row">
+                          {editingProduct.images?.map((image, index) => (
+                            <div key={image._id} className="col-md-4 mb-3">
+                              <img
+                                src={image?.url}
+                                alt={`Ảnh ${index + 1}`}
+                                className="img-fluid"
+                                style={{ height: 150, objectFit: 'cover', width: '100%' }}
+                              />
+                              <button
+                                className="btn btn-sm btn-danger mt-2 w-100"
+                                onClick={() => handleDeleteImage(image._id, image.productId)}
+                              >
+                                Xoá ảnh
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+
+                        <label className="form-label mt-3">Thêm ảnh mới:</label>
+                        <input type="file" onChange={handleImageChange} className="form-control" />
+                      </>
+                    )}
+
+                    {activeTab === 'variants' && (
+                      <div className="mt-3">
+                        <h6>Cập nhật số lượng tồn kho theo loại:</h6>
+                        {editingProduct.variants?.map((variant, idx) => (
+                          <div key={variant._id} className="mb-3 row align-items-center">
+                            <div className="col-md-6">
+                              {Object.entries(variant.attributes).map(([key, value]) => (
+                                <p key={key} className="mb-1">
+                                  <strong>{key}</strong>: {value}
+                                </p>
+                              ))}
+                            </div>
+                            <div className="col-md-6">
+                              <input
+                                type="number"
+                                className="form-control"
+                                value={variant.stock}
+                                onChange={(e) => handleStockChange(idx, e.target.value)}
+                                min={0}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="modal-footer">
                     <button className="btn btn-secondary" onClick={() => setEditingProduct(null)}>Huỷ</button>
-                    <button className="btn btn-primary" onClick={handleUpdateImage}>Cập nhật</button>
+                    {activeTab === 'images' && (
+                      <button className="btn btn-primary" onClick={handleUpdateImage}>Cập nhật ảnh</button>
+                    )}
+                    {activeTab === 'variants' && (
+                      <button className="btn btn-primary" onClick={handleUpdateProduct}>Cập nhật tồn kho</button>
+                    )}
                   </div>
                 </div>
               </div>
