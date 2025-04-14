@@ -153,7 +153,7 @@ const SetupProfile = () => {
       <div className="header">
         <Header />
       </div>
-      <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md mt-10">
+      <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md mt-10"style={{ marginTop:'100px' }}>
         <h2 className="text-xl font-semibold mb-4 text-center">Thiết lập thông tin cá nhân</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input

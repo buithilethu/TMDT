@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import '../About/style.css';
 import Footer from '../HomePage/Footer';
 import Header from '../HomePage/Header'
@@ -14,7 +15,7 @@ const About = () => {
               Tại TDB Jewelry, chúng tôi tin rằng trang sức không chỉ là phụ kiện mà còn là biểu tượng của phong cách, sự sang trọng và cá tính riêng biệt. 
               Với tâm huyết và sự sáng tạo, chúng tôi mang đến cho bạn những bộ sưu tập tinh xảo, được chế tác từ vàng, bạc, kim cương và đá quý cao cấp.
             </p>
-            <button className="about-button">XEM CHI TIẾT</button>
+            <Link to ="/"><button className="about-button">XEM CHI TIẾT</button></Link>
           </div>
           <div className="about-image-container">
             <img src="/image/About/image4.jpg" alt="Trang sức" className="about-image"/>
@@ -27,7 +28,7 @@ const About = () => {
             <p className="about-text">💎 Giao diện website thân thiện, dễ dàng chọn lựa sản phẩm phù hợp.</p>
             <p className="about-text">📞 Dịch vụ tư vấn chuyên nghiệp, giúp bạn chọn lựa món trang sức ưng ý nhất.</p>
             <p className="about-text">🚚 Giao hàng nhanh chóng, đảm bảo an toàn tuyệt đối.</p>
-            <button className="about-button">XEM CHI TIẾT</button>
+            <Link to ="/Tuongtac"><button className="about-button">XEM CHI TIẾT</button></Link>
           </div>
           <div className="about-image-container">
             <img src="/image/About/nhan-vien-ban-hang-trang-suc-topcv46740614517bb2.jpg" alt="Dịch vụ khách hàng" className="about-image"/>

@@ -16,7 +16,9 @@
     flex-wrap: wrap;
     padding: 20px 0;
   }
-  
+  .Footer p {
+    color:white;
+  }
   .Exclusive, .Support, .Account, .QuickLink, .DownloadApp {
     flex: 1;
     min-width: 200px; 
