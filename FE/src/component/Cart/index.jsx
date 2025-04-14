@@ -1,6 +1,8 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import './style.css';
+import Header from '../HomePage/Header';
+import Footer from '../HomePage/Footer';
 
 const url = 'http://localhost:3000';
 
@@ -127,6 +129,7 @@ const Cart = () => {
   return (
     <div className="Carts">
       <div className="cart">
+        <Header/>
         <div className="RoadMapCart">
           <div className="Roadmap">
             <Link to="/">Trang chủ</Link>
@@ -323,6 +326,7 @@ const Cart = () => {
             </div>
           </div>
         </div>
+        <Footer/>
       </div>
     </div>
   );

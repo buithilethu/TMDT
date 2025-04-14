@@ -6,7 +6,7 @@ const About = () => {
     return (
         
         <div className="about">
-        <Header/>
+        <Header />
         <div className="about-section left">
           <div className="about-text-content">
             <h1 className="about-title">GIỚI THIỆU VỀ TDB JEWELRY</h1>

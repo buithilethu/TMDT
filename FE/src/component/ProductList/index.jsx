@@ -5,6 +5,7 @@ import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 import {url } from '../data.js'
 const ProductList = () => {
+  const [cartItems, setCartItems] = useState([]);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const categorySlug = queryParams.get('categories');
@@ -59,7 +60,7 @@ const ProductList = () => {
 
   return (
     <div className="ProductList">
-      <Header />
+      <Header cartItems={cartItems}/>
 
       <div className="product-list-page">
         <h2 className="products-title">Sản phẩm trong danh mục: {categoryName}</h2>

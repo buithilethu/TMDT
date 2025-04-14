@@ -6,6 +6,13 @@ import axios from 'axios';
 
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    address: '',
+    phone: '',
+  });
+
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -17,27 +24,55 @@ const Checkout = () => {
       }
     };
 
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get('http://localhost:3000/v1/profile', { withCredentials: true });
+        const profile = res.data.result;
+        setFormData((prev) => ({
+          ...prev,
+          fullName: profile.fullName || '',
+          address: profile.address || '',
+          phone: profile.phone || '',
+        }));
+        setProfileLoaded(true);
+      } catch (error) {
+        console.log('Không có thông tin người dùng, yêu cầu nhập thủ công.');
+        setProfileLoaded(true);
+      }
+    };
+
     fetchCart();
+    fetchProfile();
   }, []);
 
-  const totalPrice = cartItems.reduce(
-    (acc, item) => acc + item.variant.price * item.quantity,
-    0
-  );
+  const totalPrice = cartItems.reduce((acc, item) => acc + item.variant.price * item.quantity, 0);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const placeOrder = async () => {
+    const { fullName, address, phone } = formData;
+    if (!fullName || !address || !phone) {
+      alert('Vui lòng nhập đầy đủ thông tin!');
+      return;
+    }
+
     try {
       const res = await axios.post(
         `http://localhost:3000/v1/payment/checkout`,
-        {}, // Nếu có thêm thông tin như địa chỉ, phương thức thanh toán thì truyền ở đây
+        {
+          userInfo: formData,
+          cartItems,
+          total: totalPrice,
+        },
         { withCredentials: true }
       );
 
-      // Nếu response có URL để chuyển hướng (ví dụ như PayOS):
       if (res?.data?.url) {
         window.location.href = res.data.url;
       } else {
-        console.log(res)
         alert('Đặt hàng thành công!');
       }
     } catch (error) {
@@ -46,21 +81,14 @@ const Checkout = () => {
     }
   };
 
-
   return (
     <div className="Checkout">
-      <div className="header">
-        <Header cartItems={cartItems} />
-      </div>
+      <Header cartItems={cartItems} />
       <hr />
       <div className="checkout">
         <div className="RoadMapCheckOut">
           <div className="Roadmap">
             <p className="home">Tài khoản</p>
-            <p className="home">/</p>
-            <p className="home">Tài khoản của tôi</p>
-            <p className="home">/</p>
-            <p className="home">Sản phẩm</p>
             <p className="home">/</p>
             <p className="home">Giỏ hàng</p>
             <p className="home">/</p>
@@ -71,25 +99,31 @@ const Checkout = () => {
         <div className="GroupCheckOut">
           <div className="BillingDetails">
             <h2>Thông tin thanh toán</h2>
-            <div className="GroupInputCheck">
-              {[
-                { label: 'Họ', required: true },
-                { label: 'Tên công ty (không bắt buộc)', required: false },
-                { label: 'Địa chỉ', required: true },
-                { label: 'Căn hộ, tầng, v.v. (không bắt buộc)', required: false },
-                { label: 'Thành phố', required: true },
-                { label: 'Số điện thoại', required: true },
-                { label: 'Địa chỉ Email', type: 'email', required: true },
-              ].map((input, index) => (
-                <div className="Input" key={index}>
-                  <label>
-                    {input.label} {input.required && <b>*</b>}
-                  </label>
-                  <br />
-                  <input type={input.type || 'text'} required={input.required} />
-                </div>
-              ))}
-            </div>
+            {profileLoaded ? (
+              <div className="GroupInputCheck">
+                {[ 
+                  { label: 'Họ và tên', name: 'fullName', required: true },
+                  { label: 'Địa chỉ', name: 'address', required: true },
+                  { label: 'Số điện thoại', name: 'phone', required: true },
+                ].map((input, idx) => (
+                  <div className="Input" key={idx}>
+                    <label>
+                      {input.label} {input.required && <b>*</b>}
+                    </label>
+                    <br />
+                    <input
+                      name={input.name}
+                      type={input.name === 'email' ? 'email' : 'text'}
+                      value={formData[input.name] || ''}
+                      onChange={handleChange}
+                      required={input.required}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>Đang tải thông tin...</p>
+            )}
           </div>
 
           <div className="Payment">
@@ -98,10 +132,7 @@ const Checkout = () => {
                 {cartItems.map((item) => (
                   <tr className="tr" key={item._id}>
                     <td className="NameImg">
-                      <img
-                        src={`http://localhost:3000/${item.images[0]?.url}`}
-                        alt={item.product.name}
-                      />
+                      <img src={`http://localhost:3000/${item.images[0]?.url}`} alt={item.product.name} />
                       <div>
                         <p>{item.product.name}</p>
                         <p className="variant">
@@ -135,22 +166,13 @@ const Checkout = () => {
 
                 <tr className="banks">
                   <td className="bank">
-                    <input name="paymentMethod" type="radio" value="Bank" /> Chuyển khoản ngân hàng
+                    <input name="paymentMethod" type="radio" value="Bank" defaultChecked /> Chuyển khoản ngân hàng
                   </td>
                 </tr>
 
                 <tr className="cash">
                   <td colSpan={2}>
                     <input name="paymentMethod" type="radio" value="Cash" /> Thanh toán khi nhận hàng
-                  </td>
-                </tr>
-
-                <tr className="coupons">
-                  <td>
-                    <input type="text" placeholder="Mã giảm giá" />
-                  </td>
-                  <td>
-                    <input type="button" value="Áp dụng mã" />
                   </td>
                 </tr>
 

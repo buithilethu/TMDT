@@ -18,7 +18,6 @@ const SetupProfile = () => {
   const [message, setMessage] = useState(null);
   const [hasProfile, setHasProfile] = useState(false);
 
-  // Tỉnh, quận, phường
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -27,9 +26,6 @@ const SetupProfile = () => {
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
 
-
-
-  // Lấy danh sách tỉnh từ API
   useEffect(() => {
     axios
       .get('https://provinces.open-api.vn/api/p')
@@ -37,7 +33,6 @@ const SetupProfile = () => {
       .catch((error) => console.error('Error fetching provinces:', error));
   }, []);
 
-  // Lấy danh sách quận khi tỉnh thay đổi
   useEffect(() => {
     if (selectedProvince) {
       axios
@@ -50,7 +45,6 @@ const SetupProfile = () => {
     }
   }, [selectedProvince]);
 
-  // Lấy danh sách phường khi quận thay đổi
   useEffect(() => {
     if (selectedDistrict) {
       axios
@@ -62,7 +56,6 @@ const SetupProfile = () => {
     }
   }, [selectedDistrict]);
 
-  // Lấy thông tin profile người dùng nếu đã có
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -82,26 +75,25 @@ const SetupProfile = () => {
           setHasProfile(true);
         }
       } catch (err) {
-        // Nếu không có profile thì vẫn tiếp tục
+        // Không có profile thì bỏ qua
       }
     };
 
     fetchProfile();
   }, []);
 
-  // Cập nhật địa chỉ khi tỉnh/quận/phường thay đổi
+  // ✅ Cập nhật địa chỉ mỗi khi người dùng chọn tỉnh/quận/phường
   useEffect(() => {
-    const province = provinces.find((p) => p.code === selectedProvince);
-    const district = districts.find((d) => d.code === selectedDistrict);
-    const ward = wards.find((w) => w.code === selectedWard);
+    const province = provinces.find((p) => p.code === Number(selectedProvince));
+    const district = districts.find((d) => d.code === Number(selectedDistrict));
+    const ward = wards.find((w) => w.code === Number(selectedWard));
 
-    const addressParts = [];
-    if (ward) addressParts.push(ward.name);
-    if (district) addressParts.push(district.name);
-    if (province) addressParts.push(province.name);
+    const fullAddress = [ward?.name, district?.name, province?.name].filter(Boolean).join(', ');
 
-    // Update the address field in formData
-
+    setFormData((prev) => ({
+      ...prev,
+      address: fullAddress,
+    }));
   }, [selectedProvince, selectedDistrict, selectedWard, provinces, districts, wards]);
 
   const handleChange = (e) => {
@@ -112,13 +104,12 @@ const SetupProfile = () => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
+
     const province = provinces.find((p) => p.code === Number(selectedProvince));
     const district = districts.find((d) => d.code === Number(selectedDistrict));
     const ward = wards.find((w) => w.code === Number(selectedWard));
 
     const fullAddress = [ward?.name, district?.name, province?.name].filter(Boolean).join(', ');
-
-    console.log(fullAddress); // Để kiểm tra giá trị của fullAddress trong cons
 
     const finalFormData = {
       ...formData,
@@ -144,13 +135,12 @@ const SetupProfile = () => {
     }
   };
 
-
   return (
     <div className="profile">
       <div className="header">
         <Header />
       </div>
-      <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md mt-10"style={{ marginTop:'100px' }}>
+      <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md mt-10" style={{ marginTop: '100px' }}>
         <h2 className="text-xl font-semibold mb-4 text-center">Thiết lập thông tin cá nhân</h2>
         <form onSubmit={handleSubmit} className="space-y-2">
           <input
@@ -171,7 +161,6 @@ const SetupProfile = () => {
             className="w-full border rounded"
             required
           />
-
           <input
             name="address"
             type="text"
@@ -180,7 +169,6 @@ const SetupProfile = () => {
             className="w-full border rounded"
             disabled
           />
-
           <select
             name="province"
             value={selectedProvince}
