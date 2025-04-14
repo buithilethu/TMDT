@@ -2,16 +2,50 @@ import { useState, useEffect } from 'react';
 import './style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
+import axios from 'axios';
 
 const Checkout = () => {
-  const [cartItems, setCartItems] = useState(() => {
-    const savedCartItems = localStorage.getItem('cartItems');
-    return savedCartItems ? JSON.parse(savedCartItems) : [];
-  });
+  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
-  }, [cartItems]);
+    const fetchCart = async () => {
+      try {
+        const res = await axios.get('http://localhost:3000/v1/cart', { withCredentials: true });
+        setCartItems(res.data);
+      } catch (error) {
+        console.error('Lỗi khi lấy giỏ hàng:', error);
+      }
+    };
+
+    fetchCart();
+  }, []);
+
+  const totalPrice = cartItems.reduce(
+    (acc, item) => acc + item.variant.price * item.quantity,
+    0
+  );
+
+  const placeOrder = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:3000/v1/payment/checkout`,
+        {}, // Nếu có thêm thông tin như địa chỉ, phương thức thanh toán thì truyền ở đây
+        { withCredentials: true }
+      );
+
+      // Nếu response có URL để chuyển hướng (ví dụ như PayOS):
+      if (res?.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        console.log(res)
+        alert('Đặt hàng thành công!');
+      }
+    } catch (error) {
+      console.error('Lỗi khi đặt hàng:', error);
+      alert('Có lỗi xảy ra khi đặt hàng!');
+    }
+  };
+
 
   return (
     <div className="Checkout">
@@ -33,6 +67,7 @@ const Checkout = () => {
             <p>Thanh toán</p>
           </div>
         </div>
+
         <div className="GroupCheckOut">
           <div className="BillingDetails">
             <h2>Thông tin thanh toán</h2>
@@ -56,44 +91,60 @@ const Checkout = () => {
               ))}
             </div>
           </div>
+
           <div className="Payment">
             <table>
               <tbody>
                 {cartItems.map((item) => (
-                  <tr className="tr" key={item.id}>
+                  <tr className="tr" key={item._id}>
                     <td className="NameImg">
-                      <img src={item.image} alt={item.name} />
-                      <p>{item.name}</p>
+                      <img
+                        src={`http://localhost:3000/${item.images[0]?.url}`}
+                        alt={item.product.name}
+                      />
+                      <div>
+                        <p>{item.product.name}</p>
+                        <p className="variant">
+                          {Object.entries(item.variant.attributes).map(([key, value]) => (
+                            <span key={key}>{key}: {value} </span>
+                          ))}
+                        </p>
+                        <p>Số lượng: {item.quantity}</p>
+                      </div>
                     </td>
-                    <td className="Price">{(item.price * item.quantity).toLocaleString()} VNĐ</td>
+                    <td className="Price">
+                      {(item.variant.price * item.quantity).toLocaleString()} VNĐ
+                    </td>
                   </tr>
                 ))}
+
                 <tr className="hr">
                   <td className="Name">Tạm tính:</td>
-                  <td className="Price">
-                    {cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toLocaleString()} VNĐ
-                  </td>
+                  <td className="Price">{totalPrice.toLocaleString()} VNĐ</td>
                 </tr>
+
                 <tr className="hr">
                   <td className="Name">Phí vận chuyển:</td>
                   <td className="Price">Miễn phí</td>
                 </tr>
+
                 <tr className="hr1">
                   <td className="Name">Tổng cộng:</td>
-                  <td className="Price">
-                    {cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toLocaleString()} VNĐ
-                  </td>
+                  <td className="Price">{totalPrice.toLocaleString()} VNĐ</td>
                 </tr>
+
                 <tr className="banks">
                   <td className="bank">
                     <input name="paymentMethod" type="radio" value="Bank" /> Chuyển khoản ngân hàng
                   </td>
                 </tr>
+
                 <tr className="cash">
                   <td colSpan={2}>
                     <input name="paymentMethod" type="radio" value="Cash" /> Thanh toán khi nhận hàng
                   </td>
                 </tr>
+
                 <tr className="coupons">
                   <td>
                     <input type="text" placeholder="Mã giảm giá" />
@@ -102,9 +153,10 @@ const Checkout = () => {
                     <input type="button" value="Áp dụng mã" />
                   </td>
                 </tr>
+
                 <tr className="place">
                   <td colSpan={2}>
-                    <button type="submit">Đặt hàng</button>
+                    <button onClick={placeOrder}>Đặt hàng</button>
                   </td>
                 </tr>
               </tbody>

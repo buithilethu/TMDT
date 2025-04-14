@@ -95,10 +95,10 @@ const decrease = async (userId, variantId) => {
   }
 }
 
-const remove = async (variantId, userId) => {
+const remove = async (cartItemId, userId) => {
   try {
-    const cartItem = await findUserCartItem(userId, variantId)
-    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).deleteOne({ _id: cartItem._id })
+    // const cartItem = await findUserCartItem(userId, variantId)
+    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).deleteOne({ _id: new ObjectId(cartItemId), userId: new ObjectId(userId) })
 
     return result
   } catch (error) {
@@ -112,78 +112,91 @@ const findUserCartItem = async (userId, variantId) => {
   return result
 }
 
+const clearUserCart = async (userId) => {
+  try {
+    const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).deleteMany({ userId: new ObjectId(userId) })
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+
 const getCart = async (userId) => {
   try {
     const result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).aggregate([
-  {
-    $match: {
-      userId: new ObjectId(userId)
-    }
-  },
-  {
-    $lookup: {
-      from: 'variants',
-      localField: 'variantId',
-      foreignField: '_id',
-      as: 'variant'
-    }
-  },
-  {
-    $unwind: {
-      path: '$variant',
-      preserveNullAndEmptyArrays: true
-    }
-  },
-  {
-    $lookup: {
-      from: 'products',
-      localField: 'variant.product_id',
-      foreignField: '_id',
-      as: 'product'
-    }
-  },
-  {
-    $unwind: {
-      path: '$product',
-      preserveNullAndEmptyArrays: true
-    }
-  },
-  {
-    $lookup: {
-      from: 'images',
-      localField: 'product._id',
-      foreignField: 'product_id',
-      as: 'images'
-    }
-  },
-  {
-    $project: {
-      _id: 1,
-      quantity: 1,
-      addedAt: 1,
-      variant: {
-        _id: '$variant._id',
-        price: '$variant.price',
-        attributes: '$variant.attributes',
-        size: '$variant.size',
-        stock: '$variant.stock'
+      {
+        $match: {
+          userId: new ObjectId(userId)
+        }
       },
-      product: {
-        name: '$product.name',
-        price: '$product.price'
+      {
+        $lookup: {
+          from: 'variants',
+          localField: 'variantId',
+          foreignField: '_id',
+          as: 'variant'
+        }
       },
-      images: {
-        $map: {
-          input: '$images',
-          as: 'img',
-          in: {
-            url: '$$img.url'
+      {
+        $unwind: {
+          path: '$variant',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'variant.product_id',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      {
+        $unwind: {
+          path: '$product',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: 'images',
+          localField: 'product._id',
+          foreignField: 'product_id',
+          as: 'images'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          quantity: 1,
+          addedAt: 1,
+          variant: {
+            _id: '$variant._id',
+            price: '$variant.price',
+            attributes: '$variant.attributes',
+            size: '$variant.size',
+            stock: '$variant.stock'
+          },
+          product: {
+            _id: '$product._id',
+            slug: '$product.slug',
+            name: '$product.name',
+            price: '$product.price'
+          },
+          images: {
+            $map: {
+              input: '$images',
+              as: 'img',
+              in: {
+                url: '$$img.url'
+              }
+            }
           }
         }
       }
-    }
-  }
-]).toArray();
+    ]).toArray();
 
 
     return result
@@ -201,5 +214,6 @@ export const cartItemModel = {
   remove,
   getCart,
   increase,
-  decrease
+  decrease,
+  clearUserCart
 }

@@ -7,6 +7,7 @@ import Login from "../component/Login/index.jsx";
 import Cart from "../component/Cart/index.jsx";
 import Checkout from "../component/CheckOut/index.jsx";
 import ProductDetail from "../component/HomePage/ProductDetails/index.jsx";
+import SetupProfile from "../component/UserProfile/index.jsx";
 
 import AddProduct from "../component/Products/index.jsx";
 import ProductList from "../component/ProductList/index.jsx";
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
     {
         path: "/products",
         element: <ProductList />
+    },
+    {
+        path: "/profile",
+        element: <SetupProfile />
     }
 
 ]);

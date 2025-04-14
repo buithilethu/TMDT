@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import './style.css';
 
@@ -16,40 +16,6 @@ const Cart = () => {
     if (parts.length === 2) return parts.pop().split(';').shift();
     return null;
   };
-
-  const fetchCartItems = async () => {
-    try {
-      const response = await fetch(`${url}/v1/cart`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      if (!response.ok) throw new Error('Không thể tải giỏ hàng');
-      const data = await response.json();
-
-
-      const formattedItems = data.map((item) => ({
-        id: item._id,
-        quantity: item.quantity,
-        price: item.variant?.price || item.product?.price,
-        name: item.product?.name,
-        // Update image path to use the images array directly from response
-        image: item.images?.[0]?.url
-          ? `${url}/${item.images[0].url}`
-          : 'default-image.jpg',
-        productId: item.product?._id,
-        variantId: item.variant?._id,
-      }));
-
-      console.log('Formatted cart items:', formattedItems); // Debug log
-      setCartItems(formattedItems);
-    } catch (err) {
-      console.error('Error fetching cart:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const loadCartFromLocalStorage = () => {
     const savedCartItems = localStorage.getItem('cartItems');
@@ -73,19 +39,19 @@ const Cart = () => {
           if (!response.ok) throw new Error('Không thể tải giỏ hàng');
 
           const data = await response.json();
-          console.log('Server response:', data); // Debug log
 
           const formattedItems = data.map((item) => ({
             id: item._id,
             quantity: item.quantity,
             price: item.variant?.price || item.product?.price,
             name: item.product?.name,
-            image: item.images?.[0]?.url
-              ? `${url}/${item.images[0].url}`
-              : 'default-image.jpg',
-            productId: item.product?._id,
+            image: item.images?.[0]?.url ? `${url}/${item.images[0].url}` : 'default-image.jpg',
+            productSlug: item.product?.slug,
             variantId: item.variant?._id,
+            attributes: item.variant?.attributes || {},
+            stock: item.variant?.stock || 0,
           }));
+
 
           setCartItems(formattedItems);
         } catch (err) {
@@ -113,17 +79,10 @@ const Cart = () => {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            items: [
-              {
-                _id: id,
-                quantity: newQuantity,
-                productId: itemToUpdate.productId,
-                variantId: itemToUpdate.variantId || null,
-              },
-            ],
+            quantity: newQuantity,
+            variantId: itemToUpdate.variantId || 1,
           }),
           credentials: 'include',
         });
@@ -145,9 +104,6 @@ const Cart = () => {
       try {
         await fetch(`${url}/v1/cart/deleteItem/${id}`, {
           method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
           credentials: 'include',
         });
       } catch (err) {
@@ -156,33 +112,6 @@ const Cart = () => {
     }
 
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
-
-  const handleUpdateCart = async () => {
-    const token = getCookie('token');
-    if (isLoggedIn && token) {
-      try {
-        await fetch(`${url}/v1/cart/update`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            items: cartItems.map((item) => ({
-              _id: item.id,
-              productId: item.productId,
-              variantId: item.variantId || null,
-              quantity: item.quantity,
-            })),
-          }),
-          credentials: 'include',
-        });
-        console.log('Giỏ hàng đã được cập nhật:', cartItems);
-      } catch (err) {
-        console.error('Lỗi khi cập nhật giỏ hàng:', err);
-      }
-    }
   };
 
   const calculateSubtotal = () =>
@@ -214,68 +143,140 @@ const Cart = () => {
                     <thead>
                       <tr>
                         <th className="product-col">Sản phẩm</th>
+                        <th className="variant-col">Biến thể</th>
                         <th className="price-col">Giá</th>
                         <th className="quantity-col">Số lượng</th>
+                        <th className="stock-col">Tồn kho</th>
                         <th className="total-col">Tổng</th>
                         <th className="action-col">Hành động</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {cartItems.map((item) => (
-                        <tr key={item.id} className="cart-row">
-                          <td className="product-cell">
-                            <div className="product-info">
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                className="product-image"
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.src = 'default-image.jpg';
-                                }}
+                      {Object.entries(
+                        cartItems.reduce((grouped, item) => {
+                          if (!grouped[item.name]) grouped[item.name] = [];
+                          grouped[item.name].push(item);
+                          return grouped;
+                        }, {})
+                      ).map(([productName, variants]) => (
+                        <React.Fragment key={productName}>
+                          <tr className="cart-row product-group-row">
+                            <td className="product-cell" rowSpan={variants.length}>
+                              <div className="product-info">
+                                <Link to={`/product/${variants[0]?.productSlug}`}>
+                                  <img
+                                    src={variants[0].image}
+                                    alt={productName}
+                                    className="product-image"
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = 'default-image.jpg';
+                                    }}
+                                  />
+                                  <div className="product-details">
+                                    <span className="product-name">{productName}</span>
+                                  </div>
+                                </Link>
+                              </div>
+                            </td>
+                            {/* First variant in the group */}
+                            <td className="variant-cell">
+                              {Object.entries(variants[0].attributes).map(([key, value]) => (
+                                <p key={key}><b>{key}:</b> {value}</p>
+                              ))}
+                            </td>
+                            <td className="price-cell">
+                              {variants[0].price.toLocaleString('vi-VN')} VNĐ
+                            </td>
+                            <td className="quantity-cell">
+                              <input
+                                type="number"
+                                min="1"
+                                value={variants[0].quantity}
+                                onChange={(e) => {
+                                  if (e.target.value > variants[0].stock) {
+                                    alert('Số lượng không đủ');
+                                  } else if (e.target.value < 0) {
+                                    alert('Số lượng không hợp lệ');
+                                  }
+                                  else {
+                                    updateQuantity(variants[0].id, parseInt(e.target.value))
+                                  }
+                                }
+                                }
+                                className="quantity-input"
                               />
-                              <span className="product-name">{item.name}</span>
-                            </div>
-                          </td>
-                          <td className="price-cell">
-                            {item.price.toLocaleString('vi-VN')} VNĐ
-                          </td>
-                          <td className="quantity-cell">
-                            <input
-                              type="number"
-                              min="1"
-                              value={item.quantity}
-                              onChange={(e) =>
-                                updateQuantity(item.id, e.target.value)
-                              }
-                              className="quantity-input"
-                            />
-                          </td>
-                          <td className="total-cell">
-                            {(item.price * item.quantity).toLocaleString('vi-VN')} VNĐ
-                          </td>
-                          <td className="action-cell">
-                            <button
-                              onClick={() => removeItem(item.id)}
-                              className="remove-button"
-                            >
-                              Xóa
-                            </button>
-                          </td>
-                        </tr>
+                            </td>
+                            <td className="stock-cell">{variants[0].stock}</td>
+                            <td className="total-cell">
+                              {(variants[0].price * variants[0].quantity).toLocaleString('vi-VN')} VNĐ
+                            </td>
+                            <td className="action-cell">
+                              <button
+                                onClick={() => removeItem(variants[0].id)}
+                                className="remove-button"
+                              >
+                                Xóa
+                              </button>
+                            </td>
+                          </tr>
+
+                          {/* Render remaining variants without image/product name */}
+                          {variants.slice(1).map((variant) => (
+                            <tr key={variant.id} className="cart-row variant-row">
+                              <td className="variant-cell">
+                                {Object.entries(variant.attributes).map(([key, value]) => (
+                                  <p key={key}><b>{key}:</b> {value}</p>
+                                ))}
+                              </td>
+                              <td className="price-cell">
+                                {variant.price.toLocaleString('vi-VN')} VNĐ
+                              </td>
+                              <td className="quantity-cell">
+                                <input
+                                  type="number"
+                                  min="1"
+
+                                  value={variant.quantity}
+                                  onChange={(e) => {
+                                    if (e.target.value > variant.stock) {
+                                      alert('Số lượng không đủ');
+                                    } else if (e.target.value < 0) {
+                                      alert('Số lượng không hợp lệ');
+                                    } else {
+                                      updateQuantity(variant.id, parseInt(e.target.value))
+                                    }
+                                  }
+                                  }
+                                  className="quantity-input"
+                                />
+                              </td>
+                              <td className="stock-cell">{variant.stock}</td>
+                              <td className="total-cell">
+                                {(variant.price * variant.quantity).toLocaleString('vi-VN')} VNĐ
+                              </td>
+                              <td className="action-cell">
+                                <button
+                                  onClick={() => removeItem(variant.id)}
+                                  className="remove-button"
+                                >
+                                  Xóa
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>
                 </div>
+
                 <div className="Update">
                   <Link to="/">
                     <button className="Return">
                       <b>Quay lại cửa hàng</b>
                     </button>
                   </Link>
-                  <button className="Update" onClick={handleUpdateCart}>
-                    <b>Cập nhật giỏ hàng</b>
-                  </button>
                 </div>
               </>
             ) : (
@@ -284,6 +285,7 @@ const Cart = () => {
               </p>
             )}
           </div>
+
           <div className="GroupCart">
             <div className="Coupon">
               <input type="text" placeholder="Mã giảm giá" />

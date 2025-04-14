@@ -7,6 +7,7 @@ import { authRoute } from './authRoute'
 import { cartRoute } from './cartRoute'
 import { paymentRoute } from './paymentRoute'
 import { imageRoute } from './imageRoute'
+import { userProfileRoute } from './userProfileRoute'
 const Router = express.Router()
 
 Router.get('/status', (req, res) => {
@@ -20,7 +21,7 @@ Router.use('/auth', authRoute)
 Router.use('/cart', cartRoute)
 Router.use('/payment', paymentRoute)
 Router.use('/images', imageRoute)
-
+Router.use('/profile', userProfileRoute )
 export const APIsV1 = Router
 
 //200 OK

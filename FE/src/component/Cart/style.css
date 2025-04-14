@@ -235,6 +235,13 @@ button:focus {
     gap: 15px;
 }
 
+.product-cell .product-info {
+    align-items: center;
+    max-width: 250px;
+}
+
+
+
 .product-image {
     width: 150px;
     height: 150px;

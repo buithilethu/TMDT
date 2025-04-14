@@ -39,9 +39,9 @@ const decrease = async (userId, variantId) => {
   }
 }
 
-const remove = async (variantId, userId) => {
-    const cart = await cartItemModel.remove(variantId, userId)
-    return cart
+const remove = async (cartItemId, userId) => {
+  const cart = await cartItemModel.remove(cartItemId, userId)
+  return cart
 }
 
 const getCart = async (userId) => {

@@ -61,10 +61,12 @@ const decrease = async (req, res, next) => {
 const deleteItem = async (req, res, next) => {
   try {
     //req.params => {id: 'abc'} -? variantId
-    const variantId = req.params.id
+
+
+    const cartItemId = req.params.id
     const userId = req.user.id
 
-    const cart = await cartService.remove(variantId, userId)
+    const cart = await cartService.remove(cartItemId, userId)
 
     return res.status(StatusCodes.OK).json(cart)
   } catch (error) {
@@ -76,7 +78,6 @@ const getCart = async (req, res, next) => {
   //()
   const userId = req.user.id
   const cart = await cartService.getCart(userId)
-  console.log(userId)
   return res.status(StatusCodes.OK).json(cart)
 }
 

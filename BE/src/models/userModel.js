@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
-
+import { ObjectId } from 'mongodb'
 
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
@@ -36,10 +36,19 @@ const findOne = async (userData) => {
     throw new Error(error)
   }
 }
+
+const findOneById = async (userId) => {
+  try {
+    const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne({ _id: new ObjectId(userId) })
+    return user
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
   registerUser,
-  findOne
-
+  findOne,
+  findOneById
 }
