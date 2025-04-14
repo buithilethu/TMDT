@@ -95,6 +95,20 @@ const decrease = async (userId, variantId) => {
   }
 }
 
+const decreaseVariantStock = async (variantId, quantity) => {
+  try {
+    const currentVariant = await GET_DB().collection('variants').findOne({ _id: new ObjectId(variantId) })
+    if (!currentVariant) throw new Error('Variant not found')
+    if (currentVariant.stock < quantity) throw new Error('Not enough stock')
+
+    const result = await GET_DB().collection('variants').updateOne({ _id: new ObjectId(variantId) }, { $inc: { stock: -quantity } })
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const remove = async (cartItemId, userId) => {
   try {
     // const cartItem = await findUserCartItem(userId, variantId)
@@ -215,5 +229,6 @@ export const cartItemModel = {
   getCart,
   increase,
   decrease,
-  clearUserCart
+  clearUserCart,
+  decreaseVariantStock
 }
