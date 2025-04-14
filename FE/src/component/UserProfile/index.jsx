@@ -101,10 +101,7 @@ const SetupProfile = () => {
     if (province) addressParts.push(province.name);
 
     // Update the address field in formData
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      address: addressParts.filter(Boolean).join(', '),
-    }));
+
   }, [selectedProvince, selectedDistrict, selectedWard, provinces, districts, wards]);
 
   const handleChange = (e) => {
@@ -155,14 +152,14 @@ const SetupProfile = () => {
       </div>
       <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md mt-10">
         <h2 className="text-xl font-semibold mb-4 text-center">Thiết lập thông tin cá nhân</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-2">
           <input
             name="fullName"
             type="text"
             placeholder="Họ và tên"
             value={formData.fullName}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border rounded"
             required
           />
           <input
@@ -171,7 +168,7 @@ const SetupProfile = () => {
             placeholder="Số điện thoại"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border rounded"
             required
           />
 
@@ -180,7 +177,7 @@ const SetupProfile = () => {
             type="text"
             placeholder="Địa chỉ"
             value={formData.address}
-            className="w-full border p-2 rounded"
+            className="w-full border rounded"
             disabled
           />
 
@@ -188,7 +185,7 @@ const SetupProfile = () => {
             name="province"
             value={selectedProvince}
             onChange={(e) => setSelectedProvince(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border rounded"
             required
           >
             <option value="">Chọn Tỉnh/Thành phố</option>
@@ -202,7 +199,7 @@ const SetupProfile = () => {
             name="district"
             value={selectedDistrict}
             onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border rounded"
             required
             disabled={!districts.length}
           >
@@ -217,7 +214,7 @@ const SetupProfile = () => {
             name="ward"
             value={selectedWard}
             onChange={(e) => setSelectedWard(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border rounded"
             required
             disabled={!wards.length}
           >
@@ -232,7 +229,7 @@ const SetupProfile = () => {
             name="gender"
             value={formData.gender}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border rounded"
           >
             <option value="male">Nam</option>
             <option value="female">Nữ</option>
@@ -243,13 +240,13 @@ const SetupProfile = () => {
             type="date"
             value={formData.dob}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border rounded"
             required
           />
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white rounded hover:bg-blue-700 transition"
           >
             {loading ? 'Đang lưu...' : hasProfile ? 'Cập nhật' : 'Lưu thông tin'}
           </button>
