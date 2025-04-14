@@ -4,7 +4,7 @@ import './style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 
-const url = 'http://localhost:3000';
+import {url} from '../data.js'
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);

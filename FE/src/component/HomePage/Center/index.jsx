@@ -119,7 +119,7 @@ const Center = ({ cartItems, addToCart }) => {
   const [totalProducts, setTotalProducts] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const productsPerPage = 15;
+  const productsPerPage = 18;
 
   const location = useLocation();
   const navigate = useNavigate();

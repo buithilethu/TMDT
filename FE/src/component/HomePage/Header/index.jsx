@@ -1,96 +1,79 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../Header/style.css';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { url } from '../../data.js';
-import { useNavigate } from 'react-router-dom';
 
 const Header = ({ cartItems = [] }) => {
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const [user, setUser] = useState(null);
   const [isSearchVisible, setSearchVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
+  const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleSearch = () => {
     setSearchVisible(!isSearchVisible);
+    setSuggestions([]);
   };
-
-  useEffect(() => {
-    let lastScrollY = window.scrollY;
-
-    const handleScroll = () => {
-      const header = document.querySelector('.Header');
-      if (window.scrollY > lastScrollY) {
-        header.classList.add('hidden');
-      } else {
-        header.classList.remove('hidden');
-      }
-      lastScrollY = window.scrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     const storedUser = Cookies.get('user');
     if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
+      setUser(JSON.parse(storedUser));
     }
   }, []);
-
-  const fetchUserData = async (token) => {
-    try {
-      const response = await fetch(`${url}/v1/auth/login`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUser({ ...data, accessToken: token });
-        Cookies.set('user', JSON.stringify({ ...data, accessToken: token }), {
-          expires: 7,
-          secure: true,
-          sameSite: 'Strict',
-        });
-      }
-    } catch (error) {
-      console.error('Lỗi khi lấy thông tin user:', error);
-    }
-  };
 
   const handleLogout = () => {
     Cookies.remove('user');
     Cookies.remove('token');
-
-    // Gọi API để đăng xuất
-    fetch(`${url}/v1/auth/logout`, {
-      method: 'POST',
-      credentials: 'include',
-    })
-
+    fetch(`${url}/v1/auth/logout`, { method: 'POST', credentials: 'include' });
     setUser(null);
+  };
+
+  const handleSearchChange = async (e) => {
+    const value = e.target.value;
+    setSearchText(value);
+
+    if (value.trim() === '') {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${url}/v1/products?search=${value}`);
+      const data = await response.json();
+      setSuggestions(data.products || []);
+    } catch (error) {
+      console.error('Lỗi khi gợi ý sản phẩm:', error);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && searchText.trim()) {
+      navigate(`/search?keyword=${encodeURIComponent(searchText.trim())}`);
+      setSuggestions([]);
+      setSearchVisible(false);
+    }
+  };
+
+  const handleSearchClick = () => {
+    if (searchText.trim()) {
+      navigate(`/search?keyword=${encodeURIComponent(searchText.trim())}`);
+      setSuggestions([]);
+      setSearchVisible(false);
+    }
   };
 
   return (
     <div className="Header">
       <div className="Name">
-        <p><Link to={"/"} style={{ textDecoration: "none", color: 'white' }}>TDB JEWELRY</Link></p>
-        <button className="menu-toggle" onClick={toggleMenu}>
-          ☰
-        </button>
+        <p><Link to="/" style={{ textDecoration: 'none', color: 'white' }}>TDB JEWELRY</Link></p>
+        <button className="menu-toggle" onClick={toggleMenu}>☰</button>
       </div>
 
-      {/* Nút toggle menu chỉ hiện khi mobile */}
-
-
-      {/* Menu chính */}
       <div className={`Menu ${menuOpen ? 'open' : ''}`}>
         <Link to="/">Trang chủ</Link>
         <Link to="/Gioithieu">Giới thiệu</Link>
@@ -98,12 +81,33 @@ const Header = ({ cartItems = [] }) => {
         {!user && <Link to="/Dangky">Đăng ký</Link>}
         {user?.isAdmin && <Link to="/Themsanpham">Thêm sản phẩm</Link>}
 
-        {/* Thanh tìm kiếm toggle */}
+        {/* --- Tìm kiếm --- */}
         <div className="GroupSearch">
           {isSearchVisible && (
             <div className="search-box">
-              <input type="text" placeholder="Tìm kiếm..." />
-              <button>Tìm</button>
+              <input
+                type="text"
+                placeholder="Tìm kiếm..."
+                value={searchText}
+                onChange={handleSearchChange}
+                onClick={handleSearchChange}
+                onKeyDown={handleKeyDown}
+              />
+              <button onClick={handleSearchClick}>Tìm</button>
+
+              {suggestions.length > 0 && (
+                <ul className="suggestions">
+                  {suggestions.slice(0, 5).map(product => (
+                    <li key={product._id}>
+                      <Link to={`/product/${product.slug}`} onClick={() => setSuggestions([])} className="suggestion-item">
+                        {/* Hiển thị ảnh sản phẩm và tên sản phẩm */}
+                        <img src={product.images?.[0]?.url || '/images/placeholder-image.jpg'} alt={product.name} className="suggestion-image" />
+                        <span>{product.name}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
           <button
@@ -114,6 +118,7 @@ const Header = ({ cartItems = [] }) => {
           </button>
         </div>
 
+        {/* --- Giỏ hàng & Tài khoản --- */}
         <div className="Logo">
           <div className="Wishlist">
             <img src="/image/Header/Tym.png" alt="Wishlist" />
@@ -121,9 +126,7 @@ const Header = ({ cartItems = [] }) => {
           <div className="Cart">
             <Link to="/Giohang">
               <img src="/image/Header/Cart.png" alt="Giỏ hàng" />
-              {totalItems > 0 && (
-                <span className="cart-count">{totalItems}</span>
-              )}
+              {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
             </Link>
           </div>
           <div className="User">
@@ -131,10 +134,8 @@ const Header = ({ cartItems = [] }) => {
               <div className="UserLoggedIn">
                 <span>Xin chào, {user.firstName || user.email}</span>
                 <div className="Dropdown">
-                  <Link to ="/profile">Thông tin của tôi </Link>
-                  <a href="#" onClick={handleLogout}>
-                    Đăng xuất
-                  </a>
+                  <Link to="/profile">Thông tin của tôi</Link>
+                  <a href="#" onClick={handleLogout}>Đăng xuất</a>
                 </div>
               </div>
             ) : (

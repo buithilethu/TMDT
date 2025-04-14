@@ -8,12 +8,9 @@ import Cart from "../component/Cart/index.jsx";
 import Checkout from "../component/CheckOut/index.jsx";
 import ProductDetail from "../component/HomePage/ProductDetails/index.jsx";
 import SetupProfile from "../component/UserProfile/index.jsx";
-
 import AddProduct from "../component/Products/index.jsx";
 import ProductList from "../component/ProductList/index.jsx";
-import Slidener from "../component/HomePage/Slidener/index.jsx";
-import Center from "../component/HomePage/Center/index.jsx";
-import Dvu from "../component/HomePage/Dvu/index.jsx";
+import SearchResults from "../component/Search/index.jsx";
 
 const router = createBrowserRouter([
     {
@@ -59,7 +56,12 @@ const router = createBrowserRouter([
     {
         path: "/profile",
         element: <SetupProfile />
+    },
+    {
+        path :"/search",
+        element:<SearchResults/>
     }
+
 
 ]);
 export default router;

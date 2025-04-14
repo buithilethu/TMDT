@@ -3,7 +3,7 @@ import './style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 import axios from 'axios';
-
+import {url} from "../data.js"
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [formData, setFormData] = useState({
@@ -17,7 +17,7 @@ const Checkout = () => {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/v1/cart', { withCredentials: true });
+        const res = await axios.get(`${url}/v1/cart`, { withCredentials: true });
         setCartItems(res.data);
       } catch (error) {
         console.error('Lỗi khi lấy giỏ hàng:', error);
@@ -26,7 +26,7 @@ const Checkout = () => {
 
     const fetchProfile = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/v1/profile', { withCredentials: true });
+        const res = await axios.get(`${url}/v1/profile`, { withCredentials: true });
         const profile = res.data.result;
         setFormData((prev) => ({
           ...prev,
@@ -61,7 +61,7 @@ const Checkout = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:3000/v1/payment/checkout`,
+        `${url}/v1/payment/checkout`,
         {
           userInfo: formData,
           cartItems,
@@ -132,7 +132,7 @@ const Checkout = () => {
                 {cartItems.map((item) => (
                   <tr className="tr" key={item._id}>
                     <td className="NameImg">
-                      <img src={`http://localhost:3000/${item.images[0]?.url}`} alt={item.product.name} />
+                      <img src={`${url}/${item.images[0]?.url}`} alt={item.product.name} />
                       <div>
                         <p>{item.product.name}</p>
                         <p className="variant">
