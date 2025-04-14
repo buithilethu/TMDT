@@ -3,7 +3,7 @@ import './style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 import axios from 'axios';
-import {url} from "../data.js"
+import { url } from "../data.js"
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [formData, setFormData] = useState({
@@ -62,11 +62,7 @@ const Checkout = () => {
     try {
       const res = await axios.post(
         `${url}/v1/payment/checkout`,
-        {
-          userInfo: formData,
-          cartItems,
-          total: totalPrice,
-        },
+        formData,
         { withCredentials: true }
       );
 
@@ -101,7 +97,7 @@ const Checkout = () => {
             <h2>Thông tin thanh toán</h2>
             {profileLoaded ? (
               <div className="GroupInputCheck">
-                {[ 
+                {[
                   { label: 'Họ và tên', name: 'fullName', required: true },
                   { label: 'Địa chỉ', name: 'address', required: true },
                   { label: 'Số điện thoại', name: 'phone', required: true },

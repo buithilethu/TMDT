@@ -18,12 +18,15 @@
     "axios": "^1.8.4",
     "boostrap": "^2.0.0",
     "bootstrap": "^5.3.3",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "js-cookie": "^3.0.5",
+    "jspdf": "^3.0.1",
     "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.3.0"
+    "react-router-dom": "^7.3.0",
+    "react-to-print": "^3.0.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
