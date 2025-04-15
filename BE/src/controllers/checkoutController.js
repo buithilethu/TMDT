@@ -131,7 +131,7 @@ const webhook = async (req, res, next) => {
     }
 
     // Cập nhật trạng thái giao hàng
-    await orderShippingModel.updateStatus(orderCode, 'success', { session })
+    await orderShippingModel.updateStatus(orderCode, 'delivering', { session })
 
     // Xoá giỏ hàng
     await cartItemModel.clearUserCart(order.userId, { session })

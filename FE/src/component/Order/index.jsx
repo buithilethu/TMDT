@@ -51,7 +51,7 @@ const InvoicePage = () => {
         <Header />
         <div className="max-w-4xl mx-auto p-6">
           <h1 className="text-2xl font-bold text-center mb-6">Danh Sách Hóa Đơn</h1>
-          <table className="w-full border border-collapse text-sm">
+          <table className="orderTable w-full border border-collapse text-sm">
             <thead>
               <tr className="bg-gray-100">
                 <th className="border p-2">Mã đơn hàng</th>
@@ -121,7 +121,7 @@ const InvoicePage = () => {
 
           <div className="text-sm">
             <h2 className="text-lg font-semibold mb-2">Chi tiết đơn hàng</h2>
-            <table className="w-full border border-collapse text-sm">
+            <table className="orderTable w-full border border-collapse text-sm">
               <thead>
                 <tr className="bg-gray-100">
                   <th className="border p-2">#</th>
