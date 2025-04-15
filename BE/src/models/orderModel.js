@@ -134,7 +134,7 @@ const getOrdersByUserId = async (userId) => {
     {
       $sort: { createdAt: -1 }
     }
-  ]).toArray();
+  ]).toArray()
 
   return ordersWithShippingAndProductDetails;
 };
@@ -155,6 +155,102 @@ const updateOrderInfo = async (orderCode, data) => {
     { returnDocument: 'after' }
 
   )
+}
+
+const getAllUserOrders = async (userId) => {
+  const result = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate([
+    {
+      $lookup: {
+        from: 'order_shipping',
+        localField: 'orderCode',
+        foreignField: 'orderCode',
+        as: 'shipping'
+      }
+    },
+    {
+      $unwind: {
+        path: '$shipping',
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $unwind: {
+        path: '$items',
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $lookup: {
+        from: 'products',
+        let: { productId: '$items.productId' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ['$_id', '$$productId'] }
+            }
+          },
+          {
+            $project: {
+              name: 1,
+              price: 1,
+              images: 1,
+              description: 1
+            }
+          }
+        ],
+        as: 'product'
+      }
+    },
+    {
+      $unwind: {
+        path: '$product',
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $lookup: {
+        from: 'variants',
+        let: { variantId: '$items.variantId' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ['$_id', '$$variantId'] }
+            }
+          }
+        ],
+        as: 'variant'
+      }
+    },
+    {
+      $unwind: {
+        path: '$variant',
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $group: {
+        _id: '$_id',
+        userId: { $first: '$userId' },
+        orderCode: { $first: '$orderCode' },
+        status: { $first: '$status' },
+        createdAt: { $first: '$createdAt' },
+        shipping: { $first: '$shipping' },
+        items: {
+          $push: {
+            product: '$product',
+            variant: '$variant',
+            quantity: '$items.quantity',
+            price: '$items.price',
+            totalPrice: { $multiply: ['$items.quantity', '$items.price'] }
+          }
+        }
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ])
+  return result
 }
 
 export const orderModel = {
