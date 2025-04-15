@@ -1,13 +1,15 @@
 /* === XU HƯỚNG === */
+
 .Xuhuong {
   padding: 40px 20px;
-  background-color: #fdfdfd;
+  background-color: #fdfdfd;  
 }
 
 .Xuhuong h2 {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
+  margin-top: 30px;
 }
 
 .GroupSP {

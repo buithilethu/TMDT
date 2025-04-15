@@ -49,6 +49,7 @@ const SearchResults = () => {
                     <p className="title">{product.name}</p>
                     <p className="price">{product.price.toLocaleString()} VNĐ</p>
                   </div>
+                  
                 </a>
               </div>
             ))}

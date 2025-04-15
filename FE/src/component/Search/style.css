@@ -66,3 +66,18 @@ h2{
     font-size: 14px;
   }
   
+@media (max-width: 480px) {
+  .suggestion-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .suggestion-item img {
+    margin-bottom: 5px;
+    margin-right: 0;
+  }
+
+  .suggestion-item span {
+    font-size: 12px;
+  }
+}
