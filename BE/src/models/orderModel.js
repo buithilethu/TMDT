@@ -148,17 +148,24 @@ const findOrderByOrderCode = async (orderCode) => {
   return result
 }
 
-const updateOrderInfo = async (orderCode, data) => {
+const updateOrderInfo = async (_id, status) => {
   const result = await GET_DB().collection(ORDER_COLLECTION_NAME).findOneAndUpdate(
-    { orderCode: orderCode },
-    { $set: data },
+    { _id: new ObjectId(_id) },
+    { $set: { status: status } },
     { returnDocument: 'after' }
-
   )
+  return result
 }
 
-const getAllUserOrders = async (userId) => {
-  const result = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate([
+const getAllUserOrders = async ({ page = 1, limit = 10, status, shippingStatus, search, sortBy = 'createdAt', order = 'desc' }) => {
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+  const sortOrder = order === 'asc' ? 1 : -1;
+
+  const baseMatch = {};
+  if (status) baseMatch.status = status;
+
+  const pipeline = [
+    // Join shipping
     {
       $lookup: {
         from: 'order_shipping',
@@ -167,66 +174,50 @@ const getAllUserOrders = async (userId) => {
         as: 'shipping'
       }
     },
+    { $unwind: { path: '$shipping', preserveNullAndEmptyArrays: true } },
+
+    // Điều kiện lọc sau khi đã join shipping
     {
-      $unwind: {
-        path: '$shipping',
-        preserveNullAndEmptyArrays: true
+      $match: {
+        ...baseMatch,
+        ...(shippingStatus ? { 'shipping.status': shippingStatus } : {}),
+        ...(search ? {
+          $or: [
+            { orderCode: { $regex: search, $options: 'i' } },
+            { 'shipping.fullName': { $regex: search, $options: 'i' } },
+            { 'shipping.phoneNumber': { $regex: search, $options: 'i' } }
+          ]
+        } : {})
       }
     },
-    {
-      $unwind: {
-        path: '$items',
-        preserveNullAndEmptyArrays: true
-      }
-    },
+
+    { $unwind: { path: '$items', preserveNullAndEmptyArrays: true } },
+
     {
       $lookup: {
         from: 'products',
         let: { productId: '$items.productId' },
         pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ['$_id', '$$productId'] }
-            }
-          },
-          {
-            $project: {
-              name: 1,
-              price: 1,
-              images: 1,
-              description: 1
-            }
-          }
+          { $match: { $expr: { $eq: ['$_id', '$$productId'] } } },
+          { $project: { name: 1, price: 1, images: 1, description: 1 } }
         ],
         as: 'product'
       }
     },
-    {
-      $unwind: {
-        path: '$product',
-        preserveNullAndEmptyArrays: true
-      }
-    },
+    { $unwind: { path: '$product', preserveNullAndEmptyArrays: true } },
+
     {
       $lookup: {
         from: 'variants',
         let: { variantId: '$items.variantId' },
         pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ['$_id', '$$variantId'] }
-            }
-          }
+          { $match: { $expr: { $eq: ['$_id', '$$variantId'] } } }
         ],
         as: 'variant'
       }
     },
-    {
-      $unwind: {
-        path: '$variant',
-        preserveNullAndEmptyArrays: true
-      }
-    },
+    { $unwind: { path: '$variant', preserveNullAndEmptyArrays: true } },
+
     {
       $group: {
         _id: '$_id',
@@ -246,12 +237,56 @@ const getAllUserOrders = async (userId) => {
         }
       }
     },
+
+    { $sort: { [sortBy]: sortOrder } },
+    { $skip: skip },
+    { $limit: parseInt(limit) }
+  ];
+
+  const orders = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate(pipeline).toArray();
+
+  // Count
+  const countPipeline = [
     {
-      $sort: { createdAt: -1 }
+      $lookup: {
+        from: 'order_shipping',
+        localField: 'orderCode',
+        foreignField: 'orderCode',
+        as: 'shipping'
+      }
+    },
+    { $unwind: { path: '$shipping', preserveNullAndEmptyArrays: true } },
+    {
+      $match: {
+        ...baseMatch,
+        ...(shippingStatus ? { 'shipping.status': shippingStatus } : {}),
+        ...(search ? {
+          $or: [
+            { orderCode: { $regex: search, $options: 'i' } },
+            { 'shipping.fullName': { $regex: search, $options: 'i' } },
+            { 'shipping.phoneNumber': { $regex: search, $options: 'i' } }
+          ]
+        } : {})
+      }
+    },
+    { $count: 'total' }
+  ];
+
+  const countResult = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate(countPipeline).toArray();
+  const total = countResult[0]?.total || 0;
+
+  return {
+    orders,
+    pagination: {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      total
     }
-  ])
-  return result
-}
+  };
+};
+
+
+
 
 export const orderModel = {
   ORDER_COLLECTION_NAME,
@@ -259,5 +294,6 @@ export const orderModel = {
   createOrder,
   getOrdersByUserId,
   findOrderByOrderCode,
-  updateOrderInfo
+  updateOrderInfo,
+  getAllUserOrders
 }

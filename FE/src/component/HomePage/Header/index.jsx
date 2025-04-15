@@ -79,8 +79,8 @@ const Header = ({ cartItems = [] }) => {
         <Link to="/Gioithieu">Giới thiệu</Link>
         <Link to="/Tuongtac">Tương tác</Link>
         {!user && <Link to="/Dangky">Đăng ký</Link>}
-        {user?.isAdmin && <Link to="/Themsanpham">Thêm sản phẩm</Link>}
-
+        {user?.isAdmin && <Link to="/Themsanpham">Quản lý cửa hàng</Link>}
+        {user?.isAdmin && <Link to="/admin/orders">Quản lý hóa đơn</Link>}
         {/* --- Tìm kiếm --- */}
         <div className="GroupSearch">
           {isSearchVisible && (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './style.css'; // CSS bạn đang dùng
-
+import { url } from '../data.js';
 const VariantModal = ({ product, onClose }) => {
   const navigate = useNavigate();
   const [selectedVariant, setSelectedVariant] = useState(null);

@@ -1,0 +1,225 @@
+/* Container */
+.admin-container .admin-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.admin-container .admin-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Filters */
+.admin-container .filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.filter-input,
+.admin-container .filter-select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.admin-container .filter-input {
+  max-width: 300px;
+}
+
+.admin-container .filter-select {
+  max-width: 200px;
+}
+
+/* Table */
+.admin-container .table-container {
+  overflow-x: auto;
+}
+
+.admin-container .admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.admin-table th,
+.admin-container .admin-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.admin-container .table-header {
+  background-color: #f4f4f4;
+}
+
+.admin-container .admin-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Buttons */
+.admin-container .view-button {
+  color: #007bff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.admin-container .view-button:hover {
+  color: #0056b3;
+}
+
+/* No Orders */
+.admin-container .no-orders {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+}
+
+/* Pagination */
+.admin-container .pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.admin-container .pagination-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-container .pagination-button {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin-container .pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Modal */
+.admin-container .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.admin-container .modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80vw;
+}
+
+.admin-container .modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.cancel-button,
+.admin-container .save-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin-container .cancel-button {
+  background-color: #d10000;
+}
+
+.admin-container .save-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.admin-container .status-select {
+  margin-top: 16px;
+}
+
+.admin-container .status-select label {
+  font-size: 14px;
+}
+
+.admin-container .status-select select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Đỏ cho các trạng thái "pending" và "shipping" */
+.status-pending {
+  background-color: #f9f96c;
+  color: black;
+}
+
+/* Xanh lá cho các trạng thái "paid" và "delivered" */
+.status-paid {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-other {
+  background-color: #f9f96c;
+  color: black;
+}
+
+.status-cancelled {
+  background-color: #ffe5e5;
+  color: #d10000;
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.modal-tabs button {
+  padding: 8px 16px;
+  border: none;
+  background: #f1f1f1;
+  cursor: pointer;
+}
+
+.modal-tabs button.active-tab {
+  background: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.items-table th,
+.items-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.total-amount {
+  text-align: right;
+  margin-top: 12px;
+  font-weight: bold;
+}

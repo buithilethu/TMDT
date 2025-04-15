@@ -2,8 +2,8 @@ const Joi = require('joi')
 const { ObjectId } = require('mongodb')
 const { GET_DB } = require('~/config/mongodb')
 
-
 const ORDER_SHIPPING_NAME = 'order_shipping'
+
 const ORDER_SHIPPING_SCHEMA = Joi.object({
   orderCode: Joi.number().required(),
   fullName: Joi.string().min(2).max(100).required(),
@@ -12,7 +12,7 @@ const ORDER_SHIPPING_SCHEMA = Joi.object({
     .required(),
   address: Joi.string().min(2).required(),
   status: Joi.string().valid('pending', 'success', 'delivering').default('pending'),
-  createdAt: Joi.date().timestamp().default(Date.now()),
+  createdAt: Joi.date().timestamp().default(Date.now),
   updatedAt: Joi.date().timestamp().default(null)
 }).required()
 
@@ -21,7 +21,6 @@ const validateSchema = async (data) => {
 }
 
 const create = async (data) => {
-  //{orderCode, fullName, phone, address}
   try {
     const value = await validateSchema(data)
     const result = await GET_DB()
@@ -30,7 +29,7 @@ const create = async (data) => {
 
     return result
   } catch (error) {
-    throw new Error(error)
+    throw new Error(error.message || 'Validation or insertion error')
   }
 }
 
@@ -38,33 +37,33 @@ const findOneByOrderCode = async (orderCode) => {
   try {
     const result = await GET_DB()
       .collection(ORDER_SHIPPING_NAME)
-      .findOne({ orderCode: orderCode })
+      .findOne({ orderCode: Number(orderCode) })
 
     return result
-
   } catch (error) {
-    throw new Error(error)
+    throw new Error(error.message || 'Find error')
   }
 }
 
-const updateStatus = async (orderCode, status) => {
+const updateStatus = async (_id, status) => {
   try {
     const result = await GET_DB()
       .collection(ORDER_SHIPPING_NAME)
       .findOneAndUpdate(
-        { orderCode: orderCode },
-        { $set: { status: status, updatedAt: Date.now() } },
+        { _id: new ObjectId(_id) },
+        { $set: { status: status } },
         { returnDocument: 'after' }
       )
 
     return result
   } catch (error) {
-    throw new Error(error)
+    throw new Error(error.message || 'Update error')
   }
 }
 
 export const orderShippingModel = {
   create,
   findOneByOrderCode,
-  updateStatus
+  updateStatus,
+  validateSchema
 }

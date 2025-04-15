@@ -10,6 +10,7 @@ import { imageRoute } from './imageRoute'
 import { userProfileRoute } from './userProfileRoute'
 import { orderRoute } from './orderRoute'
 import { variantRoute } from './variantRoute'
+import { orderShippingRoute } from './orderShippingRoute'
 const Router = express.Router()
 
 Router.get('/status', (req, res) => {
@@ -26,6 +27,7 @@ Router.use('/images', imageRoute)
 Router.use('/profile', userProfileRoute )
 Router.use('/orders', orderRoute)
 Router.use('/variants', variantRoute)
+Router.use('/shipping', orderShippingRoute)
 
 export const APIsV1 = Router
 
