@@ -68,7 +68,7 @@ const update = async (id, data) => {
 
 const updateStock = async (id, quantity) => {
   try {
-    const result = await GET_DB().collection(VARIANT_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $inc: { stock: quantity } })
+    const result = await GET_DB().collection(VARIANT_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $set: { stock: quantity } })
     return result
   } catch (error) {
     throw new Error(error)
@@ -100,5 +100,6 @@ export const variantModel = {
   create,
   update,
   remove,
-  findOneById
+  findOneById,
+  updateStock
 }

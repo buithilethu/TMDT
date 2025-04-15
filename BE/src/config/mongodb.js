@@ -33,4 +33,9 @@ export const GET_DB = () => {
 }
 
 //tận dụng mongoClientInstance để đóng kết nối
-
+export const GET_CLIENT = () => {
+  if (!mongoClientInstance) {
+    throw new Error('MongoClient chưa được khởi tạo')
+  }
+  return mongoClientInstance
+}

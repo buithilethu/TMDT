@@ -1,208 +1,247 @@
-.ProductList {
-  display: flex;
-  flex-direction: column;
-  background-color: #f8f9fa;
-  padding-top: 50px;
-  min-height: 100vh;
+/* === XU HƯỚNG === */
+.Xuhuong {
+  padding: 40px 20px;
+  background-color: #fdfdfd;
 }
 
-.product-list-page {
-  padding: 50px;
-  max-width: 1400px;
-  /* Increased to fit larger items (5 × ~260px + gaps) */
-  margin: 0 auto;
-  width: 100%;
-}
-
-.products-title {
+.Xuhuong h2 {
   font-size: 24px;
-  font-weight: 600;
-  color: #333;
+  font-weight: bold;
   margin-bottom: 20px;
-  text-align: center;
 }
 
-@media (max-width: 768px) {
-  .products-title {
-    font-size: 20px;
-  }
-}
-
-/* Use CSS Grid for product-grid */
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  /* 5 columns per row */
-  gap: 25px;
-  /* Increased gap for larger items */
-  padding: 0 10px;
+.GroupSP {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
   justify-content: center;
+}
+
+.SP {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 160px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.SP:hover {
+  transform: translateY(-4px);
+}
+
+.SP img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.SP .text {
+  padding: 10px;
+  text-align: center;
+  font-weight: 500;
+}
+
+
+/* === SẢN PHẨM YÊU THÍCH === */
+.yeuthich {
+  padding: 40px 20px;
+  background-color: #fafafa;
+}
+
+.yeuthich h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.GroupYT {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
 }
 
 .SPYT {
-  border: 1px solid #ddd;
-  padding: 15px;
-  /* Increased padding */
-  text-align: center;
-  transition: transform 0.2s;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  min-width: 220px;
-  /* Minimum width to make items larger */
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .SPYT:hover {
-  transform: scale(1.05);
-}
-
-.imagesyt {
-  width: 100%;
-  /* Increased height for larger images */
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  transform: translateY(-4px);
 }
 
 .imagesyt img {
-  max-width: 100%;
-  max-height: 100%;
-  /* object-fit: contain; */
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
-/* Styles for product title */
+.textyt {
+  margin-top: 10px;
+  text-align: center;
+}
+
 .textyt .title {
-  font-weight: bold;
-  margin: 15px 0;
-  /* Increased margin */
-  font-size: 18px;
-  /* Larger font size */
-  color: #333;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.textyt .title:hover {
-  color: #007bff;
-  text-decoration: underline;
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 5px;
 }
 
 .textyt .price {
-  color: #e91e63;
-  margin-bottom: 15px;
-  /* Increased margin */
-  font-size: 16px;
-  /* Larger font size */
+  font-weight: bold;
+  color: #e74c3c;
 }
 
-.SPYT button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  /* Larger padding */
-  cursor: pointer;
-  width: 100%;
-  border-radius: 4px;
-  font-size: 16px;
-  /* Larger font size */
-}
 
-.SPYT button:hover {
-  background-color: #0056b3;
-}
-
-.error-message {
-  color: red;
-  text-align: center;
-  font-size: 16px;
-  margin: 20px 0;
-}
-
-/* Pagination styles */
+/* === PAGINATION === */
 .pagination {
-  color: #000;
+  margin-top: 30px;
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
-.page-btn {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  background-color: #df1717;
-  color: white;
+.pagination button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  font-size: 16px;
 }
 
-.page-btn:hover:not(:disabled) {
-  background-color: #ed4646;
-}
-
-.page-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.page-btn.active {
-  background-color: #651503;
+.pagination button.active {
+  background-color: #3498db;
   color: white;
 }
 
-.spinner {
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  padding: 8px;
+  color: #aaa;
+}
+
+
+/* === LINK === */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #3498db;
+}
+
+
+/* === MODAL (kế thừa phần bạn đã viết) === */
+.my-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.my-modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.my-modal-content:hover {
+  transform: scale(1.02);
+}
+
+.my-modal-content h3 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
   text-align: center;
-  color: #007bff;
-  font-size: 18px;
-  margin: 20px 0;
+  color: #333;
 }
 
-/* Responsive design */
-@media (max-width: 1200px) {
-  .product-grid {
-    grid-template-columns: repeat(4, 1fr);
-    /* 4 columns */
+
+/* === SKELETON === */
+.skeleton-product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #ddd;
   }
 
-  .SPYT {
-    min-width: 200px;
-    /* Slightly smaller for medium screens */
+  50% {
+    background-color: #f4f4f4;
   }
 
-  .imagesyt {
-    height: 180px;
+  100% {
+    background-color: #ddd;
   }
 }
 
+
+/* === BỔ SUNG: responsive === */
 @media (max-width: 768px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    /* 2 columns */
-  }
 
-  .imagesyt {
-    height: 180px;
-    /* Adjusted for smaller screens */
-  }
-
+  .SP,
   .SPYT {
-    min-width: 0;
-    /* Allow full width of grid column */
-  }
-}
-
-@media (max-width: 480px) {
-  .product-grid {
-    grid-template-columns: 1fr;
-    /* 1 column */
+    width: 45%;
   }
 
-  .imagesyt {
-    height: 200px;
+  .GroupSP,
+  .GroupYT {
+    gap: 12px;
+  }
+
+  .SP img,
+  .imagesyt img {
+    height: 140px;
+  }
+
+  .my-modal-content {
+    padding: 20px;
+    max-width: 95%;
   }
 }

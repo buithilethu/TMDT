@@ -91,6 +91,16 @@ const deleteMany = async (ids) => {
   }
 }
 
+const updateStock = async (variantId, quantity) => {
+  try {
+    const result = await variantModel.updateStock(variantId, quantity)
+    return result
+  } 
+  catch (error) {
+    throw new Error(error) 
+  }
+}
+
 export const variantService = {
   create,
   update,
@@ -98,5 +108,6 @@ export const variantService = {
   updateMany,
   deleteMany,
   findOneById,
-  findAll
+  findAll,
+  updateStock
 }

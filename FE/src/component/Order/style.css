@@ -1,0 +1,4 @@
+/* Đặt chiều rộng cố định cho cột STT */
+.orderTable {
+  table-layout: fixed
+}

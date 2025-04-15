@@ -132,6 +132,7 @@ const Header = ({ cartItems = [] }) => {
                 <span>Xin chào, {user.firstName || user.email}</span>
                 <div className="Dropdown">
                   <Link to="/profile">Thông tin của tôi</Link>
+                  <Link to="/orders">Thông tin hóa đơn</Link>
                   <a href="#" onClick={handleLogout}>Đăng xuất</a>
                 </div>
               </div>

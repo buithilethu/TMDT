@@ -11,6 +11,7 @@ import SetupProfile from "../component/UserProfile/index.jsx";
 import AddProduct from "../component/Products/index.jsx";
 import ProductList from "../component/ProductList/index.jsx";
 import SearchResults from "../component/Search/index.jsx";
+import InvoicePage from "../component/Order/index.jsx";
 
 const router = createBrowserRouter([
     {
@@ -58,8 +59,12 @@ const router = createBrowserRouter([
         element: <SetupProfile />
     },
     {
-        path :"/search",
-        element:<SearchResults/>
+        path: "/search",
+        element: <SearchResults />
+    },
+    {
+        path: "/orders",
+        element: <InvoicePage />
     }
 
 

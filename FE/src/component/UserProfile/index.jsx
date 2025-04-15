@@ -18,14 +18,19 @@ const SetupProfile = () => {
   const [message, setMessage] = useState(null);
   const [hasProfile, setHasProfile] = useState(false);
 
+  // Tỉnh, quận, phường
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const [speficAddress, setSpeficAddress] = useState('');
 
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
 
+
+
+  // Lấy danh sách tỉnh từ API
   useEffect(() => {
     axios
       .get('https://provinces.open-api.vn/api/p')
@@ -33,6 +38,7 @@ const SetupProfile = () => {
       .catch((error) => console.error('Error fetching provinces:', error));
   }, []);
 
+  // Lấy danh sách quận khi tỉnh thay đổi
   useEffect(() => {
     if (selectedProvince) {
       axios
@@ -45,6 +51,7 @@ const SetupProfile = () => {
     }
   }, [selectedProvince]);
 
+  // Lấy danh sách phường khi quận thay đổi
   useEffect(() => {
     if (selectedDistrict) {
       axios
@@ -56,6 +63,7 @@ const SetupProfile = () => {
     }
   }, [selectedDistrict]);
 
+  // Lấy thông tin profile người dùng nếu đã có
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -75,26 +83,35 @@ const SetupProfile = () => {
           setHasProfile(true);
         }
       } catch (err) {
-        // Không có profile thì bỏ qua
+        // Nếu không có profile thì vẫn tiếp tục
       }
     };
 
     fetchProfile();
   }, []);
 
-  // ✅ Cập nhật địa chỉ mỗi khi người dùng chọn tỉnh/quận/phường
+  // Cập nhật địa chỉ khi tỉnh/quận/phường thay đổi
   useEffect(() => {
     const province = provinces.find((p) => p.code === Number(selectedProvince));
     const district = districts.find((d) => d.code === Number(selectedDistrict));
     const ward = wards.find((w) => w.code === Number(selectedWard));
 
-    const fullAddress = [ward?.name, district?.name, province?.name].filter(Boolean).join(', ');
+    let fullAddress = [ward?.name, district?.name, province?.name].filter(Boolean).join(', ');
+
+    if (!fullAddress) {
+      return;
+    }
+
+    fullAddress = speficAddress ? `${speficAddress}, ${fullAddress}` : fullAddress;
 
     setFormData((prev) => ({
       ...prev,
       address: fullAddress,
     }));
-  }, [selectedProvince, selectedDistrict, selectedWard, provinces, districts, wards]);
+
+    // Update the address field in formData
+
+  }, [selectedProvince, selectedDistrict, selectedWard, provinces, districts, wards, speficAddress]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -104,12 +121,14 @@ const SetupProfile = () => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
-
     const province = provinces.find((p) => p.code === Number(selectedProvince));
     const district = districts.find((d) => d.code === Number(selectedDistrict));
     const ward = wards.find((w) => w.code === Number(selectedWard));
 
-    const fullAddress = [ward?.name, district?.name, province?.name].filter(Boolean).join(', ');
+    let fullAddress = [ward?.name, district?.name, province?.name].filter(Boolean).join(', ');
+    fullAddress = speficAddress ? `${speficAddress}, ${fullAddress}` : fullAddress;
+
+    // Để kiểm tra giá trị của fullAddress trong cons
 
     const finalFormData = {
       ...formData,
@@ -135,12 +154,13 @@ const SetupProfile = () => {
     }
   };
 
+
   return (
     <div className="profile">
       <div className="header">
         <Header />
       </div>
-      <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md mt-10" style={{ marginTop: '100px' }}>
+      <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md mt-10">
         <h2 className="text-xl font-semibold mb-4 text-center">Thiết lập thông tin cá nhân</h2>
         <form onSubmit={handleSubmit} className="space-y-2">
           <input
@@ -161,6 +181,7 @@ const SetupProfile = () => {
             className="w-full border rounded"
             required
           />
+
           <input
             name="address"
             type="text"
@@ -169,6 +190,7 @@ const SetupProfile = () => {
             className="w-full border rounded"
             disabled
           />
+
           <select
             name="province"
             value={selectedProvince}
@@ -213,6 +235,15 @@ const SetupProfile = () => {
               </option>
             ))}
           </select>
+          <input
+            name="speficAddress"
+            type="text"
+            placeholder="Địa chỉ chi tiết"
+            onChange={(e) => setSpeficAddress(e.target.value)}
+
+            className="w-full border rounded"
+          />
+
           <select
             name="gender"
             value={formData.gender}

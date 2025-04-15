@@ -4,6 +4,8 @@ import { env } from '~/config/environment'
 import { cartItemModel } from '~/models/cartItemModel'
 import { orderModel } from '~/models/orderModel'
 import { userModel } from '~/models/userModel'
+import { orderShippingModel } from '~/models/orderShippingModel'
+import { GET_CLIENT } from '~/config/mongodb'
 
 const payos = new PayOS(
   env.PAYOS_CLIENT_ID,
@@ -15,8 +17,17 @@ const payos = new PayOS(
 const createPaymentLink = async (req, res, next) => {
   //req.id
   //get cart item where user_id = req.id
+  console.log(req.body)
+
   const userId = req.user.id
-  //get user
+
+
+  const { address, phone, fullName } = req.body
+
+  if (!address || !phone) {
+    return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin' })
+  }
+
   const user = await userModel.findOneById(userId)
 
   if (!user) {
@@ -59,11 +70,23 @@ const createPaymentLink = async (req, res, next) => {
 
   const orderResult = await orderModel.createOrder(order)
 
+  const orderShipping = {
+    orderCode: orderCode,
+    fullName: fullName,
+    phone: phone,
+    address: address,
+    status: 'pending'
+  }
+
+  const orderShippingResult = await orderShippingModel.create(orderShipping)
+
   const body = {
     orderCode: orderCode,
     amount: amount,
     description: 'TDB Jewelry Shop',
     buyerEmail: user.email,
+    buyerPhone: phone,
+    buyerAddress: address,
     items,
     returnUrl: `${YOUR_DOMAIN}/success.html`,
     cancelUrl: `${YOUR_DOMAIN}/cancel.html`
@@ -80,26 +103,52 @@ const createPaymentLink = async (req, res, next) => {
 }
 
 const webhook = async (req, res, next) => {
-  const orderCode = req.body.data.orderCode
-  const desc = req.body.desc
-  const order = await orderModel.findOrderByOrderCode(orderCode)
+  const session = GET_CLIENT().startSession()
+  session.startTransaction()
 
-  if (!order) {
-    return res.status(404).json({ message: 'Không tìm thấy đơn hàng' })
+
+  try {
+    const orderCode = req.body.data.orderCode
+    const desc = req.body.desc
+
+    const order = await orderModel.findOrderByOrderCode(orderCode, { session })
+
+    if (!order) {
+      await session.abortTransaction()
+      session.endSession()
+      return res.status(404).json({ message: 'Không tìm thấy đơn hàng' })
+    }
+
+    if (desc === 'success') {
+      await orderModel.updateOrderInfo(orderCode, { status: 'paid' }, { session })
+    }
+
+    const cartItems = await cartItemModel.getCart(order.userId, { session })
+
+    // Giảm tồn kho sản phẩm
+    for (const item of cartItems) {
+      await cartItemModel.decreaseVariantStock(item.variant._id.toString(), item.quantity, { session })
+    }
+
+    // Cập nhật trạng thái giao hàng
+    await orderShippingModel.updateStatus(orderCode, 'delivering', { session })
+
+    // Xoá giỏ hàng
+    await cartItemModel.clearUserCart(order.userId, { session })
+
+    await session.commitTransaction()
+    session.endSession()
+
+    return res.json({ message: 'success' })
+
+  } catch (error) {
+    console.error('Transaction failed:', error)
+    await session.abortTransaction()
+    session.endSession()
+
+    return res.status(500).json({ message: 'Lỗi xử lý đơn hàng, đã rollback' })
+
   }
-
-  if (desc === 'success') {
-    await orderModel.updateOrderInfo(orderCode, { status: 'paid' })
-  }
-  const cartItems = await cartItemModel.getCart(order.userId)
-
-  const adjustVariantsQuantity = cartItems.map(async (item) => {
-    await cartItemModel.decreaseVariantStock(item.variant._id.toString(), item.quantity)
-  })
-
-  cartItemModel.clearUserCart(order.userId)
-
-  return res.json({ message: 'success' })
 }
 
 
