@@ -413,7 +413,7 @@ const AddProduct = () => {
         })),
       };
 
-      await axios.put(`/api/products/${editingProduct._id}`, updatedData);
+      await axios.put(`${url}/v1/variants`, updatedData, { withCredentials: true });
 
       // Làm mới data & đóng modal
       await fetchProductDetail(editingProduct.slug);
