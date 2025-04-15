@@ -3,7 +3,8 @@ import './style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 import axios from 'axios';
-import {url} from "../data.js"
+import { url } from "../data.js";
+
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [formData, setFormData] = useState({
@@ -11,8 +12,8 @@ const Checkout = () => {
     address: '',
     phone: '',
   });
-
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('Bank');
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -59,21 +60,26 @@ const Checkout = () => {
       return;
     }
 
-    try {
-      const res = await axios.post(
-        `${url}/v1/payment/checkout`,
-        {
-          userInfo: formData,
-          cartItems,
-          total: totalPrice,
-        },
-        { withCredentials: true }
-      );
+    const orderData = {
+      userInfo: formData,
+      cartItems,
+      total: totalPrice,
+      paymentMethod,
+    };
 
-      if (res?.data?.url) {
+    console.log('Dữ liệu gửi đi:', orderData); // 👈 In dữ liệu ra console
+
+    try {
+      const res = await axios.post(`${url}/v1/payment/checkout`, orderData, {
+        withCredentials: true,
+      });
+
+      if (res?.data?.url && paymentMethod === 'Bank') {
         window.location.href = res.data.url;
       } else {
         alert('Đặt hàng thành công!');
+        await axios.delete(`${url}/v1/cart/clear`, { withCredentials: true }); // 👈 Xoá giỏ hàng
+        setCartItems([]);
       }
     } catch (error) {
       console.error('Lỗi khi đặt hàng:', error);
@@ -101,7 +107,7 @@ const Checkout = () => {
             <h2>Thông tin thanh toán</h2>
             {profileLoaded ? (
               <div className="GroupInputCheck">
-                {[ 
+                {[
                   { label: 'Họ và tên', name: 'fullName', required: true },
                   { label: 'Địa chỉ', name: 'address', required: true },
                   { label: 'Số điện thoại', name: 'phone', required: true },
@@ -113,7 +119,7 @@ const Checkout = () => {
                     <br />
                     <input
                       name={input.name}
-                      type={input.name === 'email' ? 'email' : 'text'}
+                      type="text"
                       value={formData[input.name] || ''}
                       onChange={handleChange}
                       required={input.required}
@@ -166,13 +172,25 @@ const Checkout = () => {
 
                 <tr className="banks">
                   <td className="bank">
-                    <input name="paymentMethod" type="radio" value="Bank" defaultChecked /> Chuyển khoản ngân hàng
+                    <input
+                      name="paymentMethod"
+                      type="radio"
+                      value="Bank"
+                      checked={paymentMethod === 'Bank'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    /> Chuyển khoản ngân hàng
                   </td>
                 </tr>
 
                 <tr className="cash">
                   <td colSpan={2}>
-                    <input name="paymentMethod" type="radio" value="Cash" /> Thanh toán khi nhận hàng
+                    <input
+                      name="paymentMethod"
+                      type="radio"
+                      value="Cash"
+                      checked={paymentMethod === 'Cash'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    /> Thanh toán khi nhận hàng
                   </td>
                 </tr>
 

@@ -120,9 +120,6 @@ const Header = ({ cartItems = [] }) => {
 
         {/* --- Giỏ hàng & Tài khoản --- */}
         <div className="Logo">
-          <div className="Wishlist">
-            <img src="/image/Header/Tym.png" alt="Wishlist" />
-          </div>
           <div className="Cart">
             <Link to="/Giohang">
               <img src="/image/Header/Cart.png" alt="Giỏ hàng" />
