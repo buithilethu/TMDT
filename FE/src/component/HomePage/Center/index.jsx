@@ -14,7 +14,7 @@ const Center = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const productsPerPage = 18;
+  const productsPerPage = 15;
 
   const location = useLocation();
   const navigate = useNavigate();
