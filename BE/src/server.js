@@ -8,6 +8,7 @@ import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware'
 import { corsOptions } from '~/config/cors'
 import { APIsV1 } from '~/routes/v1/index'
 import 'dotenv/config'
+import path from 'path'
 
 const START_SERVER = () => {
   const app = express()
@@ -16,7 +17,9 @@ const START_SERVER = () => {
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
   app.use(cookieParser())
-  app.use('/uploads', express.static('uploads'))
+
+  const rootpath = path.resolve(__dirname, '..')
+  app.use('/uploads', express.static(path.join(rootpath, 'uploads')))
   app.use('/v1', APIsV1)
   app.use(errorHandlerMiddleware)
 
