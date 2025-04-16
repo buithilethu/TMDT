@@ -1,5 +1,6 @@
 //Controller này sẽ xử lý các request liên quan đến board
 import { StatusCodes } from 'http-status-codes'
+import { variantModel } from '~/models/variantModel'
 import { variantService } from '~/services/variantService'
 
 const create = async (req, res, next) => {
@@ -67,11 +68,25 @@ const getAllVariants = async (req, res, next) => {
   }
 }
 
+const decreaseStock = async (req, res, next) => {
+  try {
+    const { variantId, quantity } = req.body
+    const variant = await variantModel.decreaseStock(variantId, quantity)
+
+    res.status(StatusCodes.OK).json(variant)
+  } catch (error) {
+
+    next(error)
+
+  }
+}
+
 export const variantController = {
   create,
   update,
   remove,
   findOneById,
-  getAllVariants
+  getAllVariants,
+  decreaseStock
 
 }

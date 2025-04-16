@@ -15,92 +15,106 @@ const payos = new PayOS(
 
 
 const createPaymentLink = async (req, res, next) => {
-  //req.id
-  //get cart item where user_id = req.id
   console.log(req.body)
 
   const userId = req.user.id
-
-
-  const { address, phone, fullName } = req.body
-
+  const { address, phone, fullName, paymentMethod } = req.body
+  // Kiểm tra thông tin
   if (!address || !phone) {
     return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin' })
   }
 
   const user = await userModel.findOneById(userId)
-
   if (!user) {
     return res.status(404).json({ message: 'Người dùng chưa đăng nhập' })
   }
 
-  //get cart item
   const cartItems = await cartItemModel.getCart(userId)
-
-  if (!cartItems) {
+  if (!cartItems || cartItems.length === 0) {
     return res.status(404).json({ message: 'Giỏ hàng trống' })
   }
 
   const YOUR_DOMAIN = env.BASE_URL
-  //get items for payos
-  const items = cartItems.map((item) => ({
+  //Tạo danh sách sản phẩm
+  const items = cartItems.map(item => ({
     name: `${item.product.name} - (${Object.values(item.variant.attributes).join(', ')})`,
     quantity: item.quantity,
     price: item.variant.price
   }))
-  //get items for order
-  const orderItems = cartItems.map((item) => ({
+
+  const orderItems = cartItems.map(item => ({
     productId: item.product._id.toString(),
     variantId: item.variant._id.toString(),
     quantity: item.quantity,
     price: item.variant.price
   }))
 
-  //create order
   const amount = items.reduce((total, item) => total + item.price * item.quantity, 0)
-  const orderCode = Number(String(Date.now()).slice(-6))
+
+  const orderCode = Number(String(Date.now()).slice(-8))
+  // Tạo đơn hàng
   const order = {
-    userId: userId,
-    orderCode: orderCode,
+    userId,
+    orderCode,
     items: orderItems,
     status: 'pending',
+    paymentMethod: paymentMethod,
     createdAt: Date.now()
   }
 
-
-  const orderResult = await orderModel.createOrder(order)
-
-  const orderShipping = {
-    orderCode: orderCode,
-    fullName: fullName,
-    phone: phone,
-    address: address,
-    status: 'pending'
-  }
-
-  const orderShippingResult = await orderShippingModel.create(orderShipping)
-
-  const body = {
-    orderCode: orderCode,
-    amount: amount,
-    description: 'TDB Jewelry Shop',
-    buyerEmail: user.email,
-    buyerPhone: phone,
-    buyerAddress: address,
-    items,
-    returnUrl: `${YOUR_DOMAIN}/success.html`,
-    cancelUrl: `${YOUR_DOMAIN}/cancel.html`
-  }
+  const session = GET_CLIENT().startSession()
+  session.startTransaction()
 
   try {
-    const paymentLinkResponse = await payos.createPaymentLink(body)
+    // Tạo đơn hàng & thông tin giao hàng
+    await orderModel.createOrder(order, { session })
+    await orderShippingModel.create(
+      {
+        orderCode,
+        fullName,
+        phone,
+        address,
+        status: paymentMethod === 'Cash' ? 'delivering' : 'pending'
+      },
+      { session }
+    )
 
-    res.json( { url : paymentLinkResponse.checkoutUrl } )
+    if (paymentMethod === 'Cash') {
+      // Xoá giỏ hàng
+      await cartItemModel.clearUserCart(userId, { session })
+
+      await session.commitTransaction()
+      session.endSession()
+
+      return res.status(200).json({ message: 'Đặt hàng thành công với COD' })
+    } else {
+      await session.commitTransaction()
+      session.endSession()
+
+      // Nếu là thanh toán qua ngân hàng → tạo link
+      const body = {
+        orderCode,
+        amount,
+        description: 'TDB Jewelry Shop',
+        buyerEmail: user.email,
+        buyerPhone: phone,
+        buyerAddress: address,
+        items,
+        returnUrl: `${YOUR_DOMAIN}/success.html`,
+        cancelUrl: `${YOUR_DOMAIN}/cancel.html`
+      }
+
+      const paymentLinkResponse = await payos.createPaymentLink(body)
+      return res.json({ url: paymentLinkResponse.checkoutUrl })
+    }
   } catch (error) {
-    console.error('Checkout error:', error)
-    return res.status(500).json({ message: 'Lỗi khi tạo đơn hàng' })
+    console.error('Lỗi khi xử lý đơn hàng:', error)
+    await session.abortTransaction()
+    session.endSession()
+    return res.status(500).json({ message: 'Lỗi khi xử lý đơn hàng' })
   }
 }
+
 
 const webhook = async (req, res, next) => {
   const session = GET_CLIENT().startSession()
@@ -120,7 +134,7 @@ const webhook = async (req, res, next) => {
     }
 
     if (desc === 'success') {
-      await orderModel.updateOrderInfo(orderCode, { status: 'paid' }, { session })
+      await orderModel.updateOrderInfoByOrderCode(orderCode, { status: 'paid' }, { session })
     }
 
     const cartItems = await cartItemModel.getCart(order.userId, { session })
@@ -131,7 +145,7 @@ const webhook = async (req, res, next) => {
     }
 
     // Cập nhật trạng thái giao hàng
-    await orderShippingModel.updateStatus(orderCode, 'delivering', { session })
+    await orderShippingModel.updateStatusByOrderCode(orderCode, 'delivering', { session })
 
     // Xoá giỏ hàng
     await cartItemModel.clearUserCart(order.userId, { session })

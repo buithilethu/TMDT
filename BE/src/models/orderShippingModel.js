@@ -61,9 +61,26 @@ const updateStatus = async (_id, status) => {
   }
 }
 
+const updateStatusByOrderCode = async (orderCode, status) => {
+  try {
+    const result = await GET_DB()
+      .collection(ORDER_SHIPPING_NAME)
+      .findOneAndUpdate(
+        { orderCode: Number(orderCode) },
+        { $set: { status: status } },
+        { returnDocument: 'after' }
+      )
+
+    return result
+  } catch (error) {
+    throw new Error(error.message || 'Update error')
+  }
+}
+
 export const orderShippingModel = {
   create,
   findOneByOrderCode,
   updateStatus,
+  updateStatusByOrderCode,
   validateSchema
 }

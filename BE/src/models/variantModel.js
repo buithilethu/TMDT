@@ -75,6 +75,15 @@ const updateStock = async (id, quantity) => {
   }
 }
 
+const decreaseStock = async (id, quantity) => {
+  try {
+    const result = await GET_DB().collection(VARIANT_COLLECTION_NAME).updateOne({ _id: new ObjectId(id) }, { $inc: { stock: -quantity } })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const remove = async (id) => {
   try {
     const result = await GET_DB().collection(VARIANT_COLLECTION_NAME).deleteOne({ _id: new ObjectId(id) })
@@ -101,5 +110,6 @@ export const variantModel = {
   update,
   remove,
   findOneById,
-  updateStock
+  updateStock,
+  decreaseStock
 }

@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import { update } from 'lodash'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
@@ -17,7 +18,9 @@ const ORDER_COLLECTION_SCHEMA = Joi.object({
   userId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).required(),
   items: Joi.array().items(ORDER_ITEM_SCHEMA).min(1).required(),
   status: Joi.string().valid('pending', 'paid', 'cancelled').default('pending'),
-  createdAt: Joi.date().timestamp().default(Date.now)
+  createdAt: Joi.date().timestamp().default(Date.now),
+  updatedAt: Joi.date().timestamp().default(null),
+  paymentMethod: Joi.string().valid('Cash', 'Banking').required()
 })
 
 const validateBeforeCreate = async (data) => {
@@ -136,8 +139,8 @@ const getOrdersByUserId = async (userId) => {
     }
   ]).toArray()
 
-  return ordersWithShippingAndProductDetails;
-};
+  return ordersWithShippingAndProductDetails
+}
 
 
 
@@ -157,12 +160,21 @@ const updateOrderInfo = async (_id, status) => {
   return result
 }
 
-const getAllUserOrders = async ({ page = 1, limit = 10, status, shippingStatus, search, sortBy = 'createdAt', order = 'desc' }) => {
-  const skip = (parseInt(page) - 1) * parseInt(limit);
-  const sortOrder = order === 'asc' ? 1 : -1;
+const updateOrderInfoByOrderCode = async (orderCode, status) => {
+  const result = await GET_DB().collection(ORDER_COLLECTION_NAME).findOneAndUpdate(
+    { orderCode: orderCode },
+    { $set: status },
+    { returnDocument: 'after' }
+  )
+  return result
+}
 
-  const baseMatch = {};
-  if (status) baseMatch.status = status;
+const getAllUserOrders = async ({ page = 1, limit = 10, status, shippingStatus, search, sortBy = 'createdAt', order = 'desc' }) => {
+  const skip = (parseInt(page) - 1) * parseInt(limit)
+  const sortOrder = order === 'asc' ? 1 : -1
+
+  const baseMatch = {}
+  if (status) baseMatch.status = status
 
   const pipeline = [
     // Join shipping
@@ -224,8 +236,10 @@ const getAllUserOrders = async ({ page = 1, limit = 10, status, shippingStatus, 
         userId: { $first: '$userId' },
         orderCode: { $first: '$orderCode' },
         status: { $first: '$status' },
+        paymentMethod: { $first: '$paymentMethod' },
         createdAt: { $first: '$createdAt' },
         shipping: { $first: '$shipping' },
+        image: { $first: '$product.images' },
         items: {
           $push: {
             product: '$product',
@@ -241,9 +255,9 @@ const getAllUserOrders = async ({ page = 1, limit = 10, status, shippingStatus, 
     { $sort: { [sortBy]: sortOrder } },
     { $skip: skip },
     { $limit: parseInt(limit) }
-  ];
+  ]
 
-  const orders = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate(pipeline).toArray();
+  const orders = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate(pipeline).toArray()
 
   // Count
   const countPipeline = [
@@ -270,10 +284,10 @@ const getAllUserOrders = async ({ page = 1, limit = 10, status, shippingStatus, 
       }
     },
     { $count: 'total' }
-  ];
+  ]
 
-  const countResult = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate(countPipeline).toArray();
-  const total = countResult[0]?.total || 0;
+  const countResult = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate(countPipeline).toArray()
+  const total = countResult[0]?.total || 0
 
   return {
     orders,
@@ -282,10 +296,8 @@ const getAllUserOrders = async ({ page = 1, limit = 10, status, shippingStatus, 
       limit: parseInt(limit),
       total
     }
-  };
-};
-
-
+  }
+}
 
 
 export const orderModel = {
@@ -295,5 +307,6 @@ export const orderModel = {
   getOrdersByUserId,
   findOrderByOrderCode,
   updateOrderInfo,
-  getAllUserOrders
+  getAllUserOrders,
+  updateOrderInfoByOrderCode
 }

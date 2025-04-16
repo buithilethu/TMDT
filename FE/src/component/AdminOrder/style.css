@@ -118,6 +118,7 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  overflow-y: auto;
 }
 
 .admin-container .modal-content {
@@ -125,6 +126,10 @@
   padding: 20px;
   border-radius: 8px;
   width: 80vw;
+  max-height: 500px;
+  overflow-y: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
 }
 
 .admin-container .modal-buttons {

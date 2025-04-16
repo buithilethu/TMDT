@@ -109,6 +109,20 @@ const AdminOrders = () => {
         headers: { 'Content-Type': 'application/json' },
       });
 
+      // Nếu trạng thái là "paid" và giao hàng là "delivered", giảm tồn kho
+      if (status === 'paid' && shipping.status === 'delivered' && selectedOrder.paymentMethod === 'Cash') {
+        // Giảm tồn kho cho các sản phẩm trong đơn hàng
+        const reduceStockPromises = selectedOrder.items.map((item) =>
+          axios.put(url + `/v1/variants/decrease-stock`, {
+            variantId: item.variant._id,
+            quantity: item.quantity,
+          }, { withCredentials: true })
+        );
+
+        // Đợi tất cả các yêu cầu giảm tồn kho
+        await Promise.all(reduceStockPromises);
+      }
+
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order._id === selectedOrder._id
@@ -162,6 +176,20 @@ const AdminOrders = () => {
     return 'status-other';
   };
 
+  const groupedItems = selectedOrder?.items?.reduce((acc, item) => {
+    const productId = item.product?._id;
+    if (!acc[productId]) {
+      acc[productId] = {
+        productName: item.product?.name,
+        variants: [],
+      };
+    }
+    acc[productId].variants.push(item);
+    return acc;
+  }, {}) || {};
+
+
+
   return (
     <div className="admin-container mt-3">
       <Header />
@@ -205,6 +233,7 @@ const AdminOrders = () => {
                 <th>Trạng thái giao hàng</th>
                 <th>Ngày tạo</th>
                 <th>Tổng tiền</th>
+                <th>Hình thức</th>
                 <th>Chi tiết</th>
               </tr>
             </thead>
@@ -219,6 +248,7 @@ const AdminOrders = () => {
                   <td>{order?.shipping?.status}</td>
                   <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                   <td>{order?.items?.reduce((total, i) => total + i.totalPrice, 0).toLocaleString('vi-VN')}₫</td>
+                  <td>{order.paymentMethod}</td>
                   <td>
                     <button
                       className="view-button"
@@ -287,7 +317,6 @@ const AdminOrders = () => {
                 <table className="items-table">
                   <thead>
                     <tr>
-                      <th>Ảnh</th>
                       <th>Sản phẩm</th>
                       <th>Biến thể</th>
                       <th>Số lượng</th>
@@ -296,17 +325,25 @@ const AdminOrders = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedOrder.items.map((item, index) => (
-                      <tr key={index}>
-                        <td><img src={item.product?.images?.[0]} alt="" width={50} /></td>
-                        <td>{item.product?.name}</td>
-                        <td>{item.variant?.color} - {item.variant?.size}</td>
-                        <td>{item.quantity}</td>
-                        <td>{item.price.toLocaleString()}₫</td>
-                        <td>{item.totalPrice.toLocaleString()}₫</td>
-                      </tr>
+                    {Object.values(groupedItems).map((group, groupIndex) => (
+                      group.variants.map((item, index) => (
+                        <tr key={`${groupIndex}-${index}`}>
+                          {index === 0 && (
+                            <td rowSpan={group.variants.length}>{group.productName}</td>
+                          )}
+                          <td>
+                            {Object.entries(item.variant.attributes).map(([key, value]) => (
+                              <div key={key}><strong>{key}:</strong> {value}</div>
+                            ))}
+                          </td>
+                          <td>{item.quantity}</td>
+                          <td>{item.price.toLocaleString()}₫</td>
+                          <td>{item.totalPrice.toLocaleString()}₫</td>
+                        </tr>
+                      ))
                     ))}
                   </tbody>
+
                 </table>
                 <div className="total-amount">
                   <strong>Tổng cộng: </strong>

@@ -10,6 +10,7 @@ const Checkout = () => {
     fullName: '',
     address: '',
     phone: '',
+    paymentMethod: 'Bank',
   });
 
   const [profileLoaded, setProfileLoaded] = useState(false);
@@ -162,13 +163,31 @@ const Checkout = () => {
 
                 <tr className="banks">
                   <td className="bank">
-                    <input name="paymentMethod" type="radio" value="Bank" defaultChecked /> Chuyển khoản ngân hàng
+                    <label>
+                      <input
+                        name="paymentMethod"
+                        type="radio"
+                        value="Banking"
+                        checked={formData.paymentMethod === 'Banking'}
+                        onChange={handleChange}
+                      />{' '}
+                      Chuyển khoản ngân hàng (PayOS)
+                    </label>
                   </td>
                 </tr>
 
                 <tr className="cash">
-                  <td colSpan={2}>
-                    <input name="paymentMethod" type="radio" value="Cash" /> Thanh toán khi nhận hàng
+                  <td className="bank">
+                    <label>
+                      <input
+                        name="paymentMethod"
+                        type="radio"
+                        value="Cash"
+                        checked={formData.paymentMethod === 'Cash'}
+                        onChange={handleChange}
+                      />{' '}
+                      Thanh toán khi nhận hàng (COD)
+                    </label>
                   </td>
                 </tr>
 
