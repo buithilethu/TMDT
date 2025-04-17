@@ -4,12 +4,11 @@ import { cartService } from '~/services/cartService'
 const add = async (req, res, next) => {
   try {
     //req.body => {variantId: 'abc', quantity: 1}
-    console.log(req.body)
-
     const { variantId, quantity } = req.body
     const userId = req.user.id
     const cart = await cartService.add({ userId, variantId, quantity })
 
+    console.log(cart)
     return res.status(StatusCodes.OK).json(cart)
   } catch (error) {
     next(error)

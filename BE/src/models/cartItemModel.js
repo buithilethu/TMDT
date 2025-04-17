@@ -18,6 +18,7 @@ const validateBeforeCreate = async (data) => {
 //add to cart
 const add = async (data) => {
   try {
+
     const cartItem = {
       userId: data.userId,
       variantId: data.variantId,
@@ -35,6 +36,7 @@ const add = async (data) => {
       value.userId = new ObjectId(value.userId)
       value.variantId = new ObjectId(value.variantId)
       result = await GET_DB().collection(CART_ITEM_COLLECTION_NAME).insertOne(value)
+      console.log(result)
     }
 
     return result

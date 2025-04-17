@@ -4,7 +4,7 @@ import './style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 
-import {url} from '../data.js'
+import { url } from '../data.js'
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -29,46 +29,48 @@ const Cart = () => {
 
   useEffect(() => {
     const checkLoginAndFetchCart = async () => {
-      const token = getCookie('token');
-      if (token) {
-        setIsLoggedIn(true);
-        try {
-          const response = await fetch(`${url}/v1/cart`, {
-            method: 'GET',
-            credentials: 'include',
-          });
+      try {
+        const response = await fetch(`${url}/v1/cart`, {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-          if (!response.ok) throw new Error('Không thể tải giỏ hàng');
-
-          const data = await response.json();
-
-          const formattedItems = data.map((item) => ({
-            id: item._id,
-            quantity: item.quantity,
-            price: item.variant?.price || item.product?.price,
-            name: item.product?.name,
-            image: item.images?.[0]?.url ? `${url}/${item.images[0].url}` : 'default-image.jpg',
-            productSlug: item.product?.slug,
-            variantId: item.variant?._id,
-            attributes: item.variant?.attributes || {},
-            stock: item.variant?.stock || 0,
-          }));
-
-
-          setCartItems(formattedItems);
-        } catch (err) {
-          console.error('Error:', err);
-          setError(err.message);
+        if (response.status === 401) {
+          // Không đăng nhập => dùng localStorage
+          loadCartFromLocalStorage();
+          setIsLoggedIn(false);
+          return;
         }
-      } else {
-        setIsLoggedIn(false);
-        loadCartFromLocalStorage();
+
+        if (!response.ok) throw new Error('Không thể tải giỏ hàng');
+
+        const data = await response.json();
+        setIsLoggedIn(true);
+
+        const formattedItems = data.map((item) => ({
+          id: item._id,
+          quantity: item.quantity,
+          price: item.variant?.price || item.product?.price,
+          name: item.product?.name,
+          image: item.images?.[0]?.url ? `${url}/${item.images[0].url}` : 'default-image.jpg',
+          productSlug: item.product?.slug,
+          variantId: item.variant?._id,
+          attributes: item.variant?.attributes || {},
+          stock: item.variant?.stock || 0,
+        }));
+
+        setCartItems(formattedItems);
+      } catch (err) {
+        console.error('Error:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkLoginAndFetchCart();
   }, []);
+
 
   const updateQuantity = async (id, quantity) => {
     const token = getCookie('token');
@@ -129,7 +131,7 @@ const Cart = () => {
   return (
     <div className="Carts">
       <div className="cart">
-        <Header/>
+        <Header />
         <div className="RoadMapCart">
           <div className="Roadmap">
             <Link to="/">Trang chủ</Link>
@@ -326,7 +328,7 @@ const Cart = () => {
             </div>
           </div>
         </div>
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );
