@@ -18,7 +18,7 @@ const START_SERVER = () => {
 
     'https://thuonggia.ecotech2a.com',
     'https://tmdt-sxwh.vercel.app',
-    'http://localhost:5174' // nếu đang test cục bộ
+    'http://localhost:5173' // nếu đang test cục bộ
 ]
 
   app.use(cors({

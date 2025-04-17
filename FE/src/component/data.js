@@ -27,6 +27,22 @@ export const banners = [
       discount: "Giảm giá lên đến 13% bằng mã giảm giá",
       shopLink: "#",
     },
+    {
+      "id": 5,
+      "image": "/image/Jewelry/images-1744268004743.jpg",
+      "title": "Bộ trang sức đá đỏ sang trọng",
+      "description": "Bao gồm vòng cổ, lắc tay và nhẫn thiết kế tinh xảo, đính đá đỏ quý phái. Thích hợp làm quà tặng hoặc sử dụng trong các dịp đặc biệt.",
+      "discount": "Giảm giá lên đến 13% bằng mã giảm giá",
+      "shopLink": "#"
+    },
+    {
+      id: 6,
+      image: "/image/Jewelry/images-1744267904041.jpg",
+      "title": "Nhẫn bạc đính đá tinh tế",
+      "description": "Thiết kế sang trọng với viên đá chủ lấp lánh, nhẫn bạc đính đá là lựa chọn hoàn hảo cho các dịp đặc biệt hoặc làm quà tặng ý nghĩa.",
+      "discount": "Ưu đãi 10% cho đơn hàng đầu tiên",
+      "shopLink": "#"
+    },
 ];
 
 export const xuhuong= [
