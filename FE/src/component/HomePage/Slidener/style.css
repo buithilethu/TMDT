@@ -77,8 +77,8 @@ a:hover {
 
 }
 
-.Banner {
-    padding-left: 100px;
+.Banner h2{
+    text-align: left;
 }
 
 .banner_text {
@@ -102,7 +102,7 @@ h1 {
     align-items: center;
     width: 396px;
     height: 300px;
-
+    padding-bottom: 50px;
 }
 
 .shop_now {
