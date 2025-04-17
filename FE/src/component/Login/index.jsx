@@ -28,7 +28,7 @@ const Login = () => {
     }
 
     try {
-      const res = await axios.post('https://thuonggiaapi.ecotech2a.com/v1/auth/login', {
+      const res = await axios.post('http://localhost:3000/v1/auth/login', {
         email, password
       }, {
         withCredentials: true // QUAN TRỌNG!
