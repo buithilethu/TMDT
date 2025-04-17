@@ -13,10 +13,15 @@ import path from 'path'
 const START_SERVER = () => {
   const app = express()
   // Danh sách các origin được phép truy cập
-  app.use(cors({
-    origin: true, // KHÔNG dùng "*"
-    credentials: true
-  }))
+
+  app.use(function(req, res, next) {
+    // Thay '*' bằng domain của frontend để cho phép credentials
+    res.header('Access-Control-Allow-Origin', 'https://tmdt-sxwh.vercel.app') // Thay thế với domain của bạn
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+    res.header('Access-Control-Allow-Credentials', 'true') // Quan trọng để cho phép credentials
+    next()
+  })
 
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
