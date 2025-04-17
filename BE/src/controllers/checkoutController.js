@@ -100,8 +100,8 @@ const createPaymentLink = async (req, res, next) => {
         buyerPhone: phone,
         buyerAddress: address,
         items,
-        returnUrl: `${YOUR_DOMAIN}/orders`,
-        cancelUrl: `${YOUR_DOMAIN}/ThanhToan`
+        returnUrl: 'https://thuonggia.ecotech2a.com/orders',
+        cancelUrl: 'https://thuonggia.ecotech2a.com/ThanhToan'
       }
 
       const paymentLinkResponse = await payos.createPaymentLink(body)

@@ -71,29 +71,61 @@ const Cart = () => {
     checkLoginAndFetchCart();
   }, []);
 
+  const handleQuantityChange = (e, item) => {
+    const newValue = parseInt(e.target.value, 10);
+
+    if (isNaN(newValue)) {
+      // Cho phép người dùng xoá hết để nhập lại, không làm gì ở đây
+      setCartItems((prev) =>
+        prev.map((i) =>
+          i.id === item.id ? { ...i, quantity: '' } : i
+        )
+      );
+      return;
+    }
+
+    if (newValue < 1) {
+      alert('Số lượng không hợp lệ');
+      return;
+    }
+
+    if (newValue > item.stock) {
+      alert('Số lượng không đủ');
+      return;
+    }
+
+    updateQuantity(item.id, newValue);
+  };
+
+  const handleQuantityBlur = (item) => {
+    const itemQuantity = parseInt(item.quantity, 10);
+
+    if (isNaN(itemQuantity) || itemQuantity < 1) {
+      updateQuantity(item.id, 1);
+    }
+  };
 
   const updateQuantity = async (id, quantity) => {
-    const token = getCookie('token');
+
     const newQuantity = Math.max(1, parseInt(quantity, 10) || 1);
 
-    if (isLoggedIn && token) {
-      try {
-        const itemToUpdate = cartItems.find((item) => item.id === id);
-        await fetch(`${url}/v1/cart/update`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            quantity: newQuantity,
-            variantId: itemToUpdate.variantId || 1,
-          }),
-          credentials: 'include',
-        });
-      } catch (err) {
-        console.error('Lỗi khi cập nhật số lượng:', err);
-      }
+    try {
+      const itemToUpdate = cartItems.find((item) => item.id === id);
+      await fetch(`${url}/v1/cart/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          quantity: newQuantity,
+          variantId: itemToUpdate.variantId || 1,
+        }),
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Lỗi khi cập nhật số lượng:', err);
     }
+
 
     setCartItems((prevItems) =>
       prevItems.map((item) =>
@@ -198,17 +230,8 @@ const Cart = () => {
                                 type="number"
                                 min="1"
                                 value={variants[0].quantity}
-                                onChange={(e) => {
-                                  if (e.target.value > variants[0].stock) {
-                                    alert('Số lượng không đủ');
-                                  } else if (e.target.value < 0) {
-                                    alert('Số lượng không hợp lệ');
-                                  }
-                                  else {
-                                    updateQuantity(variants[0].id, parseInt(e.target.value))
-                                  }
-                                }
-                                }
+                                onChange={(e) => handleQuantityChange(e, variants[0])}
+                                onBlur={() => handleQuantityBlur(variants[0])}
                                 className="quantity-input"
                               />
                             </td>
@@ -241,18 +264,9 @@ const Cart = () => {
                                 <input
                                   type="number"
                                   min="1"
-
                                   value={variant.quantity}
-                                  onChange={(e) => {
-                                    if (e.target.value > variant.stock) {
-                                      alert('Số lượng không đủ');
-                                    } else if (e.target.value < 0) {
-                                      alert('Số lượng không hợp lệ');
-                                    } else {
-                                      updateQuantity(variant.id, parseInt(e.target.value))
-                                    }
-                                  }
-                                  }
+                                  onChange={(e) => handleQuantityChange(e, variant)}
+                                  onBlur={() => handleQuantityBlur(variant)}
                                   className="quantity-input"
                                 />
                               </td>

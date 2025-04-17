@@ -10,7 +10,7 @@ const Checkout = () => {
     fullName: '',
     address: '',
     phone: '',
-    paymentMethod: 'Bank',
+    paymentMethod: 'Banking',
   });
 
   const [profileLoaded, setProfileLoaded] = useState(false);

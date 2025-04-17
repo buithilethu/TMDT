@@ -14,13 +14,25 @@ const START_SERVER = () => {
   const app = express()
   // Danh sách các origin được phép truy cập
 
-  app.use(cors(
-    {
-      origin: 'https://tmdt-sxwh.vercel.app',
-      optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-      credentials: true
-    }
-  ))
+  const allowedOrigins = [
+
+    'https://thuonggia.ecotech2a.com',
+    'https://tmdt-sxwh.vercel.app',
+    'http://localhost:5173' // nếu đang test cục bộ
+]
+
+  app.use(cors({
+    origin: (origin, callback) => {
+      // Cho phép nếu không có origin (ví dụ Postman), hoặc origin nằm trong danh sách
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+  }))
 
   // app.use(function(req, res, next) {
   //   res.header('Content-Type', 'application/json;charset=UTF-8')
