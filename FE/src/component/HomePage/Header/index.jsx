@@ -27,9 +27,9 @@ const Header = ({ cartItems = [] }) => {
   }, []);
 
   const handleLogout = () => {
+    fetch(`${url}/v1/auth/logout`, { method: 'POST', credentials: 'include' });
     Cookies.remove('user');
     Cookies.remove('token');
-    fetch(`${url}/v1/auth/logout`, { method: 'POST', credentials: 'include' });
     setUser(null);
   };
 
