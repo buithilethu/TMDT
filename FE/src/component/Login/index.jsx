@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import '../Login/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
-import {url} from '../data.js'
+import { url } from '../data.js'
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,7 +51,13 @@ const Login = () => {
 
       // Lưu thông tin user vào cookie
       Cookies.set('user', JSON.stringify(userData), { expires: 7, secure: true, sameSite: 'Strict' });
-      Cookies.set('token', loginData.accessToken, { expires: 7, secure: true, sameSite: 'Strict' });
+      Cookies.set('token', token, {
+        expires: 7,
+        path: '/',
+        secure: true,
+        sameSite: 'None',
+        domain: url // <== Cực kỳ quan trọng khi khác origin
+      });
 
 
       // Chuyển hướng sang trang chủ

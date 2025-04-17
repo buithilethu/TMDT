@@ -12,7 +12,11 @@ import path from 'path'
 
 const START_SERVER = () => {
   const app = express()
-  app.use(cors(corsOptions))
+  // Danh sách các origin được phép truy cập
+  app.use(cors({
+    origin: true, // KHÔNG dùng "*"
+    credentials: true
+  }))
 
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))

@@ -100,8 +100,8 @@ const createPaymentLink = async (req, res, next) => {
         buyerPhone: phone,
         buyerAddress: address,
         items,
-        returnUrl: `${YOUR_DOMAIN}/success.html`,
-        cancelUrl: `${YOUR_DOMAIN}/cancel.html`
+        returnUrl: `${YOUR_DOMAIN}/orders`,
+        cancelUrl: `${YOUR_DOMAIN}/ThanhToan`
       }
 
       const paymentLinkResponse = await payos.createPaymentLink(body)
@@ -123,7 +123,9 @@ const webhook = async (req, res, next) => {
 
   try {
     const orderCode = req.body.data.orderCode
-    const desc = req.body.desc
+    const paymentCode = req.body.data.code  // Mã trạng thái thanh toán từ PayOS
+    const paymentDesc = req.body.data.desc  // Mô tả trạng thái thanh toán
+
 
     const order = await orderModel.findOrderByOrderCode(orderCode, { session })
 
@@ -133,8 +135,10 @@ const webhook = async (req, res, next) => {
       return res.status(404).json({ message: 'Không tìm thấy đơn hàng' })
     }
 
-    if (desc === 'success') {
+    if (paymentCode === '00' && paymentDesc === 'Thành công') {
       await orderModel.updateOrderInfoByOrderCode(orderCode, { status: 'paid' }, { session })
+    } else {
+      await orderModel.updateOrderInfoByOrderCode(orderCode, { status: 'cancelled' }, { session })
     }
 
     const cartItems = await cartItemModel.getCart(order.userId, { session })
@@ -148,7 +152,9 @@ const webhook = async (req, res, next) => {
     await orderShippingModel.updateStatusByOrderCode(orderCode, 'delivering', { session })
 
     // Xoá giỏ hàng
-    await cartItemModel.clearUserCart(order.userId, { session })
+    if(paymentCode === '00' && paymentDesc === 'Thành công') {
+      await cartItemModel.clearUserCart(order.userId, { session }) 
+    }
 
     await session.commitTransaction()
     session.endSession()
