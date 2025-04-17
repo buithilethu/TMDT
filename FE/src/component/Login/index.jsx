@@ -28,16 +28,12 @@ const Login = () => {
     }
 
     try {
-      const res = await axios.post(
-        `${url}/v1/auth/login`,
-        {
-          withCredentials: true,
-          body: {
-            email,
-            password,
-          },
-        }
-      )
+      const res = await axios.post('https://thuonggiaapi.ecotech2a.com/v1/auth/login', {
+        email, password
+      }, {
+        withCredentials: true // QUAN TRỌNG!
+      });
+
       return res
     } catch (error) {
       console.log(error)

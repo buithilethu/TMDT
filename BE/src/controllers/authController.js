@@ -20,6 +20,7 @@ const registerUser = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
   try {
     //(req.body) => {email: 'abc', password: 'abc'}
+    console.log(req.body)
     const { accessToken, isSuccess } = await authService.loginUser(req.body, res)
     const user = await userModel.findOne({ email: req.body.email })
 
@@ -37,7 +38,7 @@ const loginUser = async (req, res, next) => {
     res.cookie('token', accessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'none',
+      sameSite: 'strict',
       maxAge: 3600000,
       path:'/'
     })
