@@ -1,128 +1,363 @@
+/* Cải thiện CSS tổng thể */
+
 .Up {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 50px;
     align-items: center;
     justify-content: center;
     margin: 40px 0;
-    padding: 50px 10px;
-}
-
-.RouterProducts {
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .RouterProducts {
     display: flex;
     justify-content: center;
     align-items: center;
     overflow-x: auto;
     width: 100%;
-    padding: 10px 0;
+    padding: 15px 0;
     -webkit-overflow-scrolling: touch;
-}
-
-.category-slider {
+    position: relative;
+  }
+  
+  .RouterProducts::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+  
+  .category-slider {
     display: flex;
     overflow-x: auto;
     cursor: grab;
     user-select: none;
     scroll-behavior: smooth;
     -ms-overflow-style: none;
-    /* IE and Edge */
     scrollbar-width: none;
-    /* Firefox */
-}
-
-.category-slider::-webkit-scrollbar {
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 30px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .category-slider::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari and Opera */
-}
-
-.category-slider:active {
+  }
+  
+  .category-slider:active {
     cursor: grabbing;
-}
-
-.category-link {
+  }
+  
+  .category-link {
     flex: 0 0 auto;
     padding: 10px 20px;
-    margin: 0 5px;
-    white-space: nowrap;
-}
-
-.category-link {
-    flex: 0 0 auto;
-    padding: 10px 16px;
-    border-radius: 20px;
-    background-color: #eee;
+    margin: 0 6px;
+    border-radius: 25px;
+    background-color: #f8f8f8;
     color: #333;
     text-decoration: none;
     white-space: nowrap;
     scroll-snap-align: start;
-    transition: background-color 0.3s ease;
-}
-
-.category-link:hover {
-    background-color: #ddd;
-}
-
-
-a:hover {
-    color: cornflowerblue;
-}
-
-.banner {
-    color: black;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    width: 1000px;
-    height: 344px;
-
-}
-
-.Banner h2{
-    text-align: left;
-}
-
-.banner_text {
+    transition: all 0.3s ease;
+    font-weight: 500;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+  }
+  
+  .category-link:hover {
+    background-color: #f9f4e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    color: #d4af37;
+    border-color: rgba(212, 175, 55, 0.3);
+  }
+  
+  a:hover {
+    color: #d4af37;
+  }
+  
+  /* Banner sang trọng cho trang sức */
+  .banner {
+    color: #333;
+    padding: 0;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 5px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 1000px;
+    height: 400px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffffff 0%, #f9f4e0 100%);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+  }
+  
+  .banner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4af37' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")
+      repeat;
+    opacity: 0.5;
+    z-index: 1;
+  }
+  
+  .banner_text {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    position: relative;
+    z-index: 2;
+    padding: 40px;
+  }
+  
+  .iphone_icon {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-}
-
-.iphone_icon {
+    gap: 30px;
+    height: 100%;
+  }
+  
+  .Banner {
+    flex: 1;
     display: flex;
-    align-items: flex-start;
-    gap: 24px;
-}
-
-h1 {
-    font-size: 48px;
-}
-
-.anh img {
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .Banner::after {
+    content: "";
+    position: absolute;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(to right, #d4af37, transparent);
+    bottom: -15px;
+    left: 0;
+  }
+  
+  .Banner h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #333;
+    line-height: 1.2;
+    position: relative;
+    display: inline-block;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .Banner h1::first-letter {
+    color: #d4af37;
+  }
+  
+  .Banner h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 25px;
+    color: #666;
+    line-height: 1.5;
+    max-width: 90%;
+    position: relative;
+    padding-left: 15px;
+    border-left: 3px solid #d4af37;
+    text-align: left;
+  }
+  
+  .anh {
+    flex: 1;
     display: flex;
     align-items: center;
-    width: 396px;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .anh::before {
+    content: "";
+    position: absolute;
+    width: 300px;
     height: 300px;
-    padding-bottom: 50px;
-}
-
-.shop_now {
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 1;
+  }
+  
+  .anh img {
+    display: block;
+    width: 100%;
+    max-width: 396px;
+    height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    padding-bottom: 0;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+    transition: all 0.5s ease;
+    transform: perspective(1000px) rotateY(-5deg);
+    image-rendering: -webkit-optimize-contrast;
+  }
+  
+  .anh img:hover {
+    transform: perspective(1000px) rotateY(0deg) scale(1.03);
+  }
+  
+  .shop_now {
     display: flex;
     align-items: center;
-    padding-left: 100px;
-    font-size: 20px;
-}
-
-.shop_now a {
-    color: plum;
+    margin-top: 25px;
+    font-size: 18px;
+  }
+  
+  .shop_now a {
+    display: inline-block;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    color: white;
     text-decoration: none;
-    font-weight: bold;
-}
-
-img {
+    font-weight: 600;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+  
+  .shop_now a::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s ease;
+    z-index: -1;
+  }
+  
+  .shop_now a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(212, 175, 55, 0.4);
+    color: white;
+  }
+  
+  .shop_now a:hover::before {
+    left: 100%;
+  }
+  
+  img {
     width: 100%;
     height: auto;
     object-fit: contain;
     image-rendering: -webkit-optimize-contrast;
-
-
-}
+  }
+  
+  /* Responsive */
+  @media (max-width: 992px) {
+    .banner {
+      height: auto;
+      min-height: 400px;
+    }
+  
+    .Banner h1 {
+      font-size: 36px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .Up {
+      padding: 40px 15px;
+      gap: 30px;
+    }
+  
+    .banner {
+      padding: 0;
+    }
+  
+    .iphone_icon {
+      flex-direction: column;
+      gap: 20px;
+    }
+  
+    .Banner,
+    .anh {
+      width: 100%;
+    }
+  
+    .Banner {
+      text-align: center;
+      padding: 20px 0;
+    }
+  
+    .Banner::after {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  
+    .Banner h1 {
+      font-size: 32px;
+    }
+  
+    .Banner h2 {
+      font-size: 16px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 0;
+      border-left: none;
+      border-bottom: 2px solid #d4af37;
+      padding-bottom: 10px;
+      text-align: center;
+    }
+  
+    .anh img {
+      max-width: 300px;
+      height: 250px;
+    }
+  
+    .shop_now {
+      justify-content: center;
+      padding-left: 0;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .banner {
+      border-radius: 12px;
+    }
+  
+    .banner_text {
+      padding: 20px;
+    }
+  
+    .Banner h1 {
+      font-size: 28px;
+    }
+  
+    .Banner h2 {
+      font-size: 14px;
+    }
+  
+    .anh img {
+      max-width: 250px;
+      height: 200px;
+    }
+  
+    .shop_now a {
+      padding: 10px 25px;
+      font-size: 16px;
+    }
+  }
+  
