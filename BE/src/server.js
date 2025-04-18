@@ -15,7 +15,6 @@ const START_SERVER = () => {
   // Danh sách các origin được phép truy cập
 
   const allowedOrigins = [
-
     'https://thuonggia.ecotech2a.com',
     'https://tmdt-sxwh.vercel.app',
     'http://localhost:5173' // nếu đang test cục bộ
@@ -27,7 +26,7 @@ const START_SERVER = () => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true)
       } else {
-        callback(new Error('Not allowed by CORS'))
+        callback(new Error('Cấu hình cors đang chặn truy cập từ : ' + origin))
       }
     },
     credentials: true,

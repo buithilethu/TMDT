@@ -15,8 +15,6 @@ const payos = new PayOS(
 
 
 const createPaymentLink = async (req, res, next) => {
-  console.log(req.body)
-
   const userId = req.user.id
   const { address, phone, fullName, paymentMethod } = req.body
   // Kiểm tra thông tin
@@ -108,7 +106,6 @@ const createPaymentLink = async (req, res, next) => {
       return res.json({ url: paymentLinkResponse.checkoutUrl })
     }
   } catch (error) {
-    console.error('Lỗi khi xử lý đơn hàng:', error)
     await session.abortTransaction()
     session.endSession()
     return res.status(500).json({ message: 'Lỗi khi xử lý đơn hàng' })
@@ -123,9 +120,10 @@ const webhook = async (req, res, next) => {
 
   try {
     const orderCode = req.body.data.orderCode
-    const paymentCode = req.body.data.code  // Mã trạng thái thanh toán từ PayOS
-    const paymentDesc = req.body.data.desc  // Mô tả trạng thái thanh toán
+    const paymentCode = req.body.data.code// Mã trạng thái thanh toán từ PayOS
+    const paymentDesc = req.body.data.desc// Mô tả trạng thái thanh toán
 
+    res.status(200).json({ message: 'success' })
 
     const order = await orderModel.findOrderByOrderCode(orderCode, { session })
 
@@ -140,6 +138,7 @@ const webhook = async (req, res, next) => {
     } else {
       await orderModel.updateOrderInfoByOrderCode(orderCode, { status: 'cancelled' }, { session })
     }
+
 
     const cartItems = await cartItemModel.getCart(order.userId, { session })
 
