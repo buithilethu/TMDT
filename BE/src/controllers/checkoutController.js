@@ -98,8 +98,8 @@ const createPaymentLink = async (req, res, next) => {
         buyerPhone: phone,
         buyerAddress: address,
         items,
-        returnUrl: 'https://thuonggia.ecotech2a.com/orders',
-        cancelUrl: 'https://thuonggia.ecotech2a.com/ThanhToan'
+        returnUrl: 'http://localhost:5173/orders',
+        cancelUrl: 'http://localhost:5173/ThanhToan'
       }
 
       const paymentLinkResponse = await payos.createPaymentLink(body)
@@ -121,9 +121,7 @@ const webhook = async (req, res, next) => {
   try {
     const orderCode = req.body.data.orderCode
     const paymentCode = req.body.data.code// Mã trạng thái thanh toán từ PayOS
-    const paymentDesc = req.body.data.desc// Mô tả trạng thái thanh toán
-
-    res.status(200).json({ message: 'success' })
+    const paymentDesc = req.body.success// Mô tả trạng thái thanh toán
 
     const order = await orderModel.findOrderByOrderCode(orderCode, { session })
 
@@ -133,10 +131,11 @@ const webhook = async (req, res, next) => {
       return res.status(404).json({ message: 'Không tìm thấy đơn hàng' })
     }
 
-    if (paymentCode === '00' && paymentDesc === 'Thành công') {
+    if (paymentDesc) {
       await orderModel.updateOrderInfoByOrderCode(orderCode, { status: 'paid' }, { session })
     } else {
       await orderModel.updateOrderInfoByOrderCode(orderCode, { status: 'cancelled' }, { session })
+      return res.status(400).json({ message: 'Thanh toán không thành công' })
     }
 
 
@@ -151,13 +150,13 @@ const webhook = async (req, res, next) => {
     await orderShippingModel.updateStatusByOrderCode(orderCode, 'delivering', { session })
 
     // Xoá giỏ hàng
-    if(paymentCode === '00' && paymentDesc === 'Thành công') {
+    if( paymentDesc ) {
       await cartItemModel.clearUserCart(order.userId, { session }) 
     }
 
     await session.commitTransaction()
     session.endSession()
-
+    console.log('Transaction completed successfully')
     return res.json({ message: 'success' })
 
   } catch (error) {
