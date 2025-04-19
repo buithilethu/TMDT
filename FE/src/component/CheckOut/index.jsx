@@ -78,6 +78,22 @@ const Checkout = () => {
     }
   };
 
+  const groupedCartItems = Object.values(
+    cartItems.reduce((acc, item) => {
+      const productId = item.product._id;
+      if (!acc[productId]) {
+        acc[productId] = {
+          ...item,
+          variants: [{ ...item.variant, quantity: item.quantity }],
+        };
+      } else {
+        acc[productId].variants.push({ ...item.variant, quantity: item.quantity });
+      }
+      return acc;
+    }, {})
+  );
+
+
   return (
     <div className="Checkout">
       <Header cartItems={cartItems} />
@@ -126,25 +142,36 @@ const Checkout = () => {
           <div className="Payment">
             <table>
               <tbody>
-                {cartItems.map((item) => (
-                  <tr className="tr" key={item._id}>
+                {groupedCartItems.map((item) => (
+                  <tr className="tr" key={item.product._id}>
                     <td className="NameImg">
                       <img src={`${url}/${item.images[0]?.url}`} alt={item.product.name} />
                       <div>
-                        <p>{item.product.name}</p>
-                        <p className="variant">
-                          {Object.entries(item.variant.attributes).map(([key, value]) => (
-                            <span key={key}>{key}: {value} </span>
-                          ))}
-                        </p>
-                        <p>Số lượng: {item.quantity}</p>
+                        <p><strong>{item.product.name}</strong></p>
+                        {item.variants.map((variant, idx) => (
+                          <div key={idx} style={{ marginLeft: '1rem', marginTop: '0.5rem' }}>
+                            <p className="variant">
+                              {Object.entries(variant.attributes).map(([key, value]) => (
+                                <span key={key}>{key}: {value} </span>
+                              ))}
+                            </p>
+                            <p>Số lượng: {variant.quantity}</p>
+                            <p>Giá: {(variant.price * variant.quantity).toLocaleString()} VNĐ</p>
+                            {idx == item.variants.length - 2 && <hr style={{ margin: '0.5rem 0' }} />}
+                          </div>
+                        ))}
                       </div>
                     </td>
                     <td className="Price">
-                      {(item.variant.price * item.quantity).toLocaleString()} VNĐ
+                      <strong>
+                        Tổng: {item.variants
+                          .reduce((total, variant) => total + variant.price * variant.quantity, 0)
+                          .toLocaleString()} VNĐ
+                      </strong>
                     </td>
                   </tr>
                 ))}
+
 
                 <tr className="hr">
                   <td className="Name">Tạm tính:</td>

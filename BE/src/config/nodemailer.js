@@ -1,20 +1,23 @@
 import nodemailer from 'nodemailer'
+import jwt from 'jsonwebtoken'
 import { env } from '~/config/environment'
 
 // Gửi email
 export const sendEmail = async (data) => {
   // Cấu hình transporter (dùng Gmail SMTP + App Password)
   let mailOptions = {}
+
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'cfgamehay@gmail.com',         // Thay bằng Gmail của bạn
-      pass: 'zuja neel fbns wiyg'            // Là App Password 16 ký tự, không phải mật khẩu thường
+      user: env.NODEMAILER_USER,
+      pass: env.NODEMAILER_PASS
     }
   })
+
   const order = data.data
 
-const grouped = {}
+  const grouped = {}
 
   for (const item of order) {
     if (!grouped[item.productId]) {
@@ -105,3 +108,60 @@ const grouped = {}
   }
 }
 
+export const sendEmailResetPassword = async (data) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: env.NODEMAILER_USER,
+        pass: env.NODEMAILER_PASS
+      }
+    })
+
+    const { email, verificationLink } = data
+
+    console.log(email, verificationLink)
+
+    const info = await transporter.sendMail({
+      from: '"TDB JEWELRY" <yourgmail@gmail.com>',
+      to: email,
+      subject: 'Đặt lại mật khẩu',
+      html: `<h3>Vui lòng nhấn vào liên kết bên dưới chuyển hướng qua trang đặt lại mật khẩu:</h3>
+            <a href="${data.resetPasswordLink}">Đặt lại mật khẩu</a>`
+    })
+
+    console.log(info)
+
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const sendEmailVerifyAccount = async (data) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: env.NODEMAILER_USER,
+        pass: env.NODEMAILER_PASS
+      }
+    })
+
+    const { email, verificationLink } = data
+
+    console.log(email, verificationLink)
+
+    const info = await transporter.sendMail({
+      from: '"TDB JEWELRY" <yourgmail@gmail.com>',
+      to: email,
+      subject: 'Xác thực email',
+      html: `<h3>Vui lòng nhấn vào liên kết bên dưới để xác thực email:</h3>
+            <a href="${verificationLink}">Xác thực email</a>`
+    })
+
+    console.log(info)
+
+  } catch (err) {
+    console.error(err)
+  }
+}

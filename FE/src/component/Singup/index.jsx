@@ -4,14 +4,14 @@ import Cookies from 'js-cookie';
 import '../Singup/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
-import {url} from '../data.js'
- const Signup = () => {
+import { url } from '../data.js'
+const Signup = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate();
+  const [checkEmail, setCheckEmail] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,26 +45,18 @@ import {url} from '../data.js'
       }
 
       const data = await response.json();
-      console.log('Đăng ký thành công:', data);
+      if (data) {
+        setCheckEmail(true)
 
-      // Tạo userData từ dữ liệu đầu vào và phản hồi API (nếu có)
-      const userData = {
-        firstName,
-        lastName,
-        email,
-        ...(data.user || {}), // Nếu API trả về thông tin user
-        accessToken: data.accessToken || null, // Lưu token nếu API trả về
-      };
+        const response = await fetch(`${url}/v1/email/sendEmailVerify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+      }
 
-      // Lưu thông tin vào cookie
-      Cookies.set('user', JSON.stringify(userData), {
-        expires: 2,
-        secure: true,
-        sameSite: 'Strict',
-      });
 
-      // Chuyển hướng sang trang chủ
-      navigate('/');
+
     } catch (error) {
       console.error('Lỗi đăng ký:', error);
       setErrorMessage(error.message || 'Đã xảy ra lỗi, vui lòng thử lại');
@@ -119,14 +111,12 @@ import {url} from '../data.js'
               />
             </div>
             <div className="BtnCreate">
+              {errorMessage && <div className="error-message">{errorMessage}</div>}
+              {checkEmail && <div style={{ maxWidth: '250px' }} className="success-message">Đăng ký thành công! Hãy xác thực email bằng mã được gửi đến hộp thư.</div>}
               <div className="Create">
                 <button type="submit">Tạo tài khoản</button>
               </div>
               <div className="GroupDownSing">
-                <div className="googleSingin">
-                  <img src="/image/Singup/Icon-Google.png" alt="Biểu tượng Google" />
-                  <a href="https://www.google.com/">Đăng ký bằng Google</a>
-                </div>
                 <div className="Singin">
                   Đã có tài khoản? <Link to="/Dangnhap">Đăng nhập</Link>
                 </div>
@@ -134,7 +124,6 @@ import {url} from '../data.js'
             </div>
           </div>
         </form>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
       </div>
       <Footer />
     </div>

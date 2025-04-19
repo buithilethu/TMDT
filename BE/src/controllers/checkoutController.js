@@ -112,8 +112,8 @@ const createPaymentLink = async (req, res, next) => {
         buyerPhone: phone,
         buyerAddress: address,
         items,
-        returnUrl: 'https://thuonggiaapi.ecotech2a.com/orders',
-        cancelUrl: 'https://thuonggiaapi.ecotech2a.com/ThanhToan'
+        returnUrl: `${env.BASE_URL}/orders`,
+        cancelUrl: `${env.BASE_URL}/ThanhToan`
       }
 
       const paymentLinkResponse = await payos.createPaymentLink(body)
@@ -131,14 +131,15 @@ const createPaymentLink = async (req, res, next) => {
 
 
 const webhook = async (req, res, next) => {
+
+  console.log(req.body)
   const session = GET_CLIENT().startSession()
   session.startTransaction()
 
-
   try {
     const orderCode = req.body.data.orderCode
-    const paymentDesc = req.body.success// Mô tả trạng thái thanh toán
-
+    const paymentSuccess = req.body.success// Mô tả trạng thái thanh toán
+    const paymentDesc = req.body.desc
     const order = await orderModel.findOrderByOrderCode(orderCode, { session })
 
     if (!order) {
@@ -147,7 +148,7 @@ const webhook = async (req, res, next) => {
       return res.status(404).json({ message: 'Không tìm thấy đơn hàng' })
     }
 
-    if (paymentDesc) {
+    if (paymentSuccess || paymentDesc == 'success') {
       await orderModel.updateOrderInfoByOrderCode(orderCode, { status: 'paid' }, { session })
     } else {
       await orderModel.updateOrderInfoByOrderCode(orderCode, { status: 'cancelled' }, { session })
@@ -167,7 +168,7 @@ const webhook = async (req, res, next) => {
 
     // Xoá giỏ hàng
     if ( paymentDesc ) {
-      await cartItemModel.clearUserCart(order.userId, { session } ) 
+      await cartItemModel.clearUserCart(order.userId, { session } )
     }
 
     await session.commitTransaction()

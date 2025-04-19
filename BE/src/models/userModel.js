@@ -18,8 +18,9 @@ const registerUser = async (userData) => {
     const emailIsExist = await findOne({ email: value.email })
 
     if (emailIsExist) {
-      throw new Error('Email already exists')
+      throw new Error('Email đã tồn tại vui lòng đăng nhập hoặc sử dụng email khác')
     }
+    value.isEnabled = false
     const user = await GET_DB().collection(USER_COLLECTION_NAME).insertOne(value)
 
     return user
@@ -45,10 +46,31 @@ const findOneById = async (userId) => {
     throw new Error(error)
   }
 }
+
+const activeUser = async (email) => {
+  try {
+    const user = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate({ email: email }, { $set: { isEnabled: true } })
+    return user
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const resetPassword = async (email, password) => {
+  try {
+    const user = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate({ email: email }, { $set: { password: password } })
+    return user
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
   registerUser,
   findOne,
-  findOneById
+  findOneById,
+  activeUser,
+  resetPassword
 }
