@@ -19,7 +19,10 @@ export const env ={
 
   PAYOS_CLIENT_ID: process.env.PAYOS_CLIENT_ID,
   PAYOS_API_KEY: process.env.PAYOS_API_KEY,
-  PAYOS_CHECKSUM_KEY: process.env.PAYOS_CHECKSUM_KEY
+  PAYOS_CHECKSUM_KEY: process.env.PAYOS_CHECKSUM_KEY,
+
+  NODEMAILER_USER: process.env.NODEMAILER_USER,
+  NODEMAILER_PASS: process.env.NODEMAILER_PASS
 }
 
 //lưu trữ biến môi trường trong file .env

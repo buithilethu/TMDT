@@ -6,6 +6,9 @@ import { orderModel } from '~/models/orderModel'
 import { userModel } from '~/models/userModel'
 import { orderShippingModel } from '~/models/orderShippingModel'
 import { GET_CLIENT } from '~/config/mongodb'
+import { sendEmail } from '~/config/nodemailer'
+import { GET_DB } from '~/config/mongodb'
+import { ObjectId } from 'mongodb'
 
 const payos = new PayOS(
   env.PAYOS_CLIENT_ID,
@@ -32,7 +35,7 @@ const createPaymentLink = async (req, res, next) => {
     return res.status(404).json({ message: 'Giỏ hàng trống' })
   }
 
-  const YOUR_DOMAIN = env.BASE_URL
+
   //Tạo danh sách sản phẩm
   const items = cartItems.map(item => ({
     name: `${item.product.name} - (${Object.values(item.variant.attributes).join(', ')})`,
@@ -77,18 +80,29 @@ const createPaymentLink = async (req, res, next) => {
       { session }
     )
 
+    const itemsWithDetails = await Promise.all(orderItems.map(async item => {
+      const variant = await GET_DB().collection('variants').findOne({ _id: new ObjectId(item.variantId) })
+      const product = await GET_DB().collection('products').findOne({ _id: new ObjectId(item.productId) })
+
+      return {
+        ...item,
+        productName: product?.name || 'Không rõ sản phẩm',
+        variantAttributes: variant?.attributes || {},
+        stock: variant?.stock ?? 0
+      }
+    }))
+
     if (paymentMethod === 'Cash') {
       // Xoá giỏ hàng
       await cartItemModel.clearUserCart(userId, { session })
 
       await session.commitTransaction()
       session.endSession()
-
+      sendEmail( { method:paymentMethod, data: itemsWithDetails, emailTo: user.email, orderCode: orderCode } )
       return res.status(200).json({ message: 'Đặt hàng thành công với COD' })
     } else {
       await session.commitTransaction()
       session.endSession()
-
       // Nếu là thanh toán qua ngân hàng → tạo link
       const body = {
         orderCode,
@@ -98,11 +112,14 @@ const createPaymentLink = async (req, res, next) => {
         buyerPhone: phone,
         buyerAddress: address,
         items,
-        returnUrl: 'http://localhost:5173/orders',
-        cancelUrl: 'http://localhost:5173/ThanhToan'
+        returnUrl: 'https://thuonggiaapi.ecotech2a.com/orders',
+        cancelUrl: 'https://thuonggiaapi.ecotech2a.com/ThanhToan'
       }
 
       const paymentLinkResponse = await payos.createPaymentLink(body)
+
+      sendEmail( { method:paymentMethod, data: itemsWithDetails, emailTo: user.email, orderCode: orderCode, paymentLink: paymentLinkResponse.checkoutUrl } )
+
       return res.json({ url: paymentLinkResponse.checkoutUrl })
     }
   } catch (error) {
@@ -120,7 +137,6 @@ const webhook = async (req, res, next) => {
 
   try {
     const orderCode = req.body.data.orderCode
-    const paymentCode = req.body.data.code// Mã trạng thái thanh toán từ PayOS
     const paymentDesc = req.body.success// Mô tả trạng thái thanh toán
 
     const order = await orderModel.findOrderByOrderCode(orderCode, { session })
@@ -150,14 +166,14 @@ const webhook = async (req, res, next) => {
     await orderShippingModel.updateStatusByOrderCode(orderCode, 'delivering', { session })
 
     // Xoá giỏ hàng
-    if( paymentDesc ) {
-      await cartItemModel.clearUserCart(order.userId, { session }) 
+    if ( paymentDesc ) {
+      await cartItemModel.clearUserCart(order.userId, { session } ) 
     }
 
     await session.commitTransaction()
     session.endSession()
-    console.log('Transaction completed successfully')
-    return res.json({ message: 'success' })
+
+    return res.status(200).json({ message: 'Thanh toán thành công' }) // Trả về trang chủ hoặc trang khác sau khi thanh toán thành công
 
   } catch (error) {
     console.error('Transaction failed:', error)
