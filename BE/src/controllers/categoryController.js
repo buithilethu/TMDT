@@ -8,6 +8,8 @@ const create = async (req, res, next) => {
   try {
     //(req.body) => {name: 'abc'}
     //req.file => {filename: imageFile}
+
+    console.log(req.files)
     const createCategory = await categoryService.create(req.body)
     if (!req.file) throw new Error('Danh mục không có hình ảnh')
     await imageService.create(createCategory.insertedId.toString(), req.file, req.body.name)

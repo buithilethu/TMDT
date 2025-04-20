@@ -135,16 +135,14 @@ const Cart = () => {
   };
 
   const removeItem = async (id) => {
-    const token = getCookie('token');
-    if (isLoggedIn && token) {
-      try {
-        await fetch(`${url}/v1/cart/deleteItem/${id}`, {
-          method: 'DELETE',
-          credentials: 'include',
-        });
-      } catch (err) {
-        console.error('Lỗi khi xóa item:', err);
-      }
+
+    try {
+      await fetch(`${url}/v1/cart/deleteItem/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Lỗi khi xóa item:', err);
     }
 
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));

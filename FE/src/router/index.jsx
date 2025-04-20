@@ -5,6 +5,7 @@ import Contact from "../component/Contact/index.jsx";
 import Singup from "../component/Singup/index.jsx";
 import Login from "../component/Login/index.jsx";
 import Cart from "../component/Cart/index.jsx";
+import LoginAdmin from "../component/Login/loginAdmin.jsx";
 import Checkout from "../component/CheckOut/index.jsx";
 import ProductDetail from "../component/HomePage/ProductDetails/index.jsx";
 import SetupProfile from "../component/UserProfile/index.jsx";
@@ -13,6 +14,8 @@ import ProductList from "../component/ProductList/index.jsx";
 import SearchResults from "../component/Search/index.jsx";
 import InvoicePage from "../component/Order/index.jsx";
 import AdminOrders from "../component/AdminOrder/index.jsx";
+import ResetPassword from "../component/ResetPassword/index.jsx";
+import ForgotPassword from "../component/FogotPassword/index.jsx";
 
 const router = createBrowserRouter([
     {
@@ -71,6 +74,18 @@ const router = createBrowserRouter([
         path: "/admin/orders",
         element: <AdminOrders />
     },
+    {
+        path: "/admin/dangnhap",
+        element: <LoginAdmin />
+    },
+    {
+        path: "/reset-password",
+        element: <ResetPassword />
+    },
+    {
+        path: "/forgot-password",
+        element: <ForgotPassword />
+    }
 
 
 ]);

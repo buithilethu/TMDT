@@ -3,7 +3,7 @@ import { env } from '~/config/environment'
 //xác thực người dùng
 const authorizedMiddleware = (req, res, next) => {
   const token = req.cookies.token
-  console.log(token)
+
   if (!token) {
     return res.status(401).json({ message: 'Please login!', isSuccess: false })
   }

@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import '../Login/style.css';
 import Header from '../HomePage/Header';
 import Footer from '../HomePage/Footer';
 import { url } from '../data.js'
+import { useSearchParams } from 'react-router-dom';
+import ForgotPassword from '../FogotPassword/index.jsx';
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [searchParams] = useSearchParams();
+  const message = searchParams.get('message');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -74,6 +79,7 @@ const Login = () => {
           <div className="GroupLogIn">
             <div className="GroupTextLogin">
               <div className="Text1">Đăng nhập</div>
+              <div className='Text2'>{message}</div>
               <div className="Text2">Nhập thông tin của bạn dưới đây</div>
             </div>
             <div className="GroupInputLogin">
@@ -99,12 +105,13 @@ const Login = () => {
               </div>
             </div>
           </div>
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
+
           <div className="BtnLogIn">
             <button type="submit">Đăng nhập</button>
-            <a href="#">Quên mật khẩu?</a>
+            <Link to='/Forgot-password'>Quên mật khẩu?</Link>
           </div>
         </form>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
       </div>
       <Footer />
     </div>

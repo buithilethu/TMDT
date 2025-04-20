@@ -11,6 +11,8 @@ import { userProfileRoute } from './userProfileRoute'
 import { orderRoute } from './orderRoute'
 import { variantRoute } from './variantRoute'
 import { orderShippingRoute } from './orderShippingRoute'
+import { EmailHellperRoute } from './emailHellperRoute'
+
 const Router = express.Router()
 
 Router.get('/status', (req, res) => {
@@ -28,6 +30,7 @@ Router.use('/profile', userProfileRoute )
 Router.use('/orders', orderRoute)
 Router.use('/variants', variantRoute)
 Router.use('/shipping', orderShippingRoute)
+Router.use('/email', EmailHellperRoute)
 
 export const APIsV1 = Router
 
